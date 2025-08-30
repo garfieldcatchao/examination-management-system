@@ -1,0 +1,106 @@
+.header-container {
+  grid-column: 1 / -1;
+  background-color: #2c3e50;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  height: 60px;
+}
+
+.system-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.system-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+}
+
+.system-version {
+  font-size: 12px;
+  background-color: #3498db;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.nav-path {
+  font-size: 14px;
+  margin-left: 20px;
+  color: white;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 20px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* tongzhi */
+
+@font-face {
+  font-family: "iconfont"; /* Project id 5010215 */
+  src: url("//at.alicdn.com/t/a/font_5010215_rlnjsdnksw.woff2?t=1756493912662")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5010215_rlnjsdnksw.woff?t=1756493912662")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5010215_rlnjsdnksw.ttf?t=1756493912662")
+      format("truetype");
+}
+
+.icon-tongzhi:before {
+  content: "\e61e";
+}
+
+.icon-tongzhi-copy:before {
+  content: "\e61f";
+}
+
+/* zhanghutouxiang */
+
+@font-face {
+  font-family: "iconfont"; /* Project id 5010214 */
+  src: url("//at.alicdn.com/t/a/font_5010214_obwxfln27gh.woff2?t=1756493653157")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5010214_obwxfln27gh.woff?t=1756493653157")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5010214_obwxfln27gh.ttf?t=1756493653157")
+      format("truetype");
+}
+
+.icon-zhanghutouxiang:before {
+  content: "\e609";
+}
+
+/* setting */
+
+@font-face {
+  font-family: "iconfont"; /* Project id 5010213 */
+  src: url("//at.alicdn.com/t/a/font_5010213_neo9zxe4bjs.woff2?t=1756494030468")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5010213_neo9zxe4bjs.woff?t=1756494030468")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5010213_neo9zxe4bjs.ttf?t=1756494030468")
+      format("truetype");
+}
+
+.icon-yunyingpeizhi:before {
+  content: "\e631";
+}
+
+.icon-yunyingpeizhi-copy:before {
+  content: "\e632";
+}

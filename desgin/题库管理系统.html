@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题库管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+        }
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        .filter-section {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        select, input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-width: 120px;
+        }
+        .question-list {
+            padding: 0;
+        }
+        .question-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px;
+            transition: background 0.2s;
+        }
+        .question-item:hover {
+            background: #f9f9f9;
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .question-type {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .question-content {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .question-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 13px;
+            color: #95a5a6;
+            margin: 10px 0;
+        }
+        .question-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .question-actions .btn {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 15px;
+            font-size: 14px;
+        }
+        .pagination a {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #3498db;
+        }
+        .pagination a.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        .star-rating {
+            color: #f39c12;
+        }
+        .tag {
+            background: #e8f4fc;
+            color: #3498db;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部标题 -->
+        <div class="header">📚 题库管理 - Question Bank Management</div>
+        
+        <!-- 功能按钮区 -->
+        <div class="action-bar">
+            <button class="btn btn-primary">➕ 新增题目</button>
+            <button class="btn btn-secondary">📁 批量导入</button>
+            <button class="btn btn-secondary">📊 题库统计</button>
+            <button class="btn btn-secondary">🔍 高级搜索</button>
+            <button class="btn btn-secondary">⚙️ 批量操作</button>
+        </div>
+        
+        <!-- 筛选条件区 -->
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-item">学科: <select><option>全部</option><option>计算机网络</option><option>数据结构</option></select></div>
+                <div class="filter-item">题型: <select><option>全部</option><option>单选</option><option>多选</option></select></div>
+                <div class="filter-item">难度: <select><option>全部</option><option>简单</option><option>中等</option></select></div>
+                <div class="filter-item">状态: <select><option>已发布</option><option>草稿</option></select></div>
+            </div>
+            <div class="filter-row">
+                <div class="filter-item">关键词: <input type="text" placeholder="输入关键词"></div>
+                <button class="btn btn-secondary">🔍 搜索</button>
+                <button class="btn btn-secondary">🔄 重置</button>
+                <button class="btn btn-secondary">💾 保存筛选</button>
+            </div>
+        </div>
+        
+        <!-- 题目列表区 -->
+        <div class="question-list">
+            <!-- 题目1 -->
+            <div class="question-item">
+                <div class="question-header">
+                    <div class="question-type">
+                        <input type="checkbox">
+                        <span>📝 [单选]</span>
+                        <span>计算机网络</span>
+                        <span class="star-rating">⭐⭐⭐</span>
+                        <span>中等</span>
+                        <span>| 创建: 2024-03-10</span>
+                    </div>
+                </div>
+                <div class="question-content">
+                    <strong>题目:</strong> TCP协议和UDP协议的主要区别是什么？
+                </div>
+                <div class="question-meta">
+                    <span><strong>选项:</strong> A.可靠性 B.连接性 C.效率 D.以上都是</span>
+                    <span><strong>答案:</strong> D</span>
+                    <div>
+                        <strong>标签:</strong>
+                        <span class="tag">传输层</span>
+                        <span class="tag">协议对比</span>
+                        <span class="tag">常考题</span>
+                    </div>
+                    <div>
+                        <strong>统计:</strong> 使用25次 | 正确率78% | 区分度0.45
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn btn-secondary">✏️ 编辑</button>
+                    <button class="btn btn-secondary">👁️ 预览</button>
+                    <button class="btn btn-secondary">📋 复制</button>
+                    <button class="btn btn-secondary">📊 详细统计</button>
+                    <button class="btn btn-secondary">🗑️ 删除</button>
+                </div>
+            </div>
+            
+            <!-- 题目2 -->
+            <div class="question-item">
+                <div class="question-header">
+                    <div class="question-type">
+                        <input type="checkbox">
+                        <span>📝 [多选]</span>
+                        <span>数据结构</span>
+                        <span class="star-rating">⭐⭐⭐⭐</span>
+                        <span>困难</span>
+                        <span>| 创建: 2024-03-08</span>
+                    </div>
+                </div>
+                <div class="question-content">
+                    <strong>题目:</strong> 以下哪些排序算法的时间复杂度为O(n²)？
+                </div>
+                <div class="question-meta">
+                    <span><strong>选项:</strong> A.冒泡排序 B.选择排序 C.插入排序 D.快速排序</span>
+                    <span><strong>答案:</strong> A,B,C</span>
+                    <div>
+                        <strong>标签:</strong>
+                        <span class="tag">排序算法</span>
+                        <span class="tag">时间复杂度</span>
+                        <span class="tag">难点</span>
+                    </div>
+                    <div>
+                        <strong>统计:</strong> 使用15次 | 正确率45% | 区分度0.62
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn btn-secondary">✏️ 编辑</button>
+                    <button class="btn btn-secondary">👁️ 预览</button>
+                    <button class="btn btn-secondary">📋 复制</button>
+                    <button class="btn btn-secondary">📊 详细统计</button>
+                    <button class="btn btn-secondary">🗑️ 删除</button>
+                </div>
+            </div>
+            
+            <!-- 可添加更多题目... -->
+        </div>
+        
+        <!-- 分页导航 -->
+        <div class="pagination">
+            <a href="#">&laquo;</a>
+            <a href="#" class="active">1</a>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <a href="#">5</a>
+            <a href="#">&raquo;</a>
+            <span style="margin-left: 20px;">每页显示: <select><option>10</option><option>20</option></select></span>
+        </div>
+    </div>
+
+    <script>
+        // 这里可以添加交互逻辑，例如：
+        // 1. 筛选功能
+        // 2. 批量操作
+        // 3. 分页加载
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                console.log(`点击了按钮: ${this.textContent.trim()}`);
+            });
+        });
+    </script>
+</body>
+</html>

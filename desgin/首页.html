@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能考试管理系统 - 教师端</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --warning-color: #e74c3c;
+            --info-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* 顶部导航栏 */
+        .header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .system-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .greeting {
+            font-weight: 300;
+        }
+        
+        /* 主菜单 */
+        .main-menu {
+            background-color: white;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 20px;
+        }
+        
+        .menu-list {
+            display: flex;
+            list-style: none;
+            gap: 15px;
+        }
+        
+        .menu-item {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .menu-item:hover {
+            background-color: var(--light-color);
+        }
+        
+        /* 主要内容区 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 20px;
+        }
+        
+        /* 左侧面板 */
+        .left-panel {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        /* 卡片基础样式 */
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 15px;
+        }
+        
+        .card-header {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 教师信息卡 */
+        .teacher-card {
+            height: 100%;
+        }
+        
+        .teacher-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .teacher-name {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .teacher-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            font-size: 0.9em;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .achievements {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .badge {
+            background-color: var(--light-color);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* 效率分析卡 */
+        .efficiency-card {
+            height: 100%;
+        }
+        
+        .efficiency-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .efficiency-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .efficiency-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .comparison {
+            font-size: 0.8em;
+            color: #7f8c8d;
+        }
+        
+        .arrow-up {
+            color: var(--secondary-color);
+        }
+        
+        .arrow-right {
+            color: #f39c12;
+        }
+        
+        /* 学生表现卡 */
+        .student-card {
+            height: 100%;
+        }
+        
+        .class-stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        .class-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        
+        .class-item:nth-child(1) {
+            background-color: rgba(46, 204, 113, 0.1);
+        }
+        
+        .class-item:nth-child(2) {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .class-item:nth-child(3) {
+            background-color: rgba(243, 156, 18, 0.1);
+        }
+        
+        .attention-students {
+            margin-top: 15px;
+        }
+        
+        .attention-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* 右侧面板 */
+        .right-panel {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        /* 工作概览卡 */
+        .work-overview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .urgent-tasks, .exam-monitor {
+            height: 100%;
+        }
+        
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        .upcoming-exams {
+            margin-top: 15px;
+        }
+        
+        .exam-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        /* AI助手卡 */
+        .ai-assistant {
+            height: 100%;
+        }
+        
+        .ai-suggestions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        .suggestion-item {
+            padding: 10px;
+            border-radius: 4px;
+            background-color: var(--light-color);
+        }
+        
+        .prediction-item {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: rgba(155, 89, 182, 0.1);
+        }
+        
+        /* 快速操作面板 */
+        .quick-actions {
+            grid-column: 1 / -1;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .work-overview {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .menu-list {
+                flex-wrap: wrap;
+            }
+            
+            .action-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <div class="header">
+            <div class="system-title">
+                <span>🎓</span>
+                <h2>智能考试管理系统 - 教师端</h2>
+            </div>
+            <div class="greeting">👋 早上好，张教授!</div>
+        </div>
+        
+        <!-- 主菜单 -->
+        <div class="main-menu">
+            <ul class="menu-list">
+                <li class="menu-item">🏠 工作台</li>
+                <li class="menu-item">📚 题库</li>
+                <li class="menu-item">📋 试卷</li>
+                <li class="menu-item">🎯 考试</li>
+                <li class="menu-item">📊 成绩</li>
+                <li class="menu-item">📈 分析</li>
+                <li class="menu-item">⚙️ 设置</li>
+            </ul>
+        </div>
+        
+        <!-- 主要内容区 -->
+        <div class="main-content">
+            <!-- 左侧面板 -->
+            <div class="left-panel">
+                <!-- 教师信息卡 -->
+                <div class="card teacher-card">
+                    <div class="card-header">👨‍🏫 教师信息卡</div>
+                    <div class="teacher-info">
+                        <div class="teacher-name">张教授</div>
+                        <div>工号: T20210001</div>
+                        <div>学院: 计算机科学与技术</div>
+                        <div>职称: 副教授</div>
+                        <div>任教课程: 4门</div>
+                        
+                        <div class="teacher-stats">
+                            <div class="stat-item">
+                                <span class="stat-value">1,240</span>
+                                <span>管理题目</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">23</span>
+                                <span>创建试卷</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">15</span>
+                                <span>组织考试</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">128</span>
+                                <span>学生总数</span>
+                            </div>
+                        </div>
+                        
+                        <div class="achievements">
+                            <div class="badge">🎯优秀教师</div>
+                            <div class="badge">💡创新奖</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 效率分析卡 -->
+                <div class="card efficiency-card">
+                    <div class="card-header">📈 AI效率提升统计</div>
+                    <div class="efficiency-stats">
+                        <div class="efficiency-item">
+                            <div class="efficiency-value">90%</div>
+                            <div>智能组卷节省时间</div>
+                            <div class="comparison">原4小时 → 现30分钟</div>
+                        </div>
+                        <div class="efficiency-item">
+                            <div class="efficiency-value">95%</div>
+                            <div>自动阅卷准确率</div>
+                        </div>
+                        <div class="efficiency-item">
+                            <div class="efficiency-value">100%</div>
+                            <div>学情分析覆盖</div>
+                        </div>
+                        <div class="efficiency-item">
+                            <div class="efficiency-value">92%</div>
+                            <div>学生满意度</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <a href="#" style="font-size: 0.9em; color: var(--primary-color);">[📊 详细报告]</a>
+                        <a href="#" style="font-size: 0.9em; color: var(--primary-color); margin-left: 15px;">[🎯 优化建议]</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧面板 -->
+            <div class="right-panel">
+                <!-- 工作概览卡 -->
+                <div class="card">
+                    <div class="card-header">📅 今日工作安排 (2024-03-15)</div>
+                    <div class="work-overview">
+                        <!-- 紧急待办 -->
+                        <div class="urgent-tasks">
+                            <div class="card-header">🔴 紧急待办</div>
+                            <div class="task-list">
+                                <div class="task-item">
+                                    <span>期末考试阅卷 (还剩67份)</span>
+                                    <span>🔥</span>
+                                </div>
+                                <div class="task-item">
+                                    <span>下周考试安排确认</span>
+                                    <span>⏰</span>
+                                </div>
+                            </div>
+                            
+                            <div class="card-header" style="margin-top: 15px;">📝 今日考试监控</div>
+                            <div class="task-item">
+                                <span>🔴 计算机网络期末 (45人参加)</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                                <span>⏰ 剩余时间: 01:23:45</span>
+                                <span>📊 已提交: 88% | 异常: 2人</span>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button style="padding: 5px 10px; background: var(--light-color); border: none; border-radius: 4px; cursor: pointer;">[👁️ 实时监控]</button>
+                                <button style="padding: 5px 10px; background: var(--light-color); border: none; border-radius: 4px; cursor: pointer;">[⚠️ 处理异常]</button>
+                            </div>
+                            
+                            <div class="upcoming-exams">
+                                <div class="card-header">⏰ 即将开始</div>
+                                <div class="exam-item">
+                                    <span>数据库原理测试 (19:00-20:30)</span>
+                                    <span>👥 报名32人</span>
+                                </div>
+                                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                    <button style="padding: 5px 10px; background: var(--light-color); border: none; border-radius: 4px; cursor: pointer;">[⚙️ 考试设置]</button>
+                                    <button style="padding: 5px 10px; background: var(--light-color); border: none; border-radius: 4px; cursor: pointer;">[👥 学生管理]</button>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 15px;">
+                                <div class="card-header">✅ 已完成</div>
+                                <div class="task-item" style="background-color: rgba(46, 204, 113, 0.1);">
+                                    <span>操作系统期中 (平均分: 76.8分)</span>
+                                </div>
+                                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                    <button style="padding: 5px 10px; background: var(--light-color); border: none; border-radius: 4px; cursor: pointer;">[📊 查看详情]</button>
+                                    <button style="padding: 5px 10px; background: var(--light-color); border: none; border-radius: 4px; cursor: pointer;">[📋 成绩发布]</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- AI助手 -->
+                        <div class="ai-assistant">
+                            <div class="card-header">🤖 今日AI建议</div>
+                            <div class="ai-suggestions">
+                                <div class="suggestion-item">
+                                    <div>📊 基于数据分析建议:</div>
+                                    <div>• 建议为薄弱班级增加练习题</div>
+                                    <div>• 下次组卷可适当提升难度</div>
+                                    <div>• 推荐关注3名学习困难学生</div>
+                                </div>
+                                
+                                <div class="card-header" style="margin-top: 15px;">🎯 智能推荐</div>
+                                <div class="suggestion-item">
+                                    <div>• 新题目: 网络安全5道新题可用</div>
+                                    <div>• 试卷模板: 期末标准模板更新</div>
+                                    <div>• 教学资源: 新增可视化教学工具</div>
+                                </div>
+                                
+                                <div class="prediction-item">
+                                    <div>🔮 预测分析:</div>
+                                    <div>下次期末平均分: 80±5分</div>
+                                    <div>及格率预估: 92%</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 15px;">
+                                <a href="#" style="font-size: 0.9em; color: var(--primary-color);">[🤖 更多建议]</a>
+                                <a href="#" style="font-size: 0.9em; color: var(--primary-color); margin-left: 15px;">[📊 详细分析]</a>
+                                <a href="#" style="font-size: 0.9em; color: var(--primary-color); margin-left: 15px;">[⚙️ AI设置]</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 学生表现卡 -->
+                <div class="card student-card">
+                    <div class="card-header">👥 班级学情分析</div>
+                    <div class="class-stats">
+                        <div class="class-item">
+                            <span>计科21-1班</span>
+                            <span>平均82分 <span class="arrow-up">↗️</span></span>
+                        </div>
+                        <div class="class-item">
+                            <span>计科21-2班</span>
+                            <span>平均78分 <span class="arrow-up">↗️</span></span>
+                        </div>
+                        <div class="class-item">
+                            <span>计科21-3班</span>
+                            <span>平均76分 <span class="arrow-right">→</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="attention-students">
+                        <div class="card-header">⚠️ 需要关注的学生</div>
+                        <div class="attention-item">
+                            <span>• 李XX</span>
+                            <span>连续2次不及格</span>
+                        </div>
+                        <div class="attention-item">
+                            <span>• 王XX</span>
+                            <span>成绩波动较大</span>
+                        </div>
+                        <div class="attention-item">
+                            <span>• 张XX</span>
+                            <span>缺考次数过多</span>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 15px;">
+                            <button style="padding: 5px 10px; background: var(--light-color); border: none; border-radius: 4px; cursor: pointer;">[👥 学生详情]</button>
+                            <button style="padding: 5px 10px; background: var(--light-color); border: none; border-radius: 4px; cursor: pointer;">[📧 发送提醒]</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 快速操作面板 -->
+                <div class="card quick-actions">
+                    <div class="card-header">🚀 常用功能</div>
+                    <div class="action-grid">
+                        <button class="action-btn">
+                            <span>➕</span>
+                            <span>新增题目</span>
+                        </button>
+                        <button class="action-btn">
+                            <span>📝</span>
+                            <span>创建试卷</span>
+                        </button>
+                        <button class="action-btn">
+                            <span>🤖</span>
+                            <span>智能组卷</span>
+                        </button>
+                        <button class="action-btn">
+                            <span>🎯</span>
+                            <span>发布考试</span>
+                        </button>
+                        <button class="action-btn">
+                            <span>📊</span>
+                            <span>成绩管理</span>
+                        </button>
+                        <button class="action-btn">
+                            <span>📈</span>
+                            <span>教学分析</span>
+                        </button>
+                        <button class="action-btn">
+                            <span>👥</span>
+                            <span>学生管理</span>
+                        </button>
+                        <button class="action-btn">
+                            <span>⚙️</span>
+                            <span>系统设置</span>
+                        </button>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                        <button style="padding: 8px 15px; background: var(--light-color); border: none; border-radius: 4px; cursor: pointer;">[📱 移动端]</button>
+                        <button style="padding: 8px 15px; background: var(--light-color); border: none; border-radius: 4px; cursor: pointer;">[📞 技术支持]</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

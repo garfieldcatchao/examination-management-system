@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>考试提交确认</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+    body {
+      background: #f5f7fa;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .confirmation-panel {
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+    .header {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header h1 {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .content {
+      padding: 24px;
+    }
+    .section {
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .stats-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      background: #f9f9f9;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px dashed #eee;
+    }
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+    .stat-label {
+      color: #666;
+    }
+    .stat-value {
+      font-weight: 500;
+    }
+    .success { color: #27ae60; }
+    .error { color: #e74c3c; }
+    .warning { color: #f39c12; }
+    .reminder-card {
+      background: #fff8e1;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .reminder-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .reminder-item::before {
+      content: "•";
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    .note-section {
+      margin-top: 20px;
+    }
+    .note-box {
+      width: 100%;
+      min-height: 80px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: white;
+      font-size: 0.95rem;
+      resize: vertical;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary {
+      background: #f1f1f1;
+      color: #333;
+    }
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+    .btn-primary {
+      background: #27ae60;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #219653;
+    }
+    .btn-warning {
+      background: #f39c12;
+      color: white;
+    }
+    .btn-warning:hover {
+      background: #d35400;
+    }
+    .timer {
+      background: #ffebee;
+      border: 1px solid #ef9a9a;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="confirmation-panel">
+    <!-- 标题栏 -->
+    <div class="header">
+      <span>⚠️</span>
+      <h1>考试提交确认 - Exam Submission Confirmation</h1>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="content">
+      <!-- 答题统计 -->
+      <div class="section">
+        <div class="section-title">
+          <span>📊</span>
+          <span>答题情况统计</span>
+        </div>
+        <div class="stats-card">
+          <div class="stat-row">
+            <span class="stat-label">总题数</span>
+            <span class="stat-value">24题</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">已答题</span>
+            <span class="stat-value success">22题 ✅</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">未答题</span>
+            <span class="stat-value error">2题 ❌ (第15题、第18题)</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">标记疑问</span>
+            <span class="stat-value warning">3题 ❓ (第6题、第12题、第20题)</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">剩余时间</span>
+            <span class="stat-value timer">⏰ 00:23:15</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 重要提醒 -->
+      <div class="section">
+        <div class="section-title">
+          <span>⚠️</span>
+          <span>重要提醒</span>
+        </div>
+        <div class="reminder-card">
+          <div class="reminder-item">您还有 2 道题未作答，未答题将按0分计算</div>
+          <div class="reminder-item">您还有 3 道题标记为疑问，建议检查确认</div>
+          <div class="reminder-item">提交后将不能修改答案，请仔细检查</div>
+          <div class="reminder-item">系统会在考试时间结束时自动提交</div>
+        </div>
+      </div>
+
+      <!-- 提交说明 -->
+      <div class="section note-section">
+        <div class="section-title">
+          <span>📝</span>
+          <span>提交说明</span>
+        </div>
+        <textarea class="note-box" placeholder="如有技术问题或特殊情况说明，请在此填写:"></textarea>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="actions">
+        <button class="btn btn-secondary">⬅️ 返回继续答题</button>
+        <button class="btn btn-warning">❓ 查看未答题</button>
+        <button class="btn btn-primary">✅ 确认提交</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

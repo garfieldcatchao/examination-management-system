@@ -1,0 +1,86 @@
+.login-container {
+  background: linear-gradient(135deg, #1a2a6c, #3a7bd5, #00d2ff);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #333;
+  padding: 20px;
+  background-image: url("https://i.postimg.cc/FzPnSZJq/login.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.login-box {
+  background-image: url("https://i.postimg.cc/kMwgFCnd/login-Panel.png");
+  background-size: cover;
+  background-position: left;
+  background-repeat: no-repeat;
+  width: 460px;
+  height: 460px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  margin-left: 653px;
+  margin-top: -8px;
+}
+
+.login-box-label h1 {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1a2a6c;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.login-box-label p {
+  color: #666;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.role-selector {
+  display: flex;
+  justify-content: space-around;
+  /* background: #f5f7fa; */
+  padding: 12px;
+  border-radius: 8px;
+  margin: 10px 70px 0;
+}
+
+.role-btn {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 40px;
+}
+
+.remember-checkbox {
+}
+
+.forgot-password {
+  color: #838282;
+  cursor: pointer;
+}
+
+.remember-forgot-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.active {
+  background: #9dc4fa;
+  color: #fff;
+}

@@ -1,0 +1,1 @@
+export const isTrue = (v: any) => `${v}` === "true";

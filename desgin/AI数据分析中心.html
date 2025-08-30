@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI数据分析中心</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #f5f7fa;
+      color: #333;
+      padding: 20px;
+    }
+    .dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #6e8efb, #a777e3);
+      color: white;
+      padding: 16px 24px;
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .content {
+      padding: 20px;
+    }
+    .panel {
+      margin-bottom: 24px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .panel h2 {
+      background: #f0f2f5;
+      padding: 12px 16px;
+      font-size: 1.1rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .card {
+      padding: 16px;
+    }
+    .card h3 {
+      margin: 12px 0;
+      color: #444;
+      font-size: 0.95rem;
+    }
+    .metrics p {
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+    .highlight {
+      color: #2a6496;
+      font-weight: bold;
+    }
+    .bar-chart {
+      margin: 16px 0;
+    }
+    .bar {
+      height: 24px;
+      margin: 4px 0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      color: white;
+      font-size: 0.8rem;
+      padding-left: 8px;
+    }
+    .bar:nth-child(1) { background: #4CAF50; width: 12%; }
+    .bar:nth-child(2) { background: #2196F3; width: 35%; }
+    .bar:nth-child(3) { background: #FFC107; width: 40%; }
+    .bar:nth-child(4) { background: #FF9800; width: 13%; }
+    .bar:nth-child(5) { background: #F44336; width: 3%; }
+    .issue-list {
+      list-style: none;
+    }
+    .issue-list li {
+      padding: 8px;
+      margin: 4px 0;
+      border-radius: 4px;
+    }
+    .warning {
+      background: #fff3e0;
+      border-left: 3px solid #ff9800;
+    }
+    .success {
+      background: #e8f5e9;
+      border-left: 3px solid #4CAF50;
+    }
+    .action-buttons {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+    }
+    .btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .btn-primary {
+      background: #4a6bdf;
+      color: white;
+    }
+    .btn-secondary {
+      background: #e0e0e0;
+    }
+    .footer-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- 标题栏 -->
+    <header class="header">
+      <h1>📈 AI数据分析中心 - Intelligent Analytics Dashboard</h1>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="content">
+      <!-- 成绩预测模型 -->
+      <section class="panel">
+        <h2>🎯 成绩预测模型</h2>
+        <div class="card">
+          <h3>🤖 基于历史数据预测本次考试成绩分布:</h3>
+          <div class="metrics">
+            <p>预测平均分: <span class="highlight">78.5 ± 3.2分</span> (95%置信区间: 75.3-81.7)</p>
+            <p>及格率预测: <span class="highlight">87% (±5%)</span></p>
+            <p>优秀率预测: <span class="highlight">23% (±3%)</span></p>
+          </div>
+          <h3>📊 分数段分布预测:</h3>
+          <div class="bar-chart">
+            <div class="bar"><span>90-100分: 12%</span></div>
+            <div class="bar"><span>80-89分: 35%</span></div>
+            <div class="bar"><span>70-79分: 40%</span></div>
+            <div class="bar"><span>60-69分: 13%</span></div>
+            <div class="bar"><span>0-59分: 3%</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 题目质量分析 -->
+      <section class="panel">
+        <h2>🔍 题目质量AI分析</h2>
+        <div class="card">
+          <h3>📋 题目效度分析结果:</h3>
+          <ul class="issue-list">
+            <li class="warning">第3题: 区分度0.21 ⚠️ 建议修改 (区分度过低)</li>
+            <li class="warning">第7题: 难度系数0.95 ⚠️ 过于简单，建议增加难度</li>
+            <li class="success">第15题: 区分度0.58 ✅ 优秀题目</li>
+            <li class="warning">第18题: 与第12题相关系数0.89 ⚠️ 内容重复度高</li>
+          </ul>
+          <h3>🎯 AI优化建议:</h3>
+          <ul class="issue-list">
+            <li>• 建议替换低质量题目3道</li>
+            <li>• 整体难度适中，建议保持</li>
+            <li>• 知识点覆盖均衡度: 85%</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 学习行为洞察 -->
+      <section class="panel">
+        <h2>👥 学习行为洞察</h2>
+        <div class="card">
+          <h3>🧠 AI发现的学习模式:</h3>
+          <h4>高分学生特征:</h4>
+          <ul>
+            <li>• 平均答题时间: 2.3分钟/题</li>
+            <li>• 返回检查次数: 平均3.2次</li>
+            <li>• 切屏行为: 几乎无</li>
+          </ul>
+          <h4>需要帮助的学生:</h4>
+          <ul>
+            <li>• 识别出5名存在学习困难的学生</li>
+            <li>• 主要薄弱点: [网络协议], [数据结构]</li>
+            <li>• 建议制定个性化辅导计划</li>
+          </ul>
+          <div class="action-buttons">
+            <button class="btn btn-primary">📧 发送个性化学习建议</button>
+            <button class="btn btn-secondary">📋 生成辅导计划</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 底部操作栏 -->
+      <div class="footer-actions">
+        <button class="btn btn-secondary">📊 详细报告</button>
+        <button class="btn btn-secondary">🔄 刷新分析</button>
+        <button class="btn btn-secondary">📤 导出数据</button>
+        <button class="btn btn-secondary">⚙️ 模型设置</button>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

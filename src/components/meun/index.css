@@ -1,0 +1,111 @@
+.menu-container {
+  padding: 10px 10px;
+}
+
+.siderbar-menu-item {
+  color: #ffffff;
+  display: flex;
+  flex-direction: row;
+  /* justify-content: center; */
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  gap: 10px;
+}
+
+.menu-item-label {
+  cursor: pointer;
+}
+
+@font-face {
+  font-family: "iconfont"; /* Project id 5010219 */
+  src: url("//at.alicdn.com/t/a/font_5010219_c6ofbyzov7.woff2?t=1756497336621")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5010219_c6ofbyzov7.woff?t=1756497336621")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5010219_c6ofbyzov7.ttf?t=1756497336621")
+      format("truetype");
+}
+
+@font-face {
+  font-family: "iconfont"; /* Project id 5010219 */
+  src: url("//at.alicdn.com/t/a/font_5010219_xpwi81tsd1.woff2?t=1756531234337")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5010219_xpwi81tsd1.woff?t=1756531234337")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5010219_xpwi81tsd1.ttf?t=1756531234337")
+      format("truetype");
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 24px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-tongjifenxi2:before {
+  content: "\e64b";
+}
+
+.icon-kuaisu:before {
+  content: "\e63a";
+}
+
+.icon-xueyuan-kaoshi:before {
+  content: "\e6c3";
+}
+
+.icon-mianshishijuan:before {
+  content: "\e61c";
+}
+
+.icon-xitongshezhi:before {
+  content: "\e601";
+}
+
+.icon-chengji:before {
+  content: "\e699";
+}
+
+.icon-tikuguanli:before {
+  content: "\e641";
+}
+
+.icon-gongzuotai:before {
+  content: "\e602";
+}
+
+.siderbar-menu-item:hover {
+  background-color: #34495e;
+}
+
+.icon-zhankai2:before {
+  content: "\ed22";
+}
+
+.icon-shouqi:before {
+  content: "\e6b8";
+}
+
+.icon-zhankai:before {
+  content: "\e685";
+}
+
+.menu-item-fold {
+  cursor: pointer;
+}
+
+.menu-item-child {
+  background-color: #393d49;
+}
+
+.siderbar-menu-item-active {
+  background-color: #34495e;
+  cursor: pointer;
+}
+
+.menu-item-link{
+    text-decoration: none;
+}

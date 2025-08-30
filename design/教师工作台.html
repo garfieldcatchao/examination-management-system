@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能考试管理系统 - 教师工作台</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: grid;
+            grid-template-rows: 60px 50px 1fr 30px;
+            grid-template-columns: 250px 1fr;
+            height: 100vh;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            grid-column: 1 / -1;
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .system-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .system-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .version {
+            font-size: 12px;
+            background-color: #3498db;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .nav-path {
+            font-size: 14px;
+            margin-left: 20px;
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .action-icon {
+            cursor: pointer;
+            font-size: 20px;
+        }
+        
+        /* 全局搜索栏 */
+        .search-bar {
+            grid-column: 1 / -1;
+            background-color: #34495e;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-container {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            max-width: 600px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .theme-toggle {
+            margin-left: 15px;
+            cursor: pointer;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            grid-row: 3 / 4;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+        }
+        
+        .user-profile {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .user-college {
+            font-size: 13px;
+            color: #bdc3c7;
+        }
+        
+        .menu {
+            flex: 1;
+            margin-top: 15px;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .menu-item:hover {
+            background-color: #34495e;
+        }
+        
+        .menu-item.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .submenu {
+            background-color: #34495e;
+            display: none;
+        }
+        
+        .submenu-item {
+            padding: 10px 20px 10px 45px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .submenu-item:hover {
+            background-color: #3d566e;
+        }
+        
+        .quick-actions {
+            padding: 15px 20px;
+            border-top: 1px solid #34495e;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .quick-action {
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            grid-row: 3 / 4;
+            grid-column: 2 / 3;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2c3e50;
+        }
+        
+        .welcome-text {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-left: 40px;
+        }
+        
+        .date-info {
+            text-align: right;
+            color: #7f8c8d;
+        }
+        
+        .date {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        /* 概览卡片组 */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .overview-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .overview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .card-icon {
+            font-size: 24px;
+        }
+        
+        .card-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .card-content {
+            color: #7f8c8d;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .card-action {
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s;
+        }
+        
+        .action-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        /* 考试监控区域 */
+        .exam-monitor {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .monitor-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .monitor-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .exam-item {
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+        
+        .exam-item:hover {
+            border-color: #3498db;
+        }
+        
+        .exam-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .exam-title {
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .exam-status {
+            background-color: #e74c3c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .exam-status.upcoming {
+            background-color: #f39c12;
+        }
+        
+        .exam-status.completed {
+            background-color: #2ecc71;
+        }
+        
+        .exam-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .exam-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .exam-btn {
+            padding: 5px 12px;
+            border: 1px solid #bdc3c7;
+            background-color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .exam-btn:hover {
+            background-color: #ecf0f1;
+        }
+        
+        .exam-btn.primary {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+        
+        .exam-btn.primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .exam-btn.danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+            color: white;
+        }
+        
+        .exam-btn.danger:hover {
+            background-color: #c0392b;
+        }
+        
+        /* 活动记录和快速操作 */
+        .bottom-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .activity-log {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .activity-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .activity-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: #95a5a6;
+            min-width: 60px;
+        }
+        
+        .activity-content {
+            flex: 1;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .quick-operations {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .operations-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .operations-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .operation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .operation-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .operation-btn:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .operation-btn .material-icons {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #3498db;
+        }
+        
+        .operation-text {
+            font-size: 13px;
+            color: #495057;
+        }
+        
+        /* 底部信息 */
+        .footer {
+            grid-column: 1 / -1;
+            background-color: #2c3e50;
+            color: #bdc3c7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 12px;
+        }
+        
+        .status-ok {
+            color: #2ecc71;
+            margin-left: 5px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .overview-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .bottom-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: fixed;
+                left: -250px;
+                z-index: 1000;
+                transition: left 0.3s;
+            }
+            
+            .sidebar.mobile-open {
+                left: 0;
+            }
+            
+            .main-content {
+                grid-column: 1 / 2;
+            }
+            
+            .exam-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .operation-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .live-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        /* 通知徽章 */
+        .notification-badge {
+            position: relative;
+        }
+        
+        .notification-badge::after {
+            content: attr(data-count);
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: white;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <div class="system-info">
+            <span class="system-title">智能考试管理系统</span>
+            <span class="version">v1.0</span>
+            <span class="nav-path">首页 > 教师后台 > 工作台</span>
+        </div>
+        <div class="user-actions">
+            <span class="material-icons action-icon notification-badge" data-count="3">notifications</span>
+            <span class="material-icons action-icon">account_circle</span>
+            <span class="material-icons action-icon">settings</span>
+        </div>
+    </div>
+    
+    <!-- 全局搜索栏 -->
+    <div class="search-bar">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="全局搜索...">
+        </div>
+        <span class="material-icons theme-toggle">dark_mode</span>
+    </div>
+    
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <div class="user-profile">
+            <div class="user-name">👨‍🏫 张老师</div>
+            <div class="user-college">计算机学院</div>
+        </div>
+        
+        <div class="menu">
+            <div class="menu-item active">
+                <span class="material-icons">dashboard</span>
+                <span>工作台</span>
+            </div>
+            <div class="menu-item">
+                <span class="material-icons">menu_book</span>
+                <span>题库管理</span>
+            </div>
+            <div class="menu-item">
+                <span class="material-icons">description</span>
+                <span>试卷管理</span>
+            </div>
+            <div class="menu-item">
+                <span class="material-icons">edit_calendar</span>
+                <span>考试管理</span>
+            </div>
+            <div class="menu-item">
+                <span class="material-icons">insert_chart</span>
+                <span>成绩管理</span>
+            </div>
+            <div class="menu-item">
+                <span class="material-icons">bar_chart</span>
+                <span>统计分析</span>
+            </div>
+            <div class="menu-item">
+                <span class="material-icons">settings</span>
+                <span>系统设置</span>
+            </div>
+            
+            <div class="menu-item" onclick="toggleSubmenu(this)">
+                <span class="material-icons">rocket_launch</span>
+                <span>快速操作</span>
+                <span class="material-icons" style="margin-left: auto; font-size: 16px;">expand_more</span>
+            </div>
+            <div class="submenu">
+                <div class="submenu-item">• 新增题目</div>
+                <div class="submenu-item">• 创建考试</div>
+                <div class="submenu-item">• 查看待办</div>
+            </div>
+        </div>
+        
+        <div class="quick-actions">
+            <span class="material-icons quick-action">refresh</span>
+            <span class="material-icons quick-action">file_download</span>
+            <span class="material-icons quick-action">help</span>
+        </div>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div>
+                <div class="page-title">
+                    <span class="material-icons">dashboard</span>
+                    <span>我的工作台 - Teacher Dashboard</span>
+                </div>
+                <div class="welcome-text">👋 早上好，张老师!</div>
+            </div>
+            <div class="date-info">
+                <div class="date">🗓️ 2024年3月15日</div>
+                <div>星期五</div>
+            </div>
+        </div>
+        
+        <!-- 概览卡片组 -->
+        <div class="overview-cards">
+            <!-- 今日概览 -->
+            <div class="overview-card">
+                <div class="card-header">
+                    <span class="material-icons card-icon" style="color: #3498db;">today</span>
+                    <span class="card-title">今日概览</span>
+                </div>
+                <div class="card-content">
+                    <div class="stat-item">
+                        <span>📅 今日考试:</span>
+                        <span class="stat-value">2场</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>⏰ 进行中:</span>
+                        <span class="stat-value">1场</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📝 待阅卷:</span>
+                        <span class="stat-value">45份</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>✅ 已完成:</span>
+                        <span class="stat-value">12份</span>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <button class="action-btn">📊 详细统计</button>
+                </div>
+            </div>
+            
+            <!-- 快速统计 -->
+            <div class="overview-card">
+                <div class="card-header">
+                    <span class="material-icons card-icon" style="color: #2ecc71;">assessment</span>
+                    <span class="card-title">快速统计</span>
+                </div>
+                <div class="card-content">
+                    <div class="stat-item">
+                        <span>📝 我的题目:</span>
+                        <span class="stat-value">156题</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📋 试卷总数:</span>
+                        <span class="stat-value">23份</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>👥 学生总数:</span>
+                        <span class="stat-value">128人</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📈 及格率:</span>
+                        <span class="stat-value">87.5%</span>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <button class="action-btn">📋 查看详情</button>
+                </div>
+            </div>
+            
+            <!-- 待办事项 -->
+            <div class="overview-card">
+                <div class="card-header">
+                    <span class="material-icons card-icon" style="color: #e74c3c;">schedule</span>
+                    <span class="card-title">待办事项</span>
+                </div>
+                <div class="card-content">
+                    <div style="color: #e74c3c; font-weight: bold; margin-bottom: 10px;">⏰ 急需处理</div>
+                    <div style="margin: 8px 0; font-size: 14px;">
+                        • 期末考试阅卷<br>
+                        <span style="color: #e74c3c;">还剩67份</span>
+                    </div>
+                    <div style="margin: 8px 0; font-size: 14px;">
+                        • 下周考试安排<br>
+                        <span style="color: #f39c12;">需要确认</span>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <button class="action-btn">📝 查看全部</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 考试状态监控 -->
+        <div class="exam-monitor">
+            <div class="monitor-header">
+                <span class="material-icons live-indicator" style="color: #e74c3c;">fiber_manual_record</span>
+                <span class="monitor-title">考试状态监控</span>
+            </div>
+            
+            <!-- 进行中的考试 -->
+            <div class="exam-item">
+                <div class="exam-header">
+                    <div class="exam-title">
+                        <span class="exam-status">进行中</span>
+                        <span>📚 计算机网络期末考试</span>
+                    </div>
+                </div>
+                <div class="exam-info">
+                    <span>👥 45人参加</span>
+                    <span>⏰ 剩余时间: 01:23:45</span>
+                    <span>💯 总分: 100分</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 88%;"></div>
+                </div>
+                <div style="font-size: 14px; color: #7f8c8d; margin: 5px 0;">
+                    状态: 88%已提交 | 异常: 🚨2人切屏异常 ⚠️3人答题时间过短
+                </div>
+                <div class="exam-actions">
+                    <button class="exam-btn primary">👁️ 实时监控</button>
+                    <button class="exam-btn">📊 查看详情</button>
+                    <button class="exam-btn danger">⚠️ 处理异常</button>
+                </div>
+            </div>
+            
+            <!-- 即将开始的考试 -->
+            <div class="exam-item">
+                <div class="exam-header">
+                    <div class="exam-title">
+                        <span class="exam-status upcoming">即将开始</span>
+                        <span>📘 数据库原理测验</span>
+                    </div>
+                </div>
+                <div class="exam-info">
+                    <span>👥 32人报名</span>
+                    <span>⏰ 19:00-20:30</span>
+                    <span>💯 总分: 80分</span>
+                </div>
+                <div style="font-size: 14px; color: #7f8c8d; margin: 10px 0;">
+                    距离开始: 3小时45分钟 | 试卷已就绪
+                </div>
+                <div class="exam-actions">
+                    <button class="exam-btn primary">⚙️ 考试设置</button>
+                    <button class="exam-btn">👥 学生管理</button>
+                    <button class="exam-btn">🔄 同步数据</button>
+                </div>
+            </div>
+            
+            <!-- 已完成的考试 -->
+            <div class="exam-item">
+                <div class="exam-header">
+                    <div class="exam-title">
+                        <span class="exam-status completed">已完成</span>
+                        <span>📗 操作系统期中考试</span>
+                    </div>
+                </div>
+                <div class="exam-info">
+                    <span>👥 42人参加</span>
+                    <span>📊 平均分: 76.8分</span>
+                    <span>📈 及格率: 85.7%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%; background-color: #2ecc71;"></div>
+                </div>
+                <div style="font-size: 14px; color: #7f8c8d; margin: 5px 0;">
+                    阅卷进度: 100%完成 | 最高分: 98分 | 最低分: 32分
+                </div>
+                <div class="exam-actions">
+                    <button class="exam-btn">📊 成绩详情</button>
+                    <button class="exam-btn">📋 成绩单</button>
+                    <button class="exam-btn primary">📧 发布成绩</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部区域 -->
+        <div class="bottom-section">
+            <!-- 最近活动 -->
+            <div class="activity-log">
+                <div class="activity-header">
+                    <span class="material-icons" style="color: #3498db;">history</span>
+                    <span class="activity-title">最近活动记录</span>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">3小时前</div>
+                    <div class="activity-content">完成了"数据结构测验"的阅卷 (30份)</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">昨天16:30</div>
+                    <div class="activity-content">发布了"操作系统期末考试"</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">前天14:20</div>
+                    <div class="activity-content">导入了50道新题目到题库</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">3天前</div>
+                    <div class="activity-content">创建了"网络协议专项练习"试卷</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-time">4天前</div>
+                    <div class="activity-content">修改了考试"计算机组成原理"的时间安排</div>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="action-btn">📋 查看全部记录</button>
+                </div>
+            </div>
+            
+            <!-- 快速操作 -->
+            <div class="quick-operations">
+                <div class="operations-header">
+                    <span class="material-icons" style="color: #2ecc71;">flash_on</span>
+                    <span class="operations-title">快速操作</span>
+                </div>
+                <div class="operation-grid">
+                    <div class="operation-btn">
+                        <span class="material-icons">add_circle</span>
+                        <div class="operation-text">新增题目</div>
+                    </div>
+                    <div class="operation-btn">
+                        <span class="material-icons">description</span>
+                        <div class="operation-text">创建试卷</div>
+                    </div>
+                    <div class="operation-btn">
+                        <span class="material-icons">event</span>
+                        <div class="operation-text">发布考试</div>
+                    </div>
+                    <div class="operation-btn">
+                        <span class="material-icons">grade</span>
+                        <div class="operation-text">查看成绩</div>
+                    </div>
+                    <div class="operation-btn">
+                        <span class="material-icons">auto_awesome</span>
+                        <div class="operation-text">智能组卷</div>
+                    </div>
+                    <div class="operation-btn">
+                        <span class="material-icons">settings</span>
+                        <div class="operation-text">系统设置</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部信息 -->
+    <div class="footer">
+        <div>© 2024 智能考试管理系统</div>
+        <div>在线用户: 1,234 | 服务器状态: <span class="material-icons status-ok">fiber_manual_record</span> 正常</div>
+    </div>
+    
+    <script>
+        function toggleSubmenu(element) {
+            const submenu = element.nextElementSibling;
+            const isExpanded = submenu.style.display === 'block';
+            
+            // 关闭所有其他子菜单
+            document.querySelectorAll('.submenu').forEach(menu => {
+                menu.style.display = 'none';
+            });
+            
+            // 切换当前子菜单
+            if (!isExpanded) {
+                submenu.style.display = 'block';
+            }
+            
+            // 切换图标
+            const icon = element.querySelector('.material-icons:last-child');
+            icon.textContent = isExpanded ? 'expand_more' : 'expand_less';
+        }
+        
+        // 点击页面其他区域关闭子菜单
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.menu-item') || !e.target.closest('.menu-item').nextElementSibling) {
+                document.querySelectorAll('.submenu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+                
+                // 重置所有菜单图标
+                document.querySelectorAll('.menu-item .material-icons:last-child').forEach(icon => {
+                    icon.textContent = 'expand_more';
+                });
+            }
+        });
+        
+        // 自动更新时间
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN');
+            document.querySelector('.date').innerHTML = `🗓️ ${timeString.split(' ')[0]}`;
+        }
+        
+        // 每分钟更新一次时间
+        setInterval(updateTime, 60000);
+        
+        // 模拟实时数据更新
+        function updateExamData() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const currentWidth = parseInt(bar.style.width);
+                if (currentWidth < 100) {
+                    bar.style.width = (currentWidth + Math.random() * 2) + '%';
+                }
+            });
+        }
+        
+        // 每30秒更新考试数据
+        setInterval(updateExamData, 30000);
+        
+        // 移动端侧边栏切换
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('mobile-open');
+        }
+        
+        // 响应式处理
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.querySelector('.sidebar').classList.remove('mobile-open');
+            }
+        });
+    </script>
+</body>
+</html>

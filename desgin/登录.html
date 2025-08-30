@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能考试管理系统 - 登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a7bd5, #00d2ff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+        }
+
+        .left-section {
+            flex: 1;
+            padding: 40px;
+            background: linear-gradient(145deg, #f5f7fa 0%, #e4e8eb 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1a2a6c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-logo::before {
+            content: "🎓";
+            margin-right: 15px;
+            font-size: 2.8rem;
+        }
+
+        .features {
+            margin: 30px 0;
+        }
+
+        .features h3 {
+            color: #3a7bd5;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .features ul {
+            list-style: none;
+        }
+
+        .features li {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .features li::before {
+            content: "•";
+            color: #00d2ff;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .stats {
+            background: rgba(58, 123, 213, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .stats h3 {
+            color: #1a2a6c;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .right-section {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            flex: 1;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            color: #1a2a6c;
+            font-size: 1.8rem;
+        }
+
+        .login-header p {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3a7bd5;
+            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2);
+        }
+
+        .role-selector {
+            display: flex;
+            justify-content: space-around;
+            margin: 25px 0;
+            background: #f5f7fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .role-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .role-btn:hover,
+        .role-btn.active {
+            background: #3a7bd5;
+            color: white;
+            border-color: #3a7bd5;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #1a2a6c, #3a7bd5);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(58, 123, 213, 0.4);
+        }
+
+        .or-divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+            color: #888;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .or-divider::before {
+            left: 0;
+        }
+
+        .or-divider::after {
+            right: 0;
+        }
+
+        .alt-login-methods {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .alt-login-btn {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .alt-login-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .register-link a {
+            color: #3a7bd5;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 0 10px;
+        }
+
+        .footer {
+            background: #f5f7fa;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .footer-item {
+            margin: 5px 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+            background: #4CAF50;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-section,
+            .right-section {
+                padding: 30px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 左侧品牌区域 -->
+        <div class="left-section">
+            <div>
+                <div class="brand-logo">智能考试管理系统</div>
+                <p style="font-size: 1.1rem; color: #555;">Intelligent Exam System</p>
+
+                <div class="features">
+                    <h3>🎯 核心特色</h3>
+                    <ul>
+                        <li>AI智能组卷</li>
+                        <li>自动阅卷评分</li>
+                        <li>防作弊监控</li>
+                        <li>个性化分析</li>
+                    </ul>
+                </div>
+
+                <div class="stats">
+                    <h3>📊 系统数据</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div>服务学校</div>
+                            <div style="font-weight: bold; color: #1a2a6c;">500+所</div>
+                        </div>
+                        <div class="stat-item">
+                            <div>注册用户</div>
+                            <div style="font-weight: bold; color: #1a2a6c;">50万+人</div>
+                        </div>
+                        <div class="stat-item">
+                            <div>考试场次</div>
+                            <div style="font-weight: bold; color: #1a2a6c;">10万+场</div>
+                        </div>
+                        <div class="stat-item">
+                            <div>智能阅卷准确率</div>
+                            <div style="font-weight: bold; color: #1a2a6c;">99.2%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features">
+                <h3>🌟 最新更新 v2.1.0</h3>
+                <ul>
+                    <li>语音识别防作弊</li>
+                    <li>多语言试卷支持</li>
+                    <li>云端题库同步</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 右侧登录区域 -->
+        <div class="right-section">
+            <div class="login-card">
+                <div class="login-header">
+                    <h2>🔐 系统登录</h2>
+                    <p>欢迎回来！请登录账户</p>
+                </div>
+
+                <div class="role-selector">
+                    <div class="role-btn active">👨‍🏫 教师</div>
+                    <div class="role-btn">👨‍🎓 学生</div>
+                    <div class="role-btn">👑 管理员</div>
+                </div>
+
+                <form>
+                    <div class="form-group">
+                        <label>用户名/邮箱:</label>
+                        <input type="text" class="form-control" placeholder="📧 请输入用户名或邮箱">
+                    </div>
+
+                    <div class="form-group">
+                        <label>密码:</label>
+                        <input type="password" class="form-control" placeholder="🔒 请输入密码">
+                    </div>
+
+                    <div class="remember-forgot">
+                        <label>
+                            <input type="checkbox" style="margin-right: 5px;"> 记住登录状态
+                        </label>
+                        <a href="#" style="color: #3a7bd5; text-decoration: none;">🔗 忘记密码?</a>
+                    </div>
+
+                    <button type="submit" class="login-btn">
+                        🚀 立即登录
+                    </button>
+                </form>
+
+                <div class="or-divider">──── 或者 ────</div>
+
+                <div class="alt-login-methods">
+                    <div class="alt-login-btn">📱扫码</div>
+                    <div class="alt-login-btn">🎓统一认证</div>
+                    <div class="alt-login-btn">📧邮箱</div>
+                    <div class="alt-login-btn">📱短信</div>
+                </div>
+
+                <div class="register-link">
+                    📝 还没有账户?
+                    <a href="#">🔗 立即注册</a> |
+                    <a href="#">🎯 演示</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部信息栏 -->
+    <div class="footer">
+        <div class="footer-item">© 2024 智能考试管理系统</div>
+        <div class="footer-item">🌐 多语言</div>
+        <div class="footer-item">📱 移动端</div>
+        <div class="footer-item">📞 技术支持</div>
+        <div class="footer-item">🔒 数据安全认证</div>
+        <div class="footer-item">🏆 教育部推荐</div>
+        <div class="footer

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生登录 - Student Login</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .login-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            width: 800px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .content {
+            display: flex;
+            padding: 20px;
+        }
+        .login-card {
+            flex: 3;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+        .welcome {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .welcome h3 {
+            margin: 0 0 10px 0;
+            color: #4a6fa5;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .school-select {
+            display: flex;
+            align-items: center;
+        }
+        .school-select select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .checkbox-group label {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        .login-btn {
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .login-btn:hover {
+            background-color: #3a5a8f;
+        }
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #999;
+        }
+        .alt-login {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .alt-login-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .alt-login-btn:hover {
+            background-color: #eee;
+        }
+        .alt-login-btn i {
+            margin-right: 5px;
+        }
+        .sidebar {
+            flex: 1;
+            padding: 20px;
+        }
+        .sidebar-link {
+            color: #4a6fa5;
+            text-decoration: none;
+            display: block;
+            margin: 10px 0;
+        }
+        .features {
+            margin-top: 30px;
+        }
+        .features-title {
+            color: #4a6fa5;
+            margin-bottom: 10px;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .feature-list i {
+            margin-right: 8px;
+            color: #4a6fa5;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .footer-links a {
+            margin: 0 15px;
+            color: #666;
+            text-decoration: none;
+        }
+        .footer-contact {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="header">🎓 学生登录 - Student Login</div>
+        
+        <div class="content">
+            <div class="login-card">
+                <div class="welcome">
+                    <h3><i class="fas fa-graduation-cap"></i> 欢迎回来，同学！</h3>
+                    <p>开启你的智能学习之旅</p>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-book"></i> 学生账户登录</label>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> 学号/用户名:</label>
+                    <input type="text" class="form-control" placeholder="请输入学号或用户名 (如: 2021001)">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> 密码:</label>
+                    <input type="password" class="form-control" placeholder="请输入密码">
+                    <span style="float: right; margin-top: -25px; color: #999;"><i class="fas fa-eye"></i></span>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-school"></i> 选择学校:</label>
+                    <div class="school-select">
+                        <select>
+                            <option>北京理工大学</option>
+                            <option>清华大学</option>
+                            <option>北京大学</option>
+                        </select>
+                        <button style="background: none; border: none; color: #4a6fa5; cursor: pointer;">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">☑️ 保持登录状态 (7天)</label>
+                    <a href="#" style="margin-left: auto; color: #4a6fa5;">🔗 忘记密码?</a>
+                </div>
+                
+                <button class="login-btn">📖 立即登录</button>
+                
+                <div class="divider">─────────── 其他登录方式 ───────────</div>
+                
+                <div class="alt-login">
+                    <button class="alt-login-btn"><i class="fas fa-mobile-alt"></i> 手机验证</button>
+                    <button class="alt-login-btn"><i class="fas fa-envelope"></i> 邮箱登录</button>
+                    <button class="alt-login-btn"><i class="fas fa-id-card"></i> 一卡通</button>
+                    <button class="alt-login-btn"><i class="fab fa-weixin"></i> 微信登录</button>
+                    <button class="alt-login-btn"><i class="fas fa-id-badge"></i> 统一认证</button>
+                    <button class="alt-login-btn"><i class="fas fa-fingerprint"></i> 指纹登录</button>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="form-group">
+                    <label>💡 新同学？</label>
+                    <a href="#" class="sidebar-link">📝 立即注册学生账户</a>
+                    <a href="#" class="sidebar-link">🎯 访客体验</a>
+                </div>
+                
+                <div class="features">
+                    <div class="features-title">📚 学生专属服务:</div>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-bullseye"></i> 🎯 个性化学习分析</li>
+                        <li><i class="fas fa-chart-line"></i> 📊 智能成绩跟踪</li>
+                        <li><i class="fas fa-book-open"></i> 📚 错题智能整理</li>
+                        <li><i class="fas fa-robot"></i> 🤖 AI学习助手</li>
+                        <li><i class="fas fa-mobile-alt"></i> 📱 移动端随时学</li>
+                        <li><i class="fas fa-trophy"></i> 🏆 学习成就系统</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-lock"></i> 安全登录</a>
+                <a href="#"><i class="fas fa-mobile-alt"></i> 下载APP</a>
+            </div>
+            <div class="footer-contact">
+                📞 学生客服: 400-123-1001
+            </div>
+        </div>
+    </div>
+</body>
+</html>《系统工程理论与实践》
