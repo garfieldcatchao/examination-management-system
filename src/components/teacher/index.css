@@ -1,14 +1,16 @@
-.teacher-container{
-    height: 100vh;  /* 使用视口高度 */
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;  /* 防止整体滚动 */
+.teacher-container {
+  height: 100vh; /* 使用视口高度 */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* overflow: hidden;  防止整体滚动 */
 }
 
-.teacher-container-content{
-    display: flex;
-    flex-direction: row;
-    flex: 1;  /* 占据剩余空间，自动计算高度 */
-    overflow: hidden;  /* 防止内容区滚动 */
+.teacher-container-content {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
 }
