@@ -1,0 +1,9 @@
+.examination-paper-container{
+    width: 100%;
+    padding: 20px;
+    overflow-y: scroll;
+}
+
+.examination-paper-container::-webkit-scrollbar{
+    display: none;
+}

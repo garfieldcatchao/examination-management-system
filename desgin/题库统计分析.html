@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题库统计分析 - 题库管理系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* 主容器 */
+        .analytics-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 页面头部 */
+        .page-header {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 24px 32px;
+            margin-bottom: 16px;
+            border-left: 4px solid #1890ff;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .title-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .title-left i {
+            font-size: 24px;
+            color: #1890ff;
+        }
+
+        .title-left h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .title-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .page-description {
+            color: #8c8c8c;
+            font-size: 14px;
+            margin-left: 36px;
+        }
+
+        /* 工具栏 */
+        .analytics-toolbar {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 16px 24px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #1890ff;
+            font-weight: 500;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        .filter-toggle:hover {
+            color: #40a9ff;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+
+        .filter-toggle.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .time-range-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .range-btn {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #595959;
+            transition: all 0.3s;
+        }
+
+        .range-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .range-btn.active {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: #fff;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: #595959;
+            border-color: #d9d9d9;
+        }
+
+        .btn-secondary:hover {
+            color: #1890ff;
+            border-color: #1890ff;
+        }
+
+        /* 筛选面板 */
+        .filter-panel {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, opacity 0.3s ease;
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .filter-panel.expanded {
+            max-height: 300px;
+            opacity: 1;
+        }
+
+        .filter-content {
+            padding: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+        }
+
+        .filter-select {
+            padding: 8px 32px 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") no-repeat right 8px center/20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-select:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+            outline: none;
+        }
+
+        /* 概览统计卡片 */
+        .overview-section {
+            margin-bottom: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 24px;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card.primary {
+            border-left-color: #1890ff;
+        }
+
+        .stat-card.success {
+            border-left-color: #52c41a;
+        }
+
+        .stat-card.warning {
+            border-left-color: #fa8c16;
+        }
+
+        .stat-card.danger {
+            border-left-color: #ff4d4f;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #8c8c8c;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .stat-icon.primary { background: #1890ff; }
+        .stat-icon.success { background: #52c41a; }
+        .stat-icon.warning { background: #fa8c16; }
+        .stat-icon.danger { background: #ff4d4f; }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+
+        .trend-up {
+            color: #52c41a;
+        }
+
+        .trend-down {
+            color: #ff4d4f;
+        }
+
+        .trend-neutral {
+            color: #8c8c8c;
+        }
+
+        /* 图表区域 */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-title i {
+            color: #1890ff;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-btn {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #595959;
+            transition: all 0.3s;
+        }
+
+        .chart-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .chart-content {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-placeholder {
+            text-align: center;
+            color: #8c8c8c;
+        }
+
+        .chart-placeholder i {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* 详细数据表格 */
+        .data-section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        .data-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .data-title i {
+            color: #1890ff;
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #262626;
+            font-size: 14px;
+        }
+
+        .data-table td {
+            font-size: 14px;
+            color: #595959;
+        }
+
+        .data-table tr:hover {
+            background: #fafafa;
+        }
+
+        /* 状态标签 */
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.active {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+
+        .status-badge.inactive {
+            background: #fff2f0;
+            color: #ff4d4f;
+        }
+
+        .status-badge.pending {
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            width: 100px;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #1890ff;
+            transition: width 0.3s;
+        }
+
+        /* 全屏模式样式 */
+        .fullscreen-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .fullscreen-section .chart-card {
+            grid-column: 1;
+        }
+
+        .fullscreen-section .chart-content {
+            height: 400px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .analytics-container {
+                padding: 16px;
+            }
+            
+            .analytics-toolbar {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            
+            .toolbar-left,
+            .toolbar-right {
+                justify-content: center;
+            }
+            
+            .time-range-selector {
+                flex-wrap: wrap;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-content {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .data-table {
+                font-size: 12px;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 8px 12px;
+            }
+        }
+
+        /* 按钮加载状态 */
+        .btn.loading {
+            position: relative;
+            color: transparent;
+            pointer-events: none;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin: -8px 0 0 -8px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .btn-primary.loading::after {
+            border-top-color: #fff;
+        }
+
+        .btn-secondary.loading::after {
+            border-top-color: #595959;
+        }
+
+        /* 按钮成功状态 */
+        .btn.success {
+            background: #52c41a !important;
+            border-color: #52c41a !important;
+            color: #fff !important;
+        }
+
+        /* 按钮错误状态 */
+        .btn.error {
+            background: #ff4d4f !important;
+            border-color: #ff4d4f !important;
+            color: #fff !important;
+        }
+
+        /* 加载动画 */
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #f0f0f0;
+            border-top: 2px solid #1890ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 消息提示 */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .message.show {
+            transform: translateX(0);
+        }
+
+        .message.success {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .message.error {
+            background: #fff2f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+
+        .message.warning {
+            background: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+
+        .message.info {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+        /* 确认对话框 */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+
+        .confirm-modal.show {
+            display: flex;
+        }
+
+        .confirm-content {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .confirm-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .confirm-message {
+            font-size: 14px;
+            color: #595959;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* 下拉选择框增强 */
+        .filter-select:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+            outline: none;
+        }
+
+        /* 图表加载状态 */
+        .chart-content.loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #8c8c8c;
+        }
+
+        .chart-content.loading canvas {
+            display: none;
+        }
+
+        /* 数据表格加载遮罩 */
+        .data-section.loading {
+            position: relative;
+        }
+
+        .data-section.loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .data-section.loading::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 32px;
+            height: 32px;
+            margin: -16px 0 0 -16px;
+            border: 3px solid #f0f0f0;
+            border-top: 3px solid #1890ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 11;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8c8c8c;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #595959;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主容器 -->
+    <div class="analytics-container">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="page-title">
+                <div class="title-left">
+                    <i class="fas fa-chart-line"></i>
+                    <h1>题库统计分析</h1>
+                </div>
+                <div class="title-right">
+                    <button class="btn btn-secondary" onclick="exportReport()" id="export-report-btn">
+                        <i class="fas fa-download"></i>
+                        <span>导出报告</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="refreshAllData()" id="refresh-data-btn">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>刷新数据</span>
+                    </button>
+                </div>
+            </div>
+            <div class="page-description">
+                全面分析题库使用情况，包含题目分布、使用统计、质量评估等多维度数据
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="analytics-toolbar">
+            <div class="toolbar-left">
+                <div class="filter-toggle" onclick="toggleFilter()">
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                    <span>筛选条件</span>
+                </div>
+                <div class="time-range-selector">
+                    <button class="range-btn" onclick="selectTimeRange('today', this)" data-range="today">今日</button>
+                    <button class="range-btn active" onclick="selectTimeRange('week', this)" data-range="week">本周</button>
+                    <button class="range-btn" onclick="selectTimeRange('month', this)" data-range="month">本月</button>
+                    <button class="range-btn" onclick="selectTimeRange('quarter', this)" data-range="quarter">季度</button>
+                    <button class="range-btn" onclick="selectTimeRange('year', this)" data-range="year">年度</button>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <button class="btn btn-secondary" onclick="toggleView()">
+                    <i class="fas fa-expand"></i>
+                    <span id="view-text">全屏模式</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 筛选面板 -->
+        <div class="filter-panel" id="filter-panel">
+            <div class="filter-content">
+                <div class="filter-group">
+                    <label class="filter-label">学科分类</label>
+                    <select class="filter-select" onchange="applyFilter('subject', this.value)" id="subject-filter">
+                        <option value="">全部学科</option>
+                        <option value="math">数学</option>
+                        <option value="chinese">语文</option>
+                        <option value="english">英语</option>
+                        <option value="physics">物理</option>
+                        <option value="chemistry">化学</option>
+                        <option value="biology">生物</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">题目类型</label>
+                    <select class="filter-select" onchange="applyFilter('type', this.value)" id="type-filter">
+                        <option value="">全部类型</option>
+                        <option value="single">单选题</option>
+                        <option value="multiple">多选题</option>
+                        <option value="judge">判断题</option>
+                        <option value="fill">填空题</option>
+                        <option value="essay">简答题</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">难度等级</label>
+                    <select class="filter-select" onchange="applyFilter('difficulty', this.value)" id="difficulty-filter">
+                        <option value="">全部难度</option>
+                        <option value="easy">简单</option>
+                        <option value="medium">中等</option>
+                        <option value="hard">困难</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">创建者</label>
+                    <select class="filter-select" onchange="applyFilter('creator', this.value)" id="creator-filter">
+                        <option value="">全部创建者</option>
+                        <option value="teacher1">张老师</option>
+                        <option value="teacher2">李老师</option>
+                        <option value="teacher3">王老师</option>
+                        <option value="teacher4">刘老师</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 概览统计 -->
+        <div class="overview-section">
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-header">
+                        <span class="stat-title">题目总数</span>
+                        <div class="stat-icon primary">
+                            <i class="fas fa-list"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">12,847</div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>较上月增长 12.5%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <span class="stat-title">活跃题目</span>
+                        <div class="stat-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">8,924</div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>使用率 69.5%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <span class="stat-title">平均正确率</span>
+                        <div class="stat-icon warning">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">76.8%</div>
+                    <div class="stat-trend trend-down">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>较上月下降 2.1%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card danger">
+                    <div class="stat-header">
+                        <span class="stat-title">待完善题目</span>
+                        <div class="stat-icon danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">342</div>
+                    <div class="stat-trend trend-neutral">
+                        <i class="fas fa-minus"></i>
+                        <span>需要补充答案或解析</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="charts-section" id="charts-section">
+            <!-- 题目类型分布 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-pie-chart"></i>
+                        题目类型分布
+                    </div>
+                    <div class="chart-actions">
+                        <button class="chart-btn" onclick="refreshChart('type-distribution')">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="chart-btn" onclick="exportChart('type-distribution')">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-content">
+                    <canvas id="type-chart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- 学科题目统计 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-bar-chart"></i>
+                        学科题目统计
+                    </div>
+                    <div class="chart-actions">
+                        <button class="chart-btn" onclick="refreshChart('subject-stats')">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="chart-btn" onclick="exportChart('subject-stats')">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-content">
+                    <canvas id="subject-chart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- 使用趋势分析 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-line-chart"></i>
+                        使用趋势分析
+                    </div>
+                    <div class="chart-actions">
+                        <button class="chart-btn" onclick="refreshChart('usage-trend')">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="chart-btn" onclick="exportChart('usage-trend')">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-content">
+                    <canvas id="trend-chart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- 质量评估分析 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-star"></i>
+                        题目质量评估
+                    </div>
+                    <div class="chart-actions">
+                        <button class="chart-btn" onclick="refreshChart('quality-assessment')">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="chart-btn" onclick="exportChart('quality-assessment')">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-content">
+                    <canvas id="quality-chart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细数据表格 -->
+        <div class="data-section">
+            <div class="data-header">
+                <div class="data-title">
+                    <i class="fas fa-table"></i>
+                    详细统计数据
+                </div>
+                <div class="data-actions">
+                    <button class="btn btn-secondary" onclick="showTableFilter()" id="table-filter-btn">
+                        <i class="fas fa-filter"></i>
+                        <span>筛选</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportTableData()" id="export-table-btn">
+                        <i class="fas fa-download"></i>
+                        <span>导出</span>
+                    </button>
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>学科</th>
+                        <th>题目类型</th>
+                        <th>题目数量</th>
+                        <th>使用次数</th>
+                        <th>平均正确率</th>
+                        <th>质量评分</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>数学</td>
+                        <td>单选题</td>
+                        <td>2,456</td>
+                        <td>12,456</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 82%;"></div>
+                                </div>
+                                <span>82%</span>
+                            </div>
+                        </td>
+                        <td>4.2</td>
+                        <td><span class="status-badge active">正常</span></td>
+                        <td>
+                            <button class="chart-btn" onclick="viewDetails('数学-单选题')" title="查看详情">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="chart-btn" onclick="editCategory('数学-单选题')" title="编辑">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>语文</td>
+                        <td>多选题</td>
+                        <td>1,847</td>
+                        <td>9,234</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 68%;"></div>
+                                </div>
+                                <span>68%</span>
+                            </div>
+                        </td>
+                        <td>3.8</td>
+                        <td><span class="status-badge active">正常</span></td>
+                        <td>
+                            <button class="chart-btn" onclick="viewDetails('语文-多选题')" title="查看详情">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="chart-btn" onclick="editCategory('语文-多选题')" title="编辑">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>英语</td>
+                        <td>填空题</td>
+                        <td>1,623</td>
+                        <td>7,891</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%;"></div>
+                                </div>
+                                <span>75%</span>
+                            </div>
+                        </td>
+                        <td>4.1</td>
+                        <td><span class="status-badge pending">待审核</span></td>
+                        <td>
+                            <button class="chart-btn" onclick="viewDetails('英语-填空题')" title="查看详情">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="chart-btn" onclick="editCategory('英语-填空题')" title="编辑">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>物理</td>
+                        <td>判断题</td>
+                        <td>1,234</td>
+                        <td>5,432</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 91%;"></div>
+                                </div>
+                                <span>91%</span>
+                            </div>
+                        </td>
+                        <td>4.6</td>
+                        <td><span class="status-badge active">正常</span></td>
+                        <td>
+                            <button class="chart-btn" onclick="viewDetails('物理-判断题')" title="查看详情">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="chart-btn" onclick="editCategory('物理-判断题')" title="编辑">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>化学</td>
+                        <td>简答题</td>
+                        <td>987</td>
+                        <td>3,156</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 54%;"></div>
+                                </div>
+                                <span>54%</span>
+                            </div>
+                        </td>
+                        <td>3.2</td>
+                        <td><span class="status-badge inactive">需优化</span></td>
+                        <td>
+                            <button class="chart-btn" onclick="viewDetails('化学-简答题')" title="查看详情">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="chart-btn" onclick="editCategory('化学-简答题')" title="编辑">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let filterExpanded = false;
+        let fullScreenMode = false;
+        let charts = {}; // 存储图表实例
+        let currentFilters = {}; // 当前筛选条件
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            showMessage('系统已就绪', 'success');
+        });
+
+        // ==================== 消息提示系统 ====================
+        function showMessage(text, type = 'info', duration = 3000) {
+            // 移除现有消息
+            const existingMessage = document.querySelector('.message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            // 创建新消息
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.innerHTML = `
+                <i class="fas fa-${getMessageIcon(type)}"></i>
+                <span>${text}</span>
+            `;
+
+            document.body.appendChild(message);
+
+            // 显示动画
+            setTimeout(() => message.classList.add('show'), 100);
+
+            // 自动隐藏
+            setTimeout(() => {
+                message.classList.remove('show');
+                setTimeout(() => message.remove(), 300);
+            }, duration);
+        }
+
+        function getMessageIcon(type) {
+            const icons = {
+                success: 'check-circle',
+                error: 'exclamation-circle',
+                warning: 'exclamation-triangle',
+                info: 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        // ==================== 确认对话框 ====================
+        function showConfirm(title, message, onConfirm, onCancel) {
+            // 创建确认对话框
+            const modal = document.createElement('div');
+            modal.className = 'confirm-modal show';
+            modal.innerHTML = `
+                <div class="confirm-content">
+                    <div class="confirm-title">
+                        <i class="fas fa-question-circle"></i>
+                        ${title}
+                    </div>
+                    <div class="confirm-message">${message}</div>
+                    <div class="confirm-actions">
+                        <button class="btn btn-secondary" onclick="closeConfirm()">取消</button>
+                        <button class="btn btn-primary" onclick="confirmAction()">确认</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // 绑定事件
+            window.confirmCallback = onConfirm;
+            window.cancelCallback = onCancel;
+        }
+
+        function closeConfirm() {
+            const modal = document.querySelector('.confirm-modal');
+            if (modal) {
+                modal.remove();
+                if (window.cancelCallback) window.cancelCallback();
+            }
+        }
+
+        function confirmAction() {
+            const modal = document.querySelector('.confirm-modal');
+            if (modal) {
+                modal.remove();
+                if (window.confirmCallback) window.confirmCallback();
+            }
+        }
+
+        // ==================== 按钮状态管理 ====================
+        function setButtonLoading(buttonId, loading = true) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        function setButtonState(buttonId, state, duration = 2000) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+
+            button.classList.remove('loading', 'success', 'error');
+            if (state !== 'normal') {
+                button.classList.add(state);
+            }
+
+            if (state !== 'normal' && duration > 0) {
+                setTimeout(() => {
+                    button.classList.remove('success', 'error');
+                }, duration);
+            }
+        }
+
+        // ==================== 主要功能按钮 ====================
+        
+        // 导出报告
+        async function exportReport() {
+            setButtonLoading('export-report-btn', true);
+            
+            try {
+                // 模拟导出过程
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // 创建并下载文件
+                const reportData = generateReportData();
+                const blob = new Blob([reportData], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `题库统计报告_${new Date().toLocaleDateString()}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                setButtonState('export-report-btn', 'success');
+                showMessage('报告导出成功！', 'success');
+            } catch (error) {
+                setButtonState('export-report-btn', 'error');
+                showMessage('导出失败，请重试', 'error');
+            } finally {
+                setButtonLoading('export-report-btn', false);
+            }
+        }
+
+        // 刷新所有数据
+        async function refreshAllData() {
+            setButtonLoading('refresh-data-btn', true);
+            
+            try {
+                // 刷新统计卡片
+                await refreshStatCards();
+                
+                // 刷新所有图表
+                await refreshAllCharts();
+                
+                // 刷新表格数据
+                await refreshTableData();
+                
+                setButtonState('refresh-data-btn', 'success');
+                showMessage('数据刷新成功！', 'success');
+            } catch (error) {
+                setButtonState('refresh-data-btn', 'error');
+                showMessage('数据刷新失败，请重试', 'error');
+            } finally {
+                setButtonLoading('refresh-data-btn', false);
+            }
+        }
+
+        // ==================== 筛选功能 ====================
+        
+        // 切换筛选面板
+        function toggleFilter() {
+            filterExpanded = !filterExpanded;
+            const filterPanel = document.getElementById('filter-panel');
+            const toggleIcon = document.querySelector('.toggle-icon');
+            
+            if (filterExpanded) {
+                filterPanel.classList.add('expanded');
+                toggleIcon.classList.add('expanded');
+            } else {
+                filterPanel.classList.remove('expanded');
+                toggleIcon.classList.remove('expanded');
+            }
+        }
+
+        // 应用筛选条件
+        async function applyFilter(filterType, value) {
+            currentFilters[filterType] = value;
+            
+            // 显示加载状态
+            document.querySelector('.data-section').classList.add('loading');
+            
+            try {
+                // 模拟数据筛选
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 更新图表和表格
+                await updateChartsWithFilter();
+                await updateTableWithFilter();
+                
+                showMessage(`已应用${getFilterName(filterType)}筛选`, 'success');
+            } catch (error) {
+                showMessage('筛选失败，请重试', 'error');
+            } finally {
+                document.querySelector('.data-section').classList.remove('loading');
+            }
+        }
+
+        function getFilterName(filterType) {
+            const names = {
+                subject: '学科',
+                type: '类型',
+                difficulty: '难度',
+                creator: '创建者'
+            };
+            return names[filterType] || filterType;
+        }
+
+        // ==================== 时间范围选择 ====================
+        
+        async function selectTimeRange(range, buttonElement) {
+            // 移除所有active类
+            document.querySelectorAll('.range-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 添加active类到被点击的按钮
+            buttonElement.classList.add('active');
+            
+            // 显示加载状态
+            document.querySelectorAll('.chart-content').forEach(content => {
+                content.classList.add('loading');
+                content.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <div>正在加载${getRangeName(range)}数据...</div>
+                `;
+            });
+            
+            try {
+                // 模拟数据加载
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // 重新初始化图表
+                await initializeChartsWithRange(range);
+                
+                showMessage(`已切换到${getRangeName(range)}数据`, 'success');
+            } catch (error) {
+                showMessage('数据加载失败', 'error');
+            }
+        }
+
+        function getRangeName(range) {
+            const names = {
+                today: '今日',
+                week: '本周',
+                month: '本月',
+                quarter: '季度',
+                year: '年度'
+            };
+            return names[range] || range;
+        }
+
+        // ==================== 视图切换 ====================
+        
+        function toggleView() {
+            fullScreenMode = !fullScreenMode;
+            const chartsSection = document.getElementById('charts-section');
+            const viewText = document.getElementById('view-text');
+            const icon = document.querySelector('#view-text').parentElement.querySelector('i');
+            
+            if (fullScreenMode) {
+                chartsSection.classList.add('fullscreen-section');
+                viewText.textContent = '退出全屏';
+                icon.className = 'fas fa-compress';
+                showMessage('已进入全屏模式', 'info');
+            } else {
+                chartsSection.classList.remove('fullscreen-section');
+                viewText.textContent = '全屏模式';
+                icon.className = 'fas fa-expand';
+                showMessage('已退出全屏模式', 'info');
+            }
+            
+            // 重新调整图表大小
+            setTimeout(() => {
+                Object.values(charts).forEach(chart => {
+                    if (chart && chart.resize) {
+                        chart.resize();
+                    }
+                });
+            }, 300);
+        }
+
+        // 初始化图表
+        function initializeCharts() {
+            // 题目类型分布饼图
+            const typeCtx = document.getElementById('type-chart').getContext('2d');
+            new Chart(typeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['单选题', '多选题', '判断题', '填空题', '简答题'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: [
+                            '#1890ff',
+                            '#52c41a',
+                            '#fa8c16',
+                            '#722ed1',
+                            '#eb2f96'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // 学科统计柱状图
+            const subjectCtx = document.getElementById('subject-chart').getContext('2d');
+            new Chart(subjectCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['数学', '语文', '英语', '物理', '化学', '生物'],
+                    datasets: [{
+                        label: '题目数量',
+                        data: [2456, 1847, 1623, 1234, 987, 756],
+                        backgroundColor: '#1890ff',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 使用趋势线图
+            const trendCtx = document.getElementById('trend-chart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '题目使用次数',
+                        data: [12000, 15000, 18000, 22000, 25000, 28000],
+                        borderColor: '#1890ff',
+                        backgroundColor: 'rgba(24, 144, 255, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 质量评估雷达图
+            const qualityCtx = document.getElementById('quality-chart').getContext('2d');
+            new Chart(qualityCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['内容质量', '难度适中', '选项合理', '解析完整', '使用频率', '正确率'],
+                    datasets: [{
+                        label: '整体评估',
+                        data: [85, 78, 82, 75, 90, 77],
+                        borderColor: '#1890ff',
+                        backgroundColor: 'rgba(24, 144, 255, 0.2)',
+                        pointBackgroundColor: '#1890ff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==================== 图表操作 ====================
+        
+        // 刷新单个图表
+        async function refreshChart(chartId) {
+            const chartElement = document.querySelector(`[onclick*="${chartId}"]`).closest('.chart-card');
+            const chartContent = chartElement.querySelector('.chart-content');
+            
+            // 显示加载状态
+            chartContent.classList.add('loading');
+            chartContent.innerHTML = `
+                <div class="loading-spinner"></div>
+                <div>正在刷新图表数据...</div>
+            `;
+            
+            try {
+                // 模拟数据加载
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 恢复图表内容
+                chartContent.classList.remove('loading');
+                const canvas = document.createElement('canvas');
+                canvas.id = chartId + '-canvas';
+                canvas.width = 400;
+                canvas.height = 300;
+                chartContent.innerHTML = '';
+                chartContent.appendChild(canvas);
+                
+                // 重新初始化对应图表
+                await initializeSpecificChart(chartId, canvas);
+                
+                showMessage('图表刷新成功', 'success');
+            } catch (error) {
+                chartContent.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>加载失败</h3>
+                        <p>图表数据刷新失败，请重试</p>
+                    </div>
+                `;
+                showMessage('图表刷新失败', 'error');
+            }
+        }
+
+        // 导出图表
+        async function exportChart(chartId) {
+            try {
+                const chart = charts[chartId];
+                if (!chart) {
+                    showMessage('图表未找到', 'warning');
+                    return;
+                }
+
+                // 获取图表图片
+                const canvas = chart.canvas || document.getElementById(chartId + '-chart');
+                const dataURL = canvas.toDataURL('image/png');
+                
+                // 创建下载链接
+                const link = document.createElement('a');
+                link.download = `图表_${chartId}_${new Date().toLocaleDateString()}.png`;
+                link.href = dataURL;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showMessage('图表导出成功', 'success');
+            } catch (error) {
+                showMessage('图表导出失败', 'error');
+            }
+        }
+
+        // 刷新所有图表数据
+        async function refreshAllCharts() {
+            const chartIds = ['type-distribution', 'subject-stats', 'usage-trend', 'quality-assessment'];
+            
+            for (const chartId of chartIds) {
+                try {
+                    // 模拟数据更新
+                    const chart = charts[chartId];
+                    if (chart) {
+                        // 更新图表数据
+                        chart.data = generateChartData(chartId);
+                        chart.update('active');
+                    }
+                } catch (error) {
+                    console.error(`刷新图表 ${chartId} 失败:`, error);
+                }
+            }
+        }
+
+        // ==================== 表格操作 ====================
+        
+        // 显示表格筛选
+        function showTableFilter() {
+            showConfirm(
+                '表格筛选',
+                '是否要打开高级筛选面板？您可以在上方的筛选条件中进行更详细的筛选设置。',
+                () => {
+                    if (!filterExpanded) {
+                        toggleFilter();
+                    }
+                    showMessage('请使用上方筛选面板进行筛选', 'info');
+                },
+                () => showMessage('已取消', 'info')
+            );
+        }
+
+        // 导出表格数据
+        async function exportTableData() {
+            setButtonLoading('export-table-btn', true);
+            
+            try {
+                // 模拟数据准备
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 生成CSV数据
+                const csvData = generateTableCSV();
+                const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `统计数据_${new Date().toLocaleDateString()}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                setButtonState('export-table-btn', 'success');
+                showMessage('表格数据导出成功！', 'success');
+            } catch (error) {
+                setButtonState('export-table-btn', 'error');
+                showMessage('导出失败，请重试', 'error');
+            } finally {
+                setButtonLoading('export-table-btn', false);
+            }
+        }
+
+        // 查看详情
+        function viewDetails(itemId) {
+            showConfirm(
+                '查看详情',
+                `您要查看 ${itemId} 的详细统计信息吗？将打开详细分析窗口。`,
+                () => {
+                    showMessage(`正在加载 ${itemId} 的详细数据...`, 'info');
+                    // 这里可以打开详情模态框或跳转到详情页
+                },
+                () => showMessage('已取消查看', 'info')
+            );
+        }
+
+        // 编辑类别
+        function editCategory(itemId) {
+            showConfirm(
+                '编辑确认',
+                `您要编辑 ${itemId} 的设置吗？这可能会影响相关的统计数据。`,
+                () => {
+                    showMessage(`正在打开 ${itemId} 的编辑界面...`, 'info');
+                    // 这里可以打开编辑模态框
+                },
+                () => showMessage('已取消编辑', 'info')
+            );
+        }
+
+        // ==================== 数据生成辅助函数 ====================
+        
+        // 生成报告数据
+        function generateReportData() {
+            const headers = ['时间', '总题目数', '活跃题目', '平均正确率', '待完善题目'];
+            const data = [
+                ['2024-03-15', '12847', '8924', '76.8%', '342'],
+                ['2024-03-14', '12821', '8901', '77.2%', '356'],
+                ['2024-03-13', '12796', '8876', '77.1%', '371'],
+                // 更多数据...
+            ];
+            
+            return [headers, ...data].map(row => row.join(',')).join('\\n');
+        }
+
+        // 生成表格CSV
+        function generateTableCSV() {
+            const headers = ['学科', '题目类型', '题目数量', '使用次数', '平均正确率', '质量评分', '状态'];
+            const data = [
+                ['数学', '单选题', '2456', '12456', '82%', '4.2', '正常'],
+                ['语文', '多选题', '1847', '9234', '68%', '3.8', '正常'],
+                ['英语', '填空题', '1623', '7891', '75%', '4.1', '待审核'],
+                ['物理', '判断题', '1234', '5432', '91%', '4.6', '正常'],
+                ['化学', '简答题', '987', '3156', '54%', '3.2', '需优化']
+            ];
+            
+            return [headers, ...data].map(row => row.join(',')).join('\\n');
+        }
+
+        // 生成图表数据
+        function generateChartData(chartId) {
+            const dataTemplates = {
+                'type-distribution': {
+                    labels: ['单选题', '多选题', '判断题', '填空题', '简答题'],
+                    data: [35, 25, 20, 15, 5]
+                },
+                'subject-stats': {
+                    labels: ['数学', '语文', '英语', '物理', '化学', '生物'],
+                    data: [2456, 1847, 1623, 1234, 987, 756]
+                },
+                'usage-trend': {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    data: [12000, 15000, 18000, 22000, 25000, 28000]
+                },
+                'quality-assessment': {
+                    labels: ['内容质量', '难度适中', '选项合理', '解析完整', '使用频率', '正确率'],
+                    data: [85, 78, 82, 75, 90, 77]
+                }
+            };
+            
+            return dataTemplates[chartId] || { labels: [], data: [] };
+        }
+
+        // ==================== 数据更新函数 ====================
+        
+        // 刷新统计卡片
+        async function refreshStatCards() {
+            const cards = document.querySelectorAll('.stat-value');
+            cards.forEach((card, index) => {
+                // 模拟数据更新
+                const currentValue = parseInt(card.textContent.replace(/,/g, ''));
+                const change = Math.floor(Math.random() * 100) - 50;
+                const newValue = Math.max(0, currentValue + change);
+                
+                // 动画更新数值
+                animateValue(card, currentValue, newValue, 1000);
+            });
+        }
+
+        // 刷新表格数据
+        async function refreshTableData() {
+            // 模拟表格数据更新
+            const rows = document.querySelectorAll('.data-table tbody tr');
+            rows.forEach(row => {
+                const progressBar = row.querySelector('.progress-fill');
+                if (progressBar) {
+                    const currentWidth = parseInt(progressBar.style.width);
+                    const newWidth = Math.max(10, Math.min(100, currentWidth + Math.floor(Math.random() * 20) - 10));
+                    progressBar.style.width = newWidth + '%';
+                    row.querySelector('.progress-bar + span').textContent = newWidth + '%';
+                }
+            });
+        }
+
+        // 根据筛选条件更新图表
+        async function updateChartsWithFilter() {
+            // 模拟根据筛选条件更新图表数据
+            await refreshAllCharts();
+        }
+
+        // 根据筛选条件更新表格
+        async function updateTableWithFilter() {
+            // 模拟根据筛选条件更新表格数据
+            await refreshTableData();
+        }
+
+        // 根据时间范围初始化图表
+        async function initializeChartsWithRange(range) {
+            // 清除所有图表内容
+            document.querySelectorAll('.chart-content').forEach(content => {
+                content.classList.remove('loading');
+                content.innerHTML = '';
+                const canvas = document.createElement('canvas');
+                canvas.width = 400;
+                canvas.height = 300;
+                content.appendChild(canvas);
+            });
+            
+            // 重新初始化图表
+            await initializeCharts();
+        }
+
+        // 初始化特定图表
+        async function initializeSpecificChart(chartId, canvas) {
+            // 根据chartId初始化对应图表
+            // 这里可以添加具体的图表初始化逻辑
+        }
+
+        // 数值动画
+        function animateValue(element, start, end, duration) {
+            const startTimestamp = performance.now();
+            
+            function step(timestamp) {
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentValue = Math.floor(progress * (end - start) + start);
+                
+                if (element.textContent.includes('%')) {
+                    element.textContent = currentValue + '%';
+                } else {
+                    element.textContent = currentValue.toLocaleString();
+                }
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+            
+            requestAnimationFrame(step);
+        }
+    </script>
+</body>
+</html>

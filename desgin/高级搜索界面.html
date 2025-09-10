@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题库管理系统 - 高级搜索</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* 主容器 */
+        .search-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 页面头部 */
+        .page-header {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 24px 32px;
+            margin-bottom: 16px;
+            border-left: 4px solid #1890ff;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .page-title i {
+            font-size: 24px;
+            color: #1890ff;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .page-description {
+            color: #8c8c8c;
+            font-size: 14px;
+            margin-left: 36px;
+        }
+
+        /* 搜索面板 */
+        .search-panel {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        /* 搜索工具栏 */
+        .search-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .advanced-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #1890ff;
+            font-weight: 500;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        .advanced-toggle:hover {
+            color: #40a9ff;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+
+        .advanced-toggle.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .saved-search-dropdown {
+            position: relative;
+        }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            color: #595959;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .dropdown-trigger:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            max-width: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+        }
+
+        .dropdown-menu.visible {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item-title {
+            font-weight: 500;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+
+        .dropdown-item-desc {
+            font-size: 12px;
+            color: #8c8c8c;
+            line-height: 1.4;
+        }
+
+        /* 搜索内容区域 */
+        .search-content {
+            padding: 32px;
+        }
+
+        /* 主搜索区域 */
+        .main-search-area {
+            margin-bottom: 24px;
+        }
+
+        /* 高级筛选区域 */
+        .advanced-filters {
+            border-top: 1px solid #f0f0f0;
+            margin-top: 24px;
+            padding-top: 24px;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .advanced-filters.expanded {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 搜索表单 */
+        .search-form {
+            max-width: none;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #1890ff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-label.required::after {
+            content: '*';
+            color: #ff4d4f;
+        }
+
+        /* 输入框样式 */
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #fff;
+        }
+
+        .form-input:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+            outline: none;
+        }
+
+        .form-input:hover {
+            border-color: #40a9ff;
+        }
+
+        .form-input::placeholder {
+            color: #bfbfbf;
+        }
+
+        /* 大输入框 */
+        .form-input.large {
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 8px;
+        }
+
+        /* 选择器组件 */
+        .form-select {
+            position: relative;
+        }
+
+        .select-input {
+            width: 100%;
+            padding: 8px 32px 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") no-repeat right 8px center/20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .select-input:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+            outline: none;
+        }
+
+        /* 多选框组 */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            padding: 16px;
+            background: #fafafa;
+            border-radius: 6px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .checkbox-item:hover {
+            background: #e6f7ff;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1890ff;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            font-size: 14px;
+            color: #595959;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 单选框组 */
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            padding: 16px;
+            background: #fafafa;
+            border-radius: 6px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .radio-item input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1890ff;
+            cursor: pointer;
+        }
+
+        .radio-item label {
+            font-size: 14px;
+            color: #595959;
+            cursor: pointer;
+        }
+
+        /* 日期范围选择器 */
+        .date-range {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .date-range input[type="date"] {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .date-range input[type="date"]:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+            outline: none;
+        }
+
+        .date-separator {
+            color: #8c8c8c;
+            font-weight: 500;
+        }
+
+        /* 范围滑块 */
+        .range-input {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .range-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #595959;
+        }
+
+        .range-slider {
+            width: 100%;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #1890ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(24, 144, 255, 0.3);
+            transition: all 0.3s;
+        }
+
+        .range-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+        }
+
+        .range-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #1890ff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* 标签输入 */
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            min-height: 40px;
+            align-items: center;
+        }
+
+        .tag-input-container:focus-within {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+
+        .tag-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            background: #e6f7ff;
+            color: #1890ff;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid #91d5ff;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .tag-remove:hover {
+            opacity: 1;
+        }
+
+        .tag-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            min-width: 100px;
+        }
+
+        /* 操作按钮区域 */
+        .search-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+            border-top: 1px solid #f0f0f0;
+            margin-top: 32px;
+        }
+
+        .action-left {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: #595959;
+            border-color: #d9d9d9;
+        }
+
+        .btn-secondary:hover {
+            color: #1890ff;
+            border-color: #1890ff;
+        }
+
+        .btn-default {
+            background: #fafafa;
+            color: #595959;
+            border-color: #d9d9d9;
+        }
+
+        .btn-default:hover {
+            background: #fff;
+            border-color: #40a9ff;
+            color: #1890ff;
+        }
+
+        .btn-large {
+            padding: 10px 24px;
+            font-size: 16px;
+        }
+
+        /* 搜索结果区域 */
+        .search-results {
+            margin-top: 24px;
+        }
+
+        .results-header {
+            background: #fff;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .results-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .results-count {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .results-filter {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* 结果列表 */
+        .results-list {
+            background: #fff;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        .result-item {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .result-item:hover {
+            background: #fafafa;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .result-meta {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .meta-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .meta-badge.type-single {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .meta-badge.type-multiple {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+
+        .meta-badge.type-judge {
+            background: #fff2e8;
+            color: #fa8c16;
+        }
+
+        .meta-badge.difficulty-easy {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+
+        .meta-badge.difficulty-medium {
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+
+        .meta-badge.difficulty-hard {
+            background: #fff2f0;
+            color: #ff4d4f;
+        }
+
+        .result-content {
+            font-size: 16px;
+            color: #262626;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .result-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #8c8c8c;
+        }
+
+        .result-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .result-tags {
+            display: flex;
+            gap: 6px;
+        }
+
+        .result-tag {
+            padding: 2px 6px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #595959;
+        }
+
+        /* 保存的搜索 */
+        .saved-searches {
+            display: none;
+        }
+
+        .saved-searches.active {
+            display: block;
+        }
+
+        .saved-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .saved-item {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .saved-item:hover {
+            border-color: #1890ff;
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+        }
+
+        .saved-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .saved-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .saved-date {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+
+        .saved-description {
+            font-size: 14px;
+            color: #595959;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .saved-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .search-container {
+                padding: 16px;
+            }
+            
+            .search-content {
+                padding: 24px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .search-tabs {
+                flex-direction: column;
+            }
+            
+            .tab-item {
+                padding: 12px 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-actions {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            
+            .action-left,
+            .action-right {
+                justify-content: center;
+            }
+            
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            
+            .results-actions {
+                justify-content: center;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: #8c8c8c;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f0f0f0;
+            border-top: 2px solid #1890ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8c8c8c;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #595959;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主容器 -->
+    <div class="search-container">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="page-title">
+                <i class="fas fa-search"></i>
+                <h1>高级搜索</h1>
+            </div>
+            <div class="page-description">
+                通过多维度条件精确检索题库资源，支持保存常用搜索条件
+            </div>
+        </div>
+
+        <!-- 搜索面板 -->
+        <div class="search-panel">
+            <!-- 搜索工具栏 -->
+            <div class="search-toolbar">
+                <div class="toolbar-left">
+                    <div class="advanced-toggle" onclick="toggleAdvancedFilters()">
+                        <i class="fas fa-chevron-down toggle-icon"></i>
+                        <span>展开筛选条件</span>
+                    </div>
+                </div>
+                <div class="toolbar-right">
+                    <div class="saved-search-dropdown">
+                        <div class="dropdown-trigger" onclick="toggleSavedDropdown()">
+                            <i class="fas fa-bookmark"></i>
+                            <span>保存的搜索</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="dropdown-menu" id="saved-dropdown">
+                            <div class="dropdown-item" onclick="loadSavedSearch('high-usage')">
+                                <div class="dropdown-item-title">高频使用题目</div>
+                                <div class="dropdown-item-desc">使用次数大于200次的题目</div>
+                            </div>
+                            <div class="dropdown-item" onclick="loadSavedSearch('difficult')">
+                                <div class="dropdown-item-title">困难题目筛选</div>
+                                <div class="dropdown-item-desc">难度为困难且正确率低于60%</div>
+                            </div>
+                            <div class="dropdown-item" onclick="loadSavedSearch('recent')">
+                                <div class="dropdown-item-title">最新题目</div>
+                                <div class="dropdown-item-desc">最近7天内创建的题目</div>
+                            </div>
+                            <div class="dropdown-item" onclick="openSaveDialog()">
+                                <div class="dropdown-item-title">
+                                    <i class="fas fa-plus"></i> 保存当前搜索
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="resetSearch()">
+                        <i class="fas fa-redo"></i>
+                        重置
+                    </button>
+                </div>
+            </div>
+
+            <!-- 搜索内容区域 -->
+            <div class="search-content">
+                <form class="search-form">
+                    <!-- 主搜索区域 -->
+                    <div class="main-search-area">
+                        <!-- 关键词搜索 -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-search"></i>
+                                搜索内容
+                            </div>
+                            <div class="form-row single">
+                                <div class="form-group">
+                                    <label class="form-label">关键词</label>
+                                    <input type="text" class="form-input large" placeholder="请输入题目内容、选项或答案关键词..." />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 基本筛选 -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-filter"></i>
+                                基本筛选
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">题目类型</label>
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="single-choice">
+                                            <label for="single-choice">
+                                                <i class="fas fa-circle"></i>
+                                                单选题
+                                            </label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="multiple-choice">
+                                            <label for="multiple-choice">
+                                                <i class="fas fa-check-square"></i>
+                                                多选题
+                                            </label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="true-false">
+                                            <label for="true-false">
+                                                <i class="fas fa-check"></i>
+                                                判断题
+                                            </label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="fill-blank">
+                                            <label for="fill-blank">
+                                                <i class="fas fa-edit"></i>
+                                                填空题
+                                            </label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="essay">
+                                            <label for="essay">
+                                                <i class="fas fa-file-alt"></i>
+                                                简答题
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">难度等级</label>
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="difficulty-easy">
+                                            <label for="difficulty-easy">
+                                                <i class="fas fa-star" style="color: #52c41a;"></i>
+                                                简单
+                                            </label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="difficulty-medium">
+                                            <label for="difficulty-medium">
+                                                <i class="fas fa-star" style="color: #fa8c16;"></i>
+                                                中等
+                                            </label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="difficulty-hard">
+                                            <label for="difficulty-hard">
+                                                <i class="fas fa-star" style="color: #ff4d4f;"></i>
+                                                困难
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">学科分类</label>
+                                    <div class="form-select">
+                                        <select class="select-input">
+                                            <option value="">请选择学科</option>
+                                            <option value="math">数学</option>
+                                            <option value="chinese">语文</option>
+                                            <option value="english">英语</option>
+                                            <option value="physics">物理</option>
+                                            <option value="chemistry">化学</option>
+                                            <option value="biology">生物</option>
+                                            <option value="history">历史</option>
+                                            <option value="geography">地理</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">创建者</label>
+                                    <input type="text" class="form-input" placeholder="输入创建者姓名..." />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 高级筛选区域 -->
+                    <div class="advanced-filters" id="advanced-filters">
+                        <!-- 时间和状态筛选 -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-calendar"></i>
+                                时间范围与状态
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">创建时间</label>
+                                    <div class="date-range">
+                                        <input type="date" />
+                                        <span class="date-separator">至</span>
+                                        <input type="date" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">答案状态</label>
+                                    <div class="radio-group">
+                                        <div class="radio-item">
+                                            <input type="radio" id="answer-all" name="answer-status" value="all" checked>
+                                            <label for="answer-all">全部</label>
+                                        </div>
+                                        <div class="radio-item">
+                                            <input type="radio" id="answer-yes" name="answer-status" value="yes">
+                                            <label for="answer-yes">有答案</label>
+                                        </div>
+                                        <div class="radio-item">
+                                            <input type="radio" id="answer-no" name="answer-status" value="no">
+                                            <label for="answer-no">无答案</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 统计数据筛选 -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-chart-bar"></i>
+                                统计数据筛选
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">使用次数范围</label>
+                                    <div class="range-input">
+                                        <div class="range-values">
+                                            <span>0</span>
+                                            <span>1000+</span>
+                                        </div>
+                                        <input type="range" class="range-slider" min="0" max="1000" value="0" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">正确率范围</label>
+                                    <div class="range-input">
+                                        <div class="range-values">
+                                            <span>0%</span>
+                                            <span>100%</span>
+                                        </div>
+                                        <input type="range" class="range-slider" min="0" max="100" value="0" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 标签和评级 -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-tags"></i>
+                                标签与评级
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">包含标签</label>
+                                    <div class="tag-input-container">
+                                        <div class="tag-item">
+                                            重点题目
+                                            <span class="tag-remove">×</span>
+                                        </div>
+                                        <div class="tag-item">
+                                            基础概念
+                                            <span class="tag-remove">×</span>
+                                        </div>
+                                        <input type="text" class="tag-input" placeholder="输入标签后按回车添加..." />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">质量评级</label>
+                                    <div class="form-select">
+                                        <select class="select-input">
+                                            <option value="">所有评级</option>
+                                            <option value="excellent">优秀 (90+)</option>
+                                            <option value="good">良好 (80-89)</option>
+                                            <option value="average">一般 (70-79)</option>
+                                            <option value="poor">较差 (60-69)</option>
+                                            <option value="unrated">未评级</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 题目状态筛选 -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <i class="fas fa-toggle-on"></i>
+                                题目状态
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">状态筛选</label>
+                                    <div class="checkbox-group">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="status-active" checked>
+                                            <label for="status-active">
+                                                <i class="fas fa-check-circle" style="color: #52c41a;"></i>
+                                                启用中
+                                            </label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="status-inactive">
+                                            <label for="status-inactive">
+                                                <i class="fas fa-pause-circle" style="color: #8c8c8c;"></i>
+                                                已禁用
+                                            </label>
+                                        </div>
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="status-pending">
+                                            <label for="status-pending">
+                                                <i class="fas fa-clock" style="color: #fa8c16;"></i>
+                                                待审核
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 搜索操作区域 -->
+                    <div class="search-actions">
+                        <div class="action-left">
+                            <button type="button" class="btn btn-secondary" onclick="exportConditions()">
+                                <i class="fas fa-download"></i>
+                                导出条件
+                            </button>
+                        </div>
+                        <div class="action-right">
+                            <button type="button" class="btn btn-secondary" onclick="saveCurrentSearch()">
+                                <i class="fas fa-save"></i>
+                                保存搜索
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-large">
+                                <i class="fas fa-search"></i>
+                                开始搜索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 搜索结果区域（集成在同一页面中）-->
+        <div class="search-results" id="search-results" style="display: none;">
+            <div class="results-header">
+                <div class="results-info">
+                    <div class="results-count">找到 156 条结果</div>
+                    <div class="results-filter">筛选条件：单选题、中等难度</div>
+                </div>
+                <div class="results-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-download"></i>
+                        导出结果
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-tasks"></i>
+                        批量操作
+                    </button>
+                </div>
+            </div>
+
+            <div class="results-list">
+                <!-- 示例结果项 -->
+                <div class="result-item">
+                    <div class="result-header">
+                        <div class="result-meta">
+                            <span class="meta-badge type-single">单选题</span>
+                            <span class="meta-badge difficulty-medium">中等</span>
+                            <span style="color: #8c8c8c; font-size: 14px;">计算机网络</span>
+                        </div>
+                        <div class="result-tags">
+                            <span class="result-tag">网络协议</span>
+                            <span class="result-tag">基础概念</span>
+                        </div>
+                    </div>
+                    <div class="result-content">
+                        TCP协议和UDP协议的主要区别是什么？
+                    </div>
+                    <div class="result-footer">
+                        <div class="result-stats">
+                            <span><i class="fas fa-user"></i> 张老师</span>
+                            <span><i class="fas fa-calendar"></i> 2024-03-15</span>
+                            <span><i class="fas fa-fire"></i> 使用234次</span>
+                            <span><i class="fas fa-chart-line"></i> 正确率78.5%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-header">
+                        <div class="result-meta">
+                            <span class="meta-badge type-multiple">多选题</span>
+                            <span class="meta-badge difficulty-hard">困难</span>
+                            <span style="color: #8c8c8c; font-size: 14px;">数据结构</span>
+                        </div>
+                        <div class="result-tags">
+                            <span class="result-tag">算法</span>
+                            <span class="result-tag">重点题目</span>
+                        </div>
+                    </div>
+                    <div class="result-content">
+                        以下哪些是常见的排序算法？（多选）
+                    </div>
+                    <div class="result-footer">
+                        <div class="result-stats">
+                            <span><i class="fas fa-user"></i> 李老师</span>
+                            <span><i class="fas fa-calendar"></i> 2024-03-14</span>
+                            <span><i class="fas fa-fire"></i> 使用156次</span>
+                            <span><i class="fas fa-chart-line"></i> 正确率65.2%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let advancedExpanded = false;
+
+        // 切换高级筛选
+        function toggleAdvancedFilters() {
+            advancedExpanded = !advancedExpanded;
+            const advancedFilters = document.getElementById('advanced-filters');
+            const toggle = document.querySelector('.advanced-toggle');
+            const toggleIcon = document.querySelector('.toggle-icon');
+            const toggleText = toggle.querySelector('span');
+
+            if (advancedExpanded) {
+                advancedFilters.classList.add('expanded');
+                toggle.classList.add('expanded');
+                toggleText.textContent = '收起筛选条件';
+            } else {
+                advancedFilters.classList.remove('expanded');
+                toggle.classList.remove('expanded');
+                toggleText.textContent = '展开筛选条件';
+            }
+        }
+
+        // 切换保存搜索下拉菜单
+        function toggleSavedDropdown() {
+            const dropdown = document.getElementById('saved-dropdown');
+            dropdown.classList.toggle('visible');
+        }
+
+        // 关闭下拉菜单（点击其他地方时）
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('saved-dropdown');
+            const trigger = document.querySelector('.dropdown-trigger');
+            
+            if (!trigger.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('visible');
+            }
+        });
+
+        // 加载保存的搜索
+        function loadSavedSearch(searchId) {
+            console.log('加载保存的搜索:', searchId);
+            
+            // 根据searchId加载相应的搜索条件
+            const searchConditions = {
+                'high-usage': {
+                    usageMin: 200,
+                    usageMax: 1000
+                },
+                'difficult': {
+                    difficulty: ['hard'],
+                    correctRateMax: 60
+                },
+                'recent': {
+                    dateRange: 7 // 最近7天
+                }
+            };
+
+            const condition = searchConditions[searchId];
+            if (condition) {
+                // 应用搜索条件到表单
+                applySearchConditions(condition);
+            }
+
+            // 关闭下拉菜单
+            document.getElementById('saved-dropdown').classList.remove('visible');
+            
+            // 自动执行搜索
+            performSearch();
+        }
+
+        // 应用搜索条件
+        function applySearchConditions(conditions) {
+            // 实际应用中，这里会根据conditions设置表单值
+            console.log('应用搜索条件:', conditions);
+        }
+
+        // 重置搜索
+        function resetSearch() {
+            document.querySelector('.search-form').reset();
+            
+            // 清除标签
+            document.querySelectorAll('.tag-item').forEach(tag => {
+                if (!tag.querySelector('.tag-input')) {
+                    tag.remove();
+                }
+            });
+            
+            // 隐藏搜索结果
+            document.getElementById('search-results').style.display = 'none';
+        }
+
+        // 保存当前搜索
+        function saveCurrentSearch() {
+            const searchName = prompt('请输入搜索条件名称：');
+            if (searchName) {
+                console.log('保存搜索条件:', searchName);
+                // 实际应用中会保存当前表单状态
+            }
+        }
+
+        // 导出条件
+        function exportConditions() {
+            console.log('导出搜索条件');
+            // 实际应用中会导出当前搜索条件为文件
+        }
+
+        // 执行搜索
+        function performSearch() {
+            // 显示加载状态
+            showLoading();
+            
+            // 模拟搜索延迟
+            setTimeout(() => {
+                hideLoading();
+                showSearchResults();
+            }, 1000);
+        }
+
+        // 显示加载状态
+        function showLoading() {
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.style.display = 'block';
+            resultsContainer.innerHTML = `
+                <div class="results-header">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        正在搜索中...
+                    </div>
+                </div>
+            `;
+        }
+
+        // 隐藏加载状态并显示结果
+        function hideLoading() {
+            // 加载状态会被showSearchResults()替换
+        }
+
+        // 显示搜索结果
+        function showSearchResults() {
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.style.display = 'block';
+            // 恢复原始HTML内容
+            location.reload(); // 简单的重载方式，实际应用中会动态更新内容
+        }
+
+        // 表单提交处理
+        document.querySelector('.search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            performSearch();
+        });
+
+        // 标签输入功能
+        document.querySelectorAll('.tag-input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    e.preventDefault();
+                    addTag(this, this.value.trim());
+                    this.value = '';
+                }
+            });
+        });
+
+        // 添加标签
+        function addTag(input, tagText) {
+            const container = input.parentElement;
+            const tagElement = document.createElement('div');
+            tagElement.className = 'tag-item';
+            tagElement.innerHTML = `
+                ${tagText}
+                <span class="tag-remove" onclick="removeTag(this)">×</span>
+            `;
+            container.insertBefore(tagElement, input);
+        }
+
+        // 移除标签
+        function removeTag(element) {
+            element.parentElement.remove();
+        }
+
+        // 范围滑块值更新
+        document.querySelectorAll('.range-slider').forEach(slider => {
+            slider.addEventListener('input', function() {
+                const rangeValues = this.parentElement.querySelector('.range-values');
+                if (rangeValues) {
+                    const spans = rangeValues.querySelectorAll('span');
+                    if (this.max == 1000) {
+                        spans[1].textContent = this.value + '+';
+                    } else if (this.max == 100) {
+                        spans[1].textContent = this.value + '%';
+                    }
+                }
+            });
+        });
+
+        // 打开保存对话框
+        function openSaveDialog() {
+            saveCurrentSearch();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统计分析 - 考试管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #262626;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            margin: -20px -20px 30px -20px;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 12px;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #595959;
+            border: 1px solid #d9d9d9;
+        }
+
+        .btn-secondary:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .form-select {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+        }
+
+        .analysis-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .dashboard-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .overview-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .card-icon.total-exams {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .card-icon.total-students {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .card-icon.avg-score {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .card-icon.pass-rate {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .card-content {
+            flex: 1;
+        }
+
+        .card-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+
+        .card-label {
+            font-size: 14px;
+            color: #8c8c8c;
+            margin-bottom: 8px;
+        }
+
+        .card-change {
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-change.positive {
+            color: #52c41a;
+        }
+
+        .card-change.negative {
+            color: #ff4d4f;
+        }
+
+        .card-change::before {
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+        }
+
+        .card-change.positive::before {
+            content: "\f062";
+        }
+
+        .card-change.negative::before {
+            content: "\f063";
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .chart-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .panel-header h3 {
+            font-size: 18px;
+            color: #262626;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8c8c8c;
+            background: #f5f5f5;
+        }
+
+        .chart-btn:hover,
+        .chart-btn.active {
+            color: #1890ff;
+            background: #e6f7ff;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 16px;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #595959;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .subject-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .subject-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .subject-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .subject-color.computer {
+            background: #1890ff;
+        }
+
+        .subject-color.data {
+            background: #52c41a;
+        }
+
+        .subject-color.system {
+            background: #faad14;
+        }
+
+        .subject-color.others {
+            background: #f759ab;
+        }
+
+        .subject-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+        }
+
+        .subject-name {
+            font-size: 14px;
+            color: #595959;
+        }
+
+        .subject-percentage {
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+        }
+
+        .analysis-details {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .detail-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f5f5f5;
+            color: #8c8c8c;
+        }
+
+        .filter-tab.active,
+        .filter-tab:hover {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .score-distribution {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .distribution-chart {
+            position: relative;
+            height: 300px;
+        }
+
+        .distribution-stats {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-group h4 {
+            font-size: 16px;
+            color: #262626;
+            margin-bottom: 16px;
+        }
+
+        .score-ranges {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .score-range {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .score-range.excellent {
+            background: #f6ffed;
+            border-color: #b7eb8f;
+        }
+
+        .score-range.good {
+            background: #f0f9ff;
+            border-color: #91d5ff;
+        }
+
+        .score-range.average {
+            background: #fff7e6;
+            border-color: #ffd591;
+        }
+
+        .score-range.pass {
+            background: #fff2f0;
+            border-color: #ffadd2;
+        }
+
+        .score-range.fail {
+            background: #fff1f0;
+            border-color: #ffa39e;
+        }
+
+        .range-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .range-label {
+            font-size: 14px;
+            color: #262626;
+            font-weight: 500;
+        }
+
+        .range-count {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+
+        .range-percentage {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .insights-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .insight-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-xs {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .insights-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .insight-item {
+            display: flex;
+            gap: 16px;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .insight-item.high-priority {
+            background: #fff2f0;
+            border-color: #ffccc7;
+        }
+
+        .insight-item.medium-priority {
+            background: #fff7e6;
+            border-color: #ffd591;
+        }
+
+        .insight-item.low-priority {
+            background: #f6ffed;
+            border-color: #b7eb8f;
+        }
+
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .insight-item.high-priority .insight-icon {
+            background: #fff2f0;
+            color: #ff4d4f;
+        }
+
+        .insight-item.medium-priority .insight-icon {
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+
+        .insight-item.low-priority .insight-icon {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+
+        .insight-content {
+            flex: 1;
+        }
+
+        .insight-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+
+        .insight-description {
+            font-size: 14px;
+            color: #595959;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .insight-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* AI数据分析对话界面样式 */
+        .ai-analysis-chat {
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e3f2fd;
+            margin: 16px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .ai-analysis-chat .chat-header {
+            background: linear-gradient(135deg, #1976d2, #1565c0);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-analysis-chat .chat-header h4 {
+            margin: 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-analysis-chat .btn-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .ai-analysis-chat .btn-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .chat-avatar.ai {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .chat-avatar.user {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+        }
+
+        .chat-content {
+            flex: 1;
+            max-width: calc(100% - 50px);
+        }
+
+        .chat-bubble {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 18px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user .chat-bubble {
+            background: #1976d2;
+            color: white;
+        }
+
+        .welcome-message .chat-bubble {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            border: 1px solid #90caf9;
+        }
+
+        .chat-input-container {
+            border-top: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .quick-questions {
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .quick-btn {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .quick-btn:hover {
+            background: #1976d2;
+            color: white;
+            border-color: #1976d2;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-distribution {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .toolbar-left,
+            .toolbar-right {
+                justify-content: center;
+            }
+
+            .dashboard-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-legend {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .insight-item {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 14px;
+            color: #8c8c8c;
+        }
+
+        .loading::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1890ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 消息提示 */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateX(400px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .message.show {
+            transform: translateX(0);
+        }
+
+        .message.success {
+            background: #52c41a;
+        }
+
+        .message.error {
+            background: #ff4d4f;
+        }
+
+        .message.warning {
+            background: #fa8c16;
+        }
+
+        .message.info {
+            background: #1890ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <div class="header-content">
+                <h1 class="page-title">统计分析</h1>
+                <p class="page-subtitle">全面的数据分析和智能洞察</p>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <button class="btn btn-primary" onclick="generateReport()">
+                    <i class="fas fa-chart-line"></i>
+                    <span>生成报表</span>
+                </button>
+                <button class="btn btn-secondary" onclick="exportAnalysis()">
+                    <i class="fas fa-download"></i>
+                    <span>导出分析</span>
+                </button>
+                <button class="btn btn-secondary" onclick="scheduleReport()">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>定时报表</span>
+                </button>
+            </div>
+            <div class="toolbar-right">
+                <div class="time-range-selector">
+                    <label for="time-range" style="font-size: 14px; color: #595959; margin-right: 8px;">时间范围：</label>
+                    <select class="form-select" id="time-range" onchange="changeTimeRange(this.value)">
+                        <option value="week">近一周</option>
+                        <option value="month" selected>近一月</option>
+                        <option value="semester">本学期</option>
+                        <option value="year">本年度</option>
+                        <option value="custom">自定义</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary" onclick="refreshAnalysis()">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>刷新数据</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="analysis-dashboard">
+            <!-- 数据概览 -->
+            <div class="dashboard-overview">
+                <div class="overview-card">
+                    <div class="card-icon total-exams">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-number">156</div>
+                        <div class="card-label">总考试数</div>
+                        <div class="card-change positive">+12%</div>
+                    </div>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon total-students">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-number">2,486</div>
+                        <div class="card-label">参与学生</div>
+                        <div class="card-change positive">+8%</div>
+                    </div>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon avg-score">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-number">78.5</div>
+                        <div class="card-label">平均分</div>
+                        <div class="card-change negative">-2.3%</div>
+                    </div>
+                </div>
+                <div class="overview-card">
+                    <div class="card-icon pass-rate">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-number">85.2%</div>
+                        <div class="card-label">及格率</div>
+                        <div class="card-change positive">+3.1%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 图表分析 -->
+            <div class="charts-container">
+                <div class="chart-panel">
+                    <div class="panel-header">
+                        <h3>考试趋势分析</h3>
+                        <div class="chart-actions">
+                            <button class="chart-btn" onclick="switchChartType('line')" title="线图">
+                                <i class="fas fa-chart-line"></i>
+                            </button>
+                            <button class="chart-btn active" onclick="switchChartType('bar')" title="柱图">
+                                <i class="fas fa-chart-bar"></i>
+                            </button>
+                            <button class="chart-btn" onclick="fullscreenChart('trend-chart')" title="全屏">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #1890ff;"></div>
+                            <span>考试数量</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #52c41a;"></div>
+                            <span>平均分</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #faad14;"></div>
+                            <span>及格率</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-panel">
+                    <div class="panel-header">
+                        <h3>学科分布</h3>
+                        <div class="chart-actions">
+                            <button class="chart-btn active" onclick="switchChartType('pie')" title="饼图">
+                                <i class="fas fa-chart-pie"></i>
+                            </button>
+                            <button class="chart-btn" onclick="switchChartType('doughnut')" title="环图">
+                                <i class="fas fa-circle-notch"></i>
+                            </button>
+                            <button class="chart-btn" onclick="fullscreenChart('subject-chart')" title="全屏">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="subject-chart"></canvas>
+                    </div>
+                    <div class="subject-stats">
+                        <div class="subject-item">
+                            <div class="subject-color computer"></div>
+                            <div class="subject-info">
+                                <span class="subject-name">计算机网络</span>
+                                <span class="subject-percentage">35.2%</span>
+                            </div>
+                        </div>
+                        <div class="subject-item">
+                            <div class="subject-color data"></div>
+                            <div class="subject-info">
+                                <span class="subject-name">数据结构</span>
+                                <span class="subject-percentage">28.6%</span>
+                            </div>
+                        </div>
+                        <div class="subject-item">
+                            <div class="subject-color system"></div>
+                            <div class="subject-info">
+                                <span class="subject-name">操作系统</span>
+                                <span class="subject-percentage">22.1%</span>
+                            </div>
+                        </div>
+                        <div class="subject-item">
+                            <div class="subject-color others"></div>
+                            <div class="subject-info">
+                                <span class="subject-name">其他</span>
+                                <span class="subject-percentage">14.1%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 详细分析 -->
+            <div class="analysis-details">
+                <div class="detail-panel">
+                    <div class="panel-header">
+                        <h3>成绩分布分析</h3>
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" onclick="switchScoreFilter('all')">全部</button>
+                            <button class="filter-tab" onclick="switchScoreFilter('computer')">计算机网络</button>
+                            <button class="filter-tab" onclick="switchScoreFilter('data')">数据结构</button>
+                            <button class="filter-tab" onclick="switchScoreFilter('system')">操作系统</button>
+                        </div>
+                    </div>
+                    <div class="score-distribution">
+                        <div class="distribution-chart">
+                            <canvas id="score-distribution-chart"></canvas>
+                        </div>
+                        <div class="distribution-stats">
+                            <div class="stat-group">
+                                <h4>分数段统计</h4>
+                                <div class="score-ranges">
+                                    <div class="score-range excellent">
+                                        <div class="range-info">
+                                            <span class="range-label">优秀 (90-100分)</span>
+                                            <span class="range-count">186人</span>
+                                        </div>
+                                        <div class="range-percentage">12.5%</div>
+                                    </div>
+                                    <div class="score-range good">
+                                        <div class="range-info">
+                                            <span class="range-label">良好 (80-89分)</span>
+                                            <span class="range-count">542人</span>
+                                        </div>
+                                        <div class="range-percentage">36.4%</div>
+                                    </div>
+                                    <div class="score-range average">
+                                        <div class="range-info">
+                                            <span class="range-label">中等 (70-79分)</span>
+                                            <span class="range-count">423人</span>
+                                        </div>
+                                        <div class="range-percentage">28.4%</div>
+                                    </div>
+                                    <div class="score-range pass">
+                                        <div class="range-info">
+                                            <span class="range-label">及格 (60-69分)</span>
+                                            <span class="range-count">245人</span>
+                                        </div>
+                                        <div class="range-percentage">16.5%</div>
+                                    </div>
+                                    <div class="score-range fail">
+                                        <div class="range-info">
+                                            <span class="range-label">不及格 (0-59分)</span>
+                                            <span class="range-count">92人</span>
+                                        </div>
+                                        <div class="range-percentage">6.2%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 智能洞察 -->
+            <div class="insights-panel">
+                <div class="panel-header">
+                    <h3>智能分析洞察</h3>
+                    <div class="insight-actions">
+                        <button class="btn btn-sm btn-secondary" onclick="generateInsights()">
+                            <i class="fas fa-brain"></i>
+                            生成洞察
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="toggleAnalysisChat()">
+                            <i class="fas fa-comments"></i>
+                            AI分析师
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="exportInsights()">
+                            <i class="fas fa-download"></i>
+                            导出洞察
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- AI数据分析对话界面 -->
+                <div class="ai-analysis-chat" id="analysisChat" style="display: none;">
+                    <div class="chat-header">
+                        <h4><i class="fas fa-robot"></i> AI数据分析师</h4>
+                        <button class="btn-close" onclick="toggleAnalysisChat()">×</button>
+                    </div>
+                    <div class="chat-container">
+                        <div class="chat-messages" id="analysisChatMessages">
+                            <div class="chat-message ai welcome-message">
+                                <div class="chat-avatar ai">AI</div>
+                                <div class="chat-content">
+                                    <div class="chat-bubble">
+                                        👋 你好！我是AI数据分析师。我可以帮您：<br><br>
+                                        📊 <strong>深度解析数据</strong> - 为什么多选题正确率低？<br>
+                                        🔍 <strong>发现数据趋势</strong> - 学生成绩变化原因分析<br>
+                                        💡 <strong>提供改进建议</strong> - 基于数据的教学优化方案<br>
+                                        📈 <strong>预测学习效果</strong> - 下次考试成绩预测<br><br>
+                                        请告诉我您想了解什么数据问题？
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-container">
+                            <div class="quick-questions">
+                                <button class="quick-btn" onclick="askQuickQuestion('为什么多选题正确率这么低？')">多选题分析</button>
+                                <button class="quick-btn" onclick="askQuickQuestion('如何提升班级整体成绩？')">成绩提升</button>
+                                <button class="quick-btn" onclick="askQuickQuestion('预测下次考试表现如何？')">成绩预测</button>
+                            </div>
+                            <div class="chat-input-area">
+                                <input type="text" class="chat-input" id="analysisChatInput" placeholder="询问任何关于数据分析的问题...">
+                                <button class="btn btn-primary btn-sm" onclick="sendAnalysisMessage()">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="insights-container">
+                    <div class="insight-item high-priority">
+                        <div class="insight-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="insight-content">
+                            <div class="insight-title">多选题难度偏高</div>
+                            <div class="insight-description">多选题平均正确率仅65.8%，建议调整题目难度或增加相关练习。这可能影响学生整体成绩表现。</div>
+                            <div class="insight-actions">
+                                <button class="btn btn-xs btn-primary" onclick="viewDetails('multiple-choice-analysis')">查看详情</button>
+                                <button class="btn btn-xs btn-secondary" onclick="generateSuggestions('difficulty')">获取建议</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-item medium-priority">
+                        <div class="insight-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="insight-content">
+                            <div class="insight-title">操作系统课程表现优异</div>
+                            <div class="insight-description">操作系统相关考试平均分达到85.2分，高于整体平均水平，教学效果显著。</div>
+                            <div class="insight-actions">
+                                <button class="btn btn-xs btn-primary" onclick="viewDetails('os-performance')">查看详情</button>
+                                <button class="btn btn-xs btn-secondary" onclick="shareSuccess('os')">分享经验</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-item low-priority">
+                        <div class="insight-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="insight-content">
+                            <div class="insight-title">考试时间分布建议</div>
+                            <div class="insight-description">建议在上午9-11点安排重要考试，学生表现相对更佳，平均分提升约5.3%。</div>
+                            <div class="insight-actions">
+                                <button class="btn btn-xs btn-primary" onclick="viewTimeAnalysis()">时间分析</button>
+                                <button class="btn btn-xs btn-secondary" onclick="optimizeSchedule()">优化安排</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="insight-item medium-priority">
+                        <div class="insight-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="insight-content">
+                            <div class="insight-title">试卷长度对表现的影响</div>
+                            <div class="insight-description">超过50题的试卷，学生后半部分答题质量明显下降，建议控制在40题以内。</div>
+                            <div class="insight-actions">
+                                <button class="btn btn-xs btn-primary" onclick="viewDetails('paper-length-analysis')">查看详情</button>
+                                <button class="btn btn-xs btn-secondary" onclick="optimizePaperLength()">优化建议</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentCharts = {};
+        
+        // 显示消息
+        function showMessage(text, type = 'info', duration = 3000) {
+            const existingMessage = document.querySelector('.message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.innerHTML = `
+                <i class="fas fa-${getMessageIcon(type)}"></i>
+                <span>${text}</span>
+            `;
+
+            document.body.appendChild(message);
+            setTimeout(() => message.classList.add('show'), 100);
+
+            setTimeout(() => {
+                message.classList.remove('show');
+                setTimeout(() => message.remove(), 300);
+            }, duration);
+        }
+
+        function getMessageIcon(type) {
+            const icons = {
+                success: 'check-circle',
+                error: 'exclamation-circle',
+                warning: 'exclamation-triangle',
+                info: 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        // 工具栏功能
+        function generateReport() {
+            showMessage('正在生成报表...', 'info');
+            setTimeout(() => {
+                showMessage('报表生成成功', 'success');
+            }, 2000);
+        }
+
+        function exportAnalysis() {
+            showMessage('正在导出分析数据...', 'info');
+            setTimeout(() => {
+                showMessage('分析数据导出成功', 'success');
+            }, 1500);
+        }
+
+        function scheduleReport() {
+            showMessage('正在设置定时报表...', 'info');
+            setTimeout(() => {
+                showMessage('定时报表设置成功', 'success');
+            }, 1000);
+        }
+
+        function changeTimeRange(value) {
+            showMessage(`正在加载${getTimeRangeText(value)}的数据...`, 'info');
+            setTimeout(() => {
+                updateCharts();
+                showMessage('数据刷新完成', 'success');
+            }, 1500);
+        }
+
+        function getTimeRangeText(value) {
+            const texts = {
+                week: '近一周',
+                month: '近一月',
+                semester: '本学期',
+                year: '本年度',
+                custom: '自定义'
+            };
+            return texts[value] || '近一月';
+        }
+
+        function refreshAnalysis() {
+            showMessage('正在刷新数据...', 'info');
+            setTimeout(() => {
+                updateCharts();
+                updateOverviewCards();
+                showMessage('数据刷新完成', 'success');
+            }, 2000);
+        }
+
+        // 图表功能
+        function switchChartType(type) {
+            showMessage(`切换到${type}图表`, 'info');
+            // 这里可以添加图表切换逻辑
+        }
+
+        function fullscreenChart(chartId) {
+            showMessage('全屏模式开发中...', 'info');
+        }
+
+        // 筛选功能
+        function switchScoreFilter(subject) {
+            // 更新筛选标签状态
+            const tabs = document.querySelectorAll('.filter-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const subjectNames = {
+                all: '全部',
+                computer: '计算机网络',
+                data: '数据结构',
+                system: '操作系统'
+            };
+            
+            showMessage(`正在加载${subjectNames[subject]}的成绩分布...`, 'info');
+            setTimeout(() => {
+                showMessage('成绩分布数据更新完成', 'success');
+            }, 1000);
+        }
+
+        // AI数据分析师功能
+        function toggleAnalysisChat() {
+            const chatDiv = document.getElementById('analysisChat');
+            const isVisible = chatDiv.style.display !== 'none';
+            chatDiv.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                // 聚焦到输入框
+                setTimeout(() => {
+                    document.getElementById('analysisChatInput').focus();
+                }, 100);
+            }
+        }
+
+        function sendAnalysisMessage() {
+            const input = document.getElementById('analysisChatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // 添加用户消息
+            addAnalysisMessage('user', message);
+            input.value = '';
+            
+            // 模拟AI分析师响应
+            setTimeout(() => {
+                const aiResponse = generateAnalysisResponse(message);
+                addAnalysisMessage('ai', aiResponse);
+            }, 1500);
+        }
+
+        function askQuickQuestion(question) {
+            // 添加用户消息
+            addAnalysisMessage('user', question);
+            
+            // 模拟AI响应
+            setTimeout(() => {
+                const aiResponse = generateAnalysisResponse(question);
+                addAnalysisMessage('ai', aiResponse);
+            }, 1500);
+        }
+
+        function addAnalysisMessage(type, content) {
+            const messagesContainer = document.getElementById('analysisChatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${type}`;
+            
+            const avatar = type === 'ai' ? 'AI' : '我';
+            
+            messageDiv.innerHTML = `
+                <div class="chat-avatar ${type}">${avatar}</div>
+                <div class="chat-content">
+                    <div class="chat-bubble">${content.replace(/\n/g, '<br>')}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateAnalysisResponse(userMessage) {
+            const analysisResponses = {
+                '多选题': `📊 **多选题正确率分析：**\n\n根据当前数据，多选题平均正确率为65.8%，主要原因包括：\n\n🎯 **难点分析：**\n• 知识点综合性强，需要学生掌握多个相关概念\n• 学生容易遗漏部分正确选项\n• 对概念理解不够深入，导致误选\n\n💡 **改进建议：**\n• 增加相关知识点的练习题\n• 在课堂教学中加强概念之间的联系讲解\n• 建议将部分复杂多选题拆分为多道单选题`,
+                
+                '成绩': `📈 **班级成绩深度分析：**\n\n当前班级平均分78.5分，分析如下：\n\n🔍 **成绩分布特点：**\n• 优秀生比例：12.5%（需提升挑战性）\n• 中等生集中：64.8%（有提升空间）\n• 后进生：6.2%（需重点关注）\n\n🚀 **提升策略：**\n• 为优秀生设计拓展题目\n• 针对中等生加强基础概念训练\n• 对后进生制定个性化辅导计划\n• 建议增加实践应用类题目`,
+                
+                '预测': `🔮 **下次考试成绩预测：**\n\n基于历史数据和学习趋势分析：\n\n📊 **预测结果：**\n• 预测平均分：80.2分（±3.1分）\n• 预计及格率：89.5%\n• 优秀率预测：15.8%\n\n📈 **趋势分析：**\n• 整体呈上升趋势，预计提升1.7分\n• 计算机网络模块掌握较好\n• 建议重点关注数据结构部分\n\n💡 **建议措施：**\n• 针对薄弱环节增加练习\n• 保持当前教学节奏\n• 适当增加综合应用题`
+            };
+            
+            // 智能匹配关键词
+            for (const [key, response] of Object.entries(analysisResponses)) {
+                if (userMessage.includes(key)) {
+                    return response;
+                }
+            }
+            
+            // 通用数据分析回复
+            const genericResponses = [
+                `📊 我分析了您提到的"${userMessage}"相关数据：\n\n根据当前统计结果，我发现了几个值得关注的数据模式。让我为您详细解读数据背后的含义，并提供针对性的改进建议。\n\n您希望我重点分析哪个方面的数据？`,
+                
+                `🔍 关于"${userMessage}"的数据洞察：\n\n我检测到相关数据指标存在一些有趣的变化趋势。通过对比历史数据，可以发现教学效果的改善空间。\n\n需要我深入分析具体哪些数据维度吗？`,
+                
+                `💡 基于"${userMessage}"的智能分析：\n\n数据显示出一些重要的教学信号，这些信息可以帮助您优化教学策略。我建议从数据驱动的角度来制定下一步的教学改进计划。\n\n您想了解哪个具体指标的详细分析？`
+            ];
+            
+            return genericResponses[Math.floor(Math.random() * genericResponses.length)];
+        }
+
+        // 洞察功能
+        function generateInsights() {
+            showMessage('正在分析数据生成智能洞察...', 'info');
+            setTimeout(() => {
+                showMessage('智能洞察生成完成', 'success');
+            }, 3000);
+        }
+
+        function exportInsights() {
+            showMessage('正在导出洞察报告...', 'info');
+            setTimeout(() => {
+                showMessage('洞察报告导出成功', 'success');
+            }, 1500);
+        }
+
+        function viewDetails(analysisType) {
+            showMessage(`正在加载${analysisType}详细分析...`, 'info');
+        }
+
+        function generateSuggestions(type) {
+            showMessage(`正在生成${type}改进建议...`, 'info');
+            setTimeout(() => {
+                showMessage('改进建议生成完成', 'success');
+            }, 2000);
+        }
+
+        function shareSuccess(subject) {
+            showMessage(`正在分享${subject}课程成功经验...`, 'info');
+        }
+
+        function viewTimeAnalysis() {
+            showMessage('正在加载时间分析详情...', 'info');
+        }
+
+        function optimizeSchedule() {
+            showMessage('正在优化考试时间安排...', 'info');
+        }
+
+        function optimizePaperLength() {
+            showMessage('正在生成试卷长度优化建议...', 'info');
+        }
+
+        // 初始化图表
+        function initCharts() {
+            initTrendChart();
+            initSubjectChart();
+            initScoreDistributionChart();
+        }
+
+        function initTrendChart() {
+            const ctx = document.getElementById('trend-chart').getContext('2d');
+            currentCharts.trendChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [
+                        {
+                            label: '考试数量',
+                            data: [12, 19, 15, 25, 22, 30],
+                            backgroundColor: 'rgba(24, 144, 255, 0.8)',
+                            borderColor: 'rgba(24, 144, 255, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '平均分',
+                            data: [65, 72, 78, 81, 79, 85],
+                            backgroundColor: 'rgba(82, 196, 26, 0.8)',
+                            borderColor: 'rgba(82, 196, 26, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function initSubjectChart() {
+            const ctx = document.getElementById('subject-chart').getContext('2d');
+            currentCharts.subjectChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['计算机网络', '数据结构', '操作系统', '其他'],
+                    datasets: [{
+                        data: [35.2, 28.6, 22.1, 14.1],
+                        backgroundColor: [
+                            '#1890ff',
+                            '#52c41a',
+                            '#faad14',
+                            '#f759ab'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function initScoreDistributionChart() {
+            const ctx = document.getElementById('score-distribution-chart').getContext('2d');
+            currentCharts.scoreChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-59', '60-69', '70-79', '80-89', '90-100'],
+                    datasets: [{
+                        label: '人数',
+                        data: [92, 245, 423, 542, 186],
+                        backgroundColor: [
+                            '#ff4d4f',
+                            '#fa8c16',
+                            '#faad14',
+                            '#1890ff',
+                            '#52c41a'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            // 模拟数据更新
+            if (currentCharts.trendChart) {
+                const newData = Array.from({length: 6}, () => Math.floor(Math.random() * 30) + 10);
+                currentCharts.trendChart.data.datasets[0].data = newData;
+                currentCharts.trendChart.update();
+            }
+        }
+
+        function updateOverviewCards() {
+            // 模拟数据更新
+            const cards = document.querySelectorAll('.card-number');
+            cards.forEach(card => {
+                const currentValue = parseInt(card.textContent.replace(/[,\s]/g, ''));
+                const change = Math.floor(Math.random() * 20) - 10;
+                const newValue = Math.max(0, currentValue + change);
+                card.textContent = newValue.toLocaleString();
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            
+            // 支持回车键发送分析消息
+            const analysisChatInput = document.getElementById('analysisChatInput');
+            if (analysisChatInput) {
+                analysisChatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendAnalysisMessage();
+                    }
+                });
+            }
+            
+            // 模拟定期数据更新
+            setInterval(() => {
+                const randomCard = Math.floor(Math.random() * 4);
+                const cards = document.querySelectorAll('.card-number');
+                if (cards[randomCard]) {
+                    const currentValue = parseInt(cards[randomCard].textContent.replace(/[,\s]/g, ''));
+                    const change = Math.floor(Math.random() * 10) - 5;
+                    const newValue = Math.max(0, currentValue + change);
+                    cards[randomCard].textContent = newValue.toLocaleString();
+                }
+            }, 5000); // 每5秒更新一次
+        });
+    </script>
+</body>
+</html>

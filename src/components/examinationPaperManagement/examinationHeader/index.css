@@ -1,0 +1,43 @@
+.page-header {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  padding: 24px 32px;
+  margin-bottom: 16px;
+  border-left: 4px solid #1890ff;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.title-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title-left i {
+  font-size: 24px;
+  color: #1890ff;
+}
+
+.title-left h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.title-right {
+  display: flex;
+  gap: 12px;
+}
+
+.page-description {
+  color: #8c8c8c;
+  font-size: 14px;
+  margin-left: 36px;
+}

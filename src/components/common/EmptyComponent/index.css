@@ -1,0 +1,31 @@
+.examination-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  color: #8c8c8c;
+}
+
+@font-face {
+  font-family: "examination-iconfont"; /* Project id 5015714 */
+  src: url("//at.alicdn.com/t/a/font_5015714_b2wq242uu8f.woff2?t=1757235015966")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5015714_b2wq242uu8f.woff?t=1757235015966")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5015714_b2wq242uu8f.ttf?t=1757235015966")
+      format("truetype");
+}
+
+.examination-iconfont {
+  font-family: "examination-iconfont" !important;
+  font-size: 100px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-zanwushuju:before {
+  content: "\e650";
+}

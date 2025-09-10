@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考试管理系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* 主容器 */
+        .management-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 页面头部 */
+        .page-header {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 24px 32px;
+            margin-bottom: 16px;
+            border-left: 4px solid #1890ff;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .title-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .title-left i {
+            font-size: 24px;
+            color: #1890ff;
+        }
+
+        .title-left h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .title-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .page-description {
+            color: #8c8c8c;
+            font-size: 14px;
+            margin-left: 36px;
+        }
+
+        /* 标签页导航 */
+        .tabs-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .tabs-header {
+            display: flex;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .tab-item {
+            flex: 1;
+            padding: 16px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #595959;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .tab-item:hover {
+            color: #1890ff;
+            background: rgba(24, 144, 255, 0.04);
+        }
+
+        .tab-item.active {
+            color: #1890ff;
+            background: #fff;
+            border-bottom-color: #1890ff;
+        }
+
+        .tab-content {
+            padding: 24px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: #595959;
+            border-color: #d9d9d9;
+        }
+
+        .btn-secondary:hover {
+            color: #1890ff;
+            border-color: #1890ff;
+        }
+
+        .btn-success {
+            background: #52c41a;
+            color: #fff;
+            border-color: #52c41a;
+        }
+
+        .btn-success:hover {
+            background: #73d13d;
+            border-color: #73d13d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+        }
+
+        .btn-warning {
+            background: #fa8c16;
+            color: #fff;
+            border-color: #fa8c16;
+        }
+
+        .btn-warning:hover {
+            background: #ffa940;
+            border-color: #ffa940;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(250, 140, 22, 0.3);
+        }
+
+        .btn-danger {
+            background: #ff4d4f;
+            color: #fff;
+            border-color: #ff4d4f;
+        }
+
+        .btn-danger:hover {
+            background: #ff7875;
+            border-color: #ff7875;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
+        }
+
+        .btn-large {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* 考试卡片 */
+        .exam-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .exam-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid #f0f0f0;
+            position: relative;
+        }
+
+        .exam-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            border-color: #1890ff;
+        }
+
+        .exam-header {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+            color: #fff;
+            position: relative;
+        }
+
+        .exam-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .exam-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .exam-status {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-upcoming {
+            background: rgba(250, 140, 22, 0.2);
+            color: #fa8c16;
+        }
+
+        .status-ongoing {
+            background: rgba(82, 196, 26, 0.2);
+            color: #52c41a;
+        }
+
+        .status-completed {
+            background: rgba(0, 0, 0, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .status-cancelled {
+            background: rgba(255, 77, 79, 0.2);
+            color: #ff4d4f;
+        }
+
+        .exam-content {
+            padding: 20px;
+        }
+
+        .exam-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #595959;
+        }
+
+        .info-item i {
+            color: #8c8c8c;
+            width: 16px;
+        }
+
+        .exam-progress {
+            margin-bottom: 16px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1890ff, #40a9ff);
+            transition: width 0.3s;
+        }
+
+        .exam-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1890ff;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #8c8c8c;
+            margin-top: 4px;
+        }
+
+        .exam-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* 表单样式 */
+        .form-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 24px;
+        }
+
+        .form-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #1890ff;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+            outline: none;
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* 参与人员管理 */
+        .participants-section {
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .participants-header {
+            background: #fafafa;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .participants-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .participant-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .participant-item:last-child {
+            border-bottom: none;
+        }
+
+        .participant-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .participant-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1890ff;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .participant-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .participant-name {
+            font-weight: 500;
+            color: #262626;
+        }
+
+        .participant-role {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+
+        /* 监考设置 */
+        .proctoring-settings {
+            background: #f6f8fa;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .setting-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            color: #262626;
+        }
+
+        .switch {
+            position: relative;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #1890ff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* 统计面板 */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stats-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 20px;
+            text-align: center;
+            border-left: 4px solid #1890ff;
+        }
+
+        .stats-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1890ff;
+            margin-bottom: 8px;
+        }
+
+        .stats-label {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+
+        .stats-trend {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .trend-up { color: #52c41a; }
+        .trend-down { color: #ff4d4f; }
+
+        /* 消息提示 */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .message.show {
+            transform: translateX(0);
+        }
+
+        .message.success {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .message.error {
+            background: #fff2f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+
+        .message.info {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+        .message.warning {
+            background: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+
+        /* 日历视图 */
+        .calendar-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .calendar-day {
+            background: #fff;
+            padding: 12px 8px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .day-header {
+            font-weight: 600;
+            color: #262626;
+            font-size: 14px;
+            text-align: center;
+            background: #fafafa;
+        }
+
+        .day-number {
+            font-size: 14px;
+            color: #595959;
+        }
+
+        .day-event {
+            background: #e6f7ff;
+            color: #1890ff;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .day-event:hover {
+            background: #1890ff;
+            color: #fff;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .exam-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .management-container {
+                padding: 16px;
+            }
+            
+            .tabs-header {
+                flex-direction: column;
+            }
+            
+            .tab-item {
+                flex: none;
+                padding: 12px 16px;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            
+            .toolbar-left,
+            .toolbar-right {
+                justify-content: center;
+            }
+            
+            .exam-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-panel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* 实时状态指示 */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-online { background: #52c41a; }
+        .status-offline { background: #d9d9d9; }
+        .status-warning { background: #fa8c16; }
+        .status-error { background: #ff4d4f; }
+
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #8c8c8c;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 主容器 -->
+    <div class="management-container">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="page-title">
+                <div class="title-left">
+                    <i class="fas fa-clipboard-check"></i>
+                    <h1>考试管理</h1>
+                </div>
+                <div class="title-right">
+                    <button class="btn btn-success btn-large" onclick="createExam()">
+                        <i class="fas fa-plus"></i>
+                        <span>创建考试</span>
+                    </button>
+                </div>
+            </div>
+            <div class="page-description">
+                全面管理考试流程，包括考试安排、监考设置、实时监控、成绩统计等功能
+            </div>
+        </div>
+
+        <!-- 标签页容器 -->
+        <div class="tabs-container">
+            <!-- 标签页头部 -->
+            <div class="tabs-header">
+                <div class="tab-item active" onclick="switchTab('exam-list')">
+                    <i class="fas fa-list"></i>
+                    <span>考试列表</span>
+                </div>
+                <div class="tab-item" onclick="switchTab('create-exam')">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>创建考试</span>
+                </div>
+                <div class="tab-item" onclick="switchTab('exam-monitor')">
+                    <i class="fas fa-eye"></i>
+                    <span>实时监控</span>
+                </div>
+                <div class="tab-item" onclick="switchTab('exam-calendar')">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>考试日历</span>
+                </div>
+                <div class="tab-item" onclick="switchTab('exam-reports')">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>考试报告</span>
+                </div>
+            </div>
+
+            <!-- 考试列表 -->
+            <div id="exam-list" class="tab-content active">
+                <!-- 工具栏 -->
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <button class="btn btn-primary" onclick="createExam()">
+                            <i class="fas fa-plus"></i>
+                            <span>创建考试</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="batchOperation()">
+                            <i class="fas fa-check-square"></i>
+                            <span>批量操作</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportExams()">
+                            <i class="fas fa-download"></i>
+                            <span>导出数据</span>
+                        </button>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="btn btn-secondary" onclick="filterExams()">
+                            <i class="fas fa-filter"></i>
+                            <span>筛选</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="refreshExams()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 考试卡片网格 -->
+                <div class="exam-grid">
+                    <!-- 进行中的考试 -->
+                    <div class="exam-card">
+                        <div class="exam-header">
+                            <div class="exam-title">计算机网络期末考试</div>
+                            <div class="exam-subtitle">2024年春季学期 · 网络工程专业</div>
+                            <div class="exam-status status-ongoing">进行中</div>
+                        </div>
+                        <div class="exam-content">
+                            <div class="exam-info">
+                                <div class="info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>14:00-16:00</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>2024-03-15</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>教学楼A201</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>张老师</span>
+                                </div>
+                            </div>
+                            <div class="exam-progress">
+                                <div class="progress-header">
+                                    <span>考试进度</span>
+                                    <span>65%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%;"></div>
+                                </div>
+                            </div>
+                            <div class="exam-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">45</div>
+                                    <div class="stat-label">参考人数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">42</div>
+                                    <div class="stat-label">在线人数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">3</div>
+                                    <div class="stat-label">异常状态</div>
+                                </div>
+                            </div>
+                            <div class="exam-actions">
+                                <button class="btn btn-warning btn-sm" onclick="monitorExam()">
+                                    <i class="fas fa-eye"></i>
+                                    <span>实时监控</span>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="examSettings()">
+                                    <i class="fas fa-cog"></i>
+                                    <span>设置</span>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="stopExam()">
+                                    <i class="fas fa-stop"></i>
+                                    <span>结束考试</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 即将开始的考试 -->
+                    <div class="exam-card">
+                        <div class="exam-header">
+                            <div class="exam-title">数据结构算法测试</div>
+                            <div class="exam-subtitle">2024年春季学期 · 计算机科学专业</div>
+                            <div class="exam-status status-upcoming">即将开始</div>
+                        </div>
+                        <div class="exam-content">
+                            <div class="exam-info">
+                                <div class="info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>19:00-20:30</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>2024-03-16</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>机房B305</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>李老师</span>
+                                </div>
+                            </div>
+                            <div class="exam-progress">
+                                <div class="progress-header">
+                                    <span>准备进度</span>
+                                    <span>90%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 90%;"></div>
+                                </div>
+                            </div>
+                            <div class="exam-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">38</div>
+                                    <div class="stat-label">报名人数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">35</div>
+                                    <div class="stat-label">确认参加</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">3</div>
+                                    <div class="stat-label">待确认</div>
+                                </div>
+                            </div>
+                            <div class="exam-actions">
+                                <button class="btn btn-primary btn-sm" onclick="startExam()">
+                                    <i class="fas fa-play"></i>
+                                    <span>开始考试</span>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="editExam()">
+                                    <i class="fas fa-edit"></i>
+                                    <span>编辑</span>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="previewExam()">
+                                    <i class="fas fa-eye"></i>
+                                    <span>预览</span>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="notifyStudents()">
+                                    <i class="fas fa-bell"></i>
+                                    <span>通知</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 已完成的考试 -->
+                    <div class="exam-card">
+                        <div class="exam-header">
+                            <div class="exam-title">操作系统原理考试</div>
+                            <div class="exam-subtitle">2024年春季学期 · 软件工程专业</div>
+                            <div class="exam-status status-completed">已完成</div>
+                        </div>
+                        <div class="exam-content">
+                            <div class="exam-info">
+                                <div class="info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>09:00-11:00</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>2024-03-10</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>教学楼C102</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>王老师</span>
+                                </div>
+                            </div>
+                            <div class="exam-progress">
+                                <div class="progress-header">
+                                    <span>阅卷进度</span>
+                                    <span>75%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%;"></div>
+                                </div>
+                            </div>
+                            <div class="exam-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">42</div>
+                                    <div class="stat-label">参考人数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">31</div>
+                                    <div class="stat-label">已阅卷</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">11</div>
+                                    <div class="stat-label">待阅卷</div>
+                                </div>
+                            </div>
+                            <div class="exam-actions">
+                                <button class="btn btn-primary btn-sm" onclick="gradeExam()">
+                                    <i class="fas fa-clipboard-check"></i>
+                                    <span>阅卷</span>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="viewReport()">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>报告</span>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="exportResults()">
+                                    <i class="fas fa-download"></i>
+                                    <span>导出</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 已取消的考试 -->
+                    <div class="exam-card">
+                        <div class="exam-header">
+                            <div class="exam-title">软件工程期中考试</div>
+                            <div class="exam-subtitle">2024年春季学期 · 软件工程专业</div>
+                            <div class="exam-status status-cancelled">已取消</div>
+                        </div>
+                        <div class="exam-content">
+                            <div class="exam-info">
+                                <div class="info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>原定 10:00-12:00</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>2024-03-12</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>因故取消</span>
+                                </div>
+                            </div>
+                            <div style="padding: 16px; background: #fff2f0; border-radius: 6px; margin: 16px 0; color: #ff4d4f; font-size: 14px;">
+                                <i class="fas fa-info-circle"></i> 
+                                取消原因：教学计划调整，考试时间另行通知
+                            </div>
+                            <div class="exam-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="rescheduleExam()">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    <span>重新安排</span>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="deleteExam()">
+                                    <i class="fas fa-trash"></i>
+                                    <span>删除</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 创建考试 -->
+            <div id="create-exam" class="tab-content">
+                <div class="form-container">
+                    <!-- 基本信息 -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            基本信息
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">考试名称 *</label>
+                                <input type="text" class="form-input" placeholder="请输入考试名称">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">考试科目 *</label>
+                                <select class="form-select">
+                                    <option>请选择科目</option>
+                                    <option>计算机网络</option>
+                                    <option>数据结构</option>
+                                    <option>操作系统</option>
+                                    <option>软件工程</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">考试类型</label>
+                                <select class="form-select">
+                                    <option>期末考试</option>
+                                    <option>期中考试</option>
+                                    <option>章节测试</option>
+                                    <option>模拟考试</option>
+                                    <option>补考</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">试卷模板 *</label>
+                                <select class="form-select">
+                                    <option>请选择试卷</option>
+                                    <option>计算机网络期末试卷</option>
+                                    <option>数据结构章节测试</option>
+                                    <option>操作系统综合测试</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">考试说明</label>
+                            <textarea class="form-textarea" placeholder="请输入考试说明和注意事项..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 时间安排 -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-clock"></i>
+                            时间安排
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">考试日期 *</label>
+                                <input type="date" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">开始时间 *</label>
+                                <input type="time" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">结束时间 *</label>
+                                <input type="time" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">考试时长</label>
+                                <input type="number" class="form-input" placeholder="分钟">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">迟到限制</label>
+                                <select class="form-select">
+                                    <option>开考30分钟内可入场</option>
+                                    <option>开考15分钟内可入场</option>
+                                    <option>开考后不允许入场</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">提前交卷</label>
+                                <select class="form-select">
+                                    <option>考试结束前30分钟可交卷</option>
+                                    <option>考试结束前15分钟可交卷</option>
+                                    <option>不允许提前交卷</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 参与人员 -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-users"></i>
+                            参与人员
+                        </div>
+                        <div class="participants-section">
+                            <div class="participants-header">
+                                <span>考生名单 (已选择 0 人)</span>
+                                <div>
+                                    <button class="btn btn-secondary btn-sm" onclick="importStudents()">
+                                        <i class="fas fa-upload"></i>
+                                        导入名单
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="addStudents()">
+                                        <i class="fas fa-plus"></i>
+                                        添加考生
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="participants-list">
+                                <div style="padding: 40px; text-align: center; color: #8c8c8c;">
+                                    <i class="fas fa-user-plus" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                                    <p>还没有添加考生，点击上方按钮添加</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">监考老师</label>
+                                <select class="form-select">
+                                    <option>请选择监考老师</option>
+                                    <option>张老师</option>
+                                    <option>李老师</option>
+                                    <option>王老师</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 监考设置 -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-shield-alt"></i>
+                            监考设置
+                        </div>
+                        <div class="proctoring-settings">
+                            <div class="setting-item">
+                                <span class="setting-label">启用摄像头监控</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">启用屏幕录制</span>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">禁止切换窗口</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">禁止复制粘贴</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">随机题目顺序</span>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">随机选项顺序</span>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <div class="toolbar">
+                        <div class="toolbar-left">
+                            <button class="btn btn-secondary" onclick="previewExamConfig()">
+                                <i class="fas fa-eye"></i>
+                                <span>预览配置</span>
+                            </button>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn btn-secondary" onclick="saveDraftExam()">
+                                <i class="fas fa-save"></i>
+                                <span>保存草稿</span>
+                            </button>
+                            <button class="btn btn-primary btn-large" onclick="createExamSubmit()">
+                                <i class="fas fa-check"></i>
+                                <span>创建考试</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 实时监控 -->
+            <div id="exam-monitor" class="tab-content">
+                <!-- 统计面板 -->
+                <div class="stats-panel">
+                    <div class="stats-card">
+                        <div class="stats-value">3</div>
+                        <div class="stats-label">进行中考试</div>
+                        <div class="stats-trend trend-up">
+                            <i class="fas fa-arrow-up"></i> +1
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-value">127</div>
+                        <div class="stats-label">在线考生</div>
+                        <div class="stats-trend">
+                            <span class="status-indicator status-online"></span> 正常
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-value">5</div>
+                        <div class="stats-label">异常状态</div>
+                        <div class="stats-trend trend-down">
+                            <span class="status-indicator status-warning"></span> 需关注
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-value">98.5%</div>
+                        <div class="stats-label">系统稳定性</div>
+                        <div class="stats-trend trend-up">
+                            <span class="status-indicator status-online"></span> 优秀
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 监控内容 -->
+                <div class="form-container">
+                    <div class="section-title">
+                        <i class="fas fa-desktop"></i>
+                        实时监控面板
+                    </div>
+                    <div style="text-align: center; padding: 60px; color: #8c8c8c;">
+                        <i class="fas fa-eye" style="font-size: 64px; margin-bottom: 24px; opacity: 0.5;"></i>
+                        <h3 style="margin-bottom: 12px;">监控功能开发中</h3>
+                        <p>实时监控功能正在开发中，敬请期待</p>
+                        <div style="margin-top: 24px;">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-play"></i>
+                                <span>启动监控</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 考试日历 -->
+            <div id="exam-calendar" class="tab-content">
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-title">2024年3月考试安排</div>
+                        <div class="calendar-nav">
+                            <button class="btn btn-secondary btn-sm">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-secondary btn-sm">今天</button>
+                            <button class="btn btn-secondary btn-sm">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-grid">
+                        <div class="calendar-day day-header">周日</div>
+                        <div class="calendar-day day-header">周一</div>
+                        <div class="calendar-day day-header">周二</div>
+                        <div class="calendar-day day-header">周三</div>
+                        <div class="calendar-day day-header">周四</div>
+                        <div class="calendar-day day-header">周五</div>
+                        <div class="calendar-day day-header">周六</div>
+                        
+                        <!-- 日历内容行 -->
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day">
+                            <div class="day-number">1</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">2</div>
+                        </div>
+                        
+                        <div class="calendar-day">
+                            <div class="day-number">3</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">4</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">5</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">6</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">7</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">8</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">9</div>
+                        </div>
+                        
+                        <div class="calendar-day">
+                            <div class="day-number">10</div>
+                            <div class="day-event" onclick="viewExamDetail()">操作系统考试</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">11</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">12</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">13</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">14</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">15</div>
+                            <div class="day-event" onclick="viewExamDetail()">计算机网络</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">16</div>
+                            <div class="day-event" onclick="viewExamDetail()">数据结构测试</div>
+                        </div>
+                        
+                        <div class="calendar-day">
+                            <div class="day-number">17</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">18</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">19</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">20</div>
+                            <div class="day-event" onclick="viewExamDetail()">软件工程</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">21</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">22</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">23</div>
+                        </div>
+                        
+                        <div class="calendar-day">
+                            <div class="day-number">24</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">25</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">26</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">27</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">28</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">29</div>
+                        </div>
+                        <div class="calendar-day">
+                            <div class="day-number">30</div>
+                        </div>
+                        
+                        <div class="calendar-day">
+                            <div class="day-number">31</div>
+                        </div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                        <div class="calendar-day"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 考试报告 -->
+            <div id="exam-reports" class="tab-content">
+                <!-- 统计概览 -->
+                <div class="stats-panel">
+                    <div class="stats-card">
+                        <div class="stats-value">156</div>
+                        <div class="stats-label">总考试场次</div>
+                        <div class="stats-trend trend-up">
+                            <i class="fas fa-arrow-up"></i> +12%
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-value">3,247</div>
+                        <div class="stats-label">参考人次</div>
+                        <div class="stats-trend trend-up">
+                            <i class="fas fa-arrow-up"></i> +18%
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-value">82.5</div>
+                        <div class="stats-label">平均得分</div>
+                        <div class="stats-trend trend-down">
+                            <i class="fas fa-arrow-down"></i> -2.1%
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-value">88.2%</div>
+                        <div class="stats-label">及格率</div>
+                        <div class="stats-trend trend-up">
+                            <i class="fas fa-arrow-up"></i> +5.3%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 报告内容 -->
+                <div class="form-container">
+                    <div class="section-title">
+                        <i class="fas fa-chart-line"></i>
+                        详细分析报告
+                    </div>
+                    <div style="text-align: center; padding: 60px; color: #8c8c8c;">
+                        <i class="fas fa-chart-bar" style="font-size: 64px; margin-bottom: 24px; opacity: 0.5;"></i>
+                        <h3 style="margin-bottom: 12px;">选择考试查看详细报告</h3>
+                        <p>选择具体的考试场次，查看详细的统计分析报告</p>
+                        <div style="margin-top: 24px;">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                                <span>选择考试</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示消息
+        function showMessage(text, type = 'info', duration = 3000) {
+            const existingMessage = document.querySelector('.message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.innerHTML = `
+                <i class="fas fa-${getMessageIcon(type)}"></i>
+                <span>${text}</span>
+            `;
+
+            document.body.appendChild(message);
+            setTimeout(() => message.classList.add('show'), 100);
+
+            setTimeout(() => {
+                message.classList.remove('show');
+                setTimeout(() => message.remove(), 300);
+            }, duration);
+        }
+
+        function getMessageIcon(type) {
+            const icons = {
+                success: 'check-circle',
+                error: 'exclamation-circle',
+                info: 'info-circle',
+                warning: 'exclamation-triangle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        // 切换标签页
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.closest('.tab-item').classList.add('active');
+            
+            showMessage(`已切换到${event.target.textContent.trim()}`, 'info', 1500);
+        }
+
+        // 考试管理功能
+        function createExam() {
+            showMessage('打开创建考试页面...', 'info');
+        }
+
+        function batchOperation() {
+            showMessage('打开批量操作界面...', 'info');
+        }
+
+        function exportExams() {
+            showMessage('正在导出考试数据...', 'info');
+        }
+
+        function filterExams() {
+            showMessage('打开筛选面板...', 'info');
+        }
+
+        function refreshExams() {
+            showMessage('考试列表已刷新', 'success');
+        }
+
+        // 考试操作
+        function monitorExam() {
+            showMessage('进入实时监控模式...', 'info');
+        }
+
+        function examSettings() {
+            showMessage('打开考试设置界面...', 'info');
+        }
+
+        function stopExam() {
+            if (confirm('确定要结束这场考试吗？')) {
+                showMessage('考试已结束', 'warning');
+            }
+        }
+
+        function startExam() {
+            showMessage('考试已开始，进入监控模式...', 'success');
+        }
+
+        function editExam() {
+            showMessage('打开编辑考试界面...', 'info');
+        }
+
+        function previewExam() {
+            showMessage('打开考试预览界面...', 'info');
+        }
+
+        function notifyStudents() {
+            showMessage('正在发送考试通知...', 'info');
+        }
+
+        function gradeExam() {
+            showMessage('打开阅卷界面...', 'info');
+        }
+
+        function viewReport() {
+            showMessage('打开考试报告...', 'info');
+        }
+
+        function exportResults() {
+            showMessage('正在导出考试结果...', 'info');
+        }
+
+        function rescheduleExam() {
+            showMessage('打开重新安排界面...', 'info');
+        }
+
+        function deleteExam() {
+            if (confirm('确定要删除这场考试吗？')) {
+                showMessage('考试已删除', 'success');
+            }
+        }
+
+        // 创建考试功能
+        function importStudents() {
+            showMessage('打开导入考生名单界面...', 'info');
+        }
+
+        function addStudents() {
+            showMessage('打开添加考生界面...', 'info');
+        }
+
+        function previewExamConfig() {
+            showMessage('生成考试配置预览...', 'info');
+        }
+
+        function saveDraftExam() {
+            showMessage('考试草稿已保存', 'success');
+        }
+
+        function createExamSubmit() {
+            showMessage('正在创建考试...', 'info');
+            setTimeout(() => {
+                showMessage('考试创建成功！', 'success');
+            }, 2000);
+        }
+
+        // 日历功能
+        function viewExamDetail() {
+            showMessage('打开考试详情...', 'info');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+.examination-management-container {
+    width: 100%;
+    padding: 20px;
+    overflow-y: scroll;
+  }
+  
+  .examination-management-container::webkit-scrollbar {
+    display: none;
+    /* scrollbar-width: none; */
+    /* width: 0; */
+  }
+  
+  .examination-i-page-header {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    padding: 24px 32px;
+    margin-bottom: 16px;
+    border-left: 4px solid #1890ff;
+  }
+  
+  .examination-i-page-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  
+  .examination-i-title-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .examination-i-title-left i {
+    font-size: 24px;
+    color: #1890ff;
+  }
+  
+  .examination-i-title-left h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #262626;
+  }
+  
+  .examination-i-title-right {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .examination-i-page-description {
+    color: #8c8c8c;
+    font-size: 14px;
+    margin-left: 36px;
+  }
+  
+  .examination-tabs-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    margin-bottom: 16px;
+    height: fit-content;
+    min-height: 400px;
+  }
+  

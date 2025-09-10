@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索结果 - 题库管理系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* 主容器 */
+        .results-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 搜索结果头部 */
+        .results-header {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            border-left: 4px solid #1890ff;
+        }
+
+        .results-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .results-info {
+            flex: 1;
+        }
+
+        .results-count {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+
+        .results-count .highlight {
+            color: #1890ff;
+        }
+
+        .search-conditions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .condition-tag {
+            padding: 4px 8px;
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #1890ff;
+        }
+
+        .search-time {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+
+        /* 控制栏 */
+        .results-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* 视图切换 */
+        .view-switcher {
+            display: flex;
+            background: #f5f5f5;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .view-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #595959;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .view-btn.active {
+            background: #fff;
+            color: #1890ff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        }
+
+        .view-btn:hover:not(.active) {
+            background: rgba(24, 144, 255, 0.1);
+            color: #1890ff;
+        }
+
+        /* 排序选择器 */
+        .sort-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sort-select {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .sort-select:focus {
+            border-color: #1890ff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+
+        /* 批量操作 */
+        .batch-actions {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #e6f7ff;
+            border-radius: 6px;
+            border: 1px solid #91d5ff;
+        }
+
+        .batch-actions.visible {
+            display: flex;
+        }
+
+        .selected-count {
+            color: #1890ff;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: #595959;
+            border-color: #d9d9d9;
+        }
+
+        .btn-secondary:hover {
+            color: #1890ff;
+            border-color: #1890ff;
+        }
+
+        .btn-danger {
+            background: #fff;
+            color: #ff4d4f;
+            border-color: #ffccc7;
+        }
+
+        .btn-danger:hover {
+            background: #ff4d4f;
+            color: #fff;
+            border-color: #ff4d4f;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        /* 结果展示区域 */
+        .results-content {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        /* 列表视图 */
+        .results-list {
+            display: block;
+        }
+
+        .result-item {
+            padding: 24px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .result-item:hover {
+            background: #fafafa;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item.selected {
+            background: #e6f7ff;
+            border-left: 4px solid #1890ff;
+        }
+
+        /* 题目选择框 */
+        .result-checkbox {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            width: 18px;
+            height: 18px;
+            accent-color: #1890ff;
+            cursor: pointer;
+        }
+
+        .result-content {
+            margin-left: 40px;
+        }
+
+        /* 题目头部 */
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .result-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .meta-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .type-single { background: #e6f7ff; color: #1890ff; }
+        .type-multiple { background: #f6ffed; color: #52c41a; }
+        .type-judge { background: #fff2e8; color: #fa8c16; }
+        .type-fill { background: #f9f0ff; color: #722ed1; }
+        .type-essay { background: #fff0f6; color: #eb2f96; }
+
+        .difficulty-easy { background: #f6ffed; color: #52c41a; }
+        .difficulty-medium { background: #fff7e6; color: #fa8c16; }
+        .difficulty-hard { background: #fff2f0; color: #ff4d4f; }
+
+        .subject-tag {
+            background: #f0f0f0;
+            color: #595959;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .result-item:hover .result-actions {
+            opacity: 1;
+        }
+
+        /* 题目内容 */
+        .result-question {
+            font-size: 16px;
+            color: #262626;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .result-question .keyword-highlight {
+            background: #fff566;
+            padding: 1px 2px;
+            border-radius: 2px;
+        }
+
+        /* 题目选项预览 */
+        .result-options {
+            margin-bottom: 16px;
+        }
+
+        .options-preview {
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 14px;
+            color: #595959;
+        }
+
+        .option-item {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .option-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .option-label {
+            font-weight: 500;
+            min-width: 20px;
+        }
+
+        .correct-answer {
+            color: #52c41a;
+            font-weight: 500;
+        }
+
+        /* 题目底部信息 */
+        .result-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #8c8c8c;
+        }
+
+        .result-stats {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .result-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .result-tag {
+            padding: 2px 6px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #595959;
+        }
+
+        /* 卡片视图 */
+        .results-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .results-grid.active {
+            display: grid;
+        }
+
+        .result-card {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .result-card:hover {
+            border-color: #1890ff;
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .result-card.selected {
+            border-color: #1890ff;
+            background: #e6f7ff;
+        }
+
+        .card-checkbox {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 18px;
+            height: 18px;
+            accent-color: #1890ff;
+            cursor: pointer;
+        }
+
+        /* 表格视图 */
+        .results-table {
+            display: none;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table.active {
+            display: table;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .results-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #262626;
+            font-size: 14px;
+        }
+
+        .results-table td {
+            font-size: 14px;
+            color: #595959;
+            vertical-align: top;
+        }
+
+        .results-table tr:hover {
+            background: #fafafa;
+        }
+
+        .table-question {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;
+            color: #262626;
+        }
+
+        .table-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #1890ff;
+            cursor: pointer;
+        }
+
+        /* 分页器 */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #595959;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-btn {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #595959;
+            transition: all 0.3s;
+            min-width: 32px;
+            text-align: center;
+        }
+
+        .page-btn:hover:not(.disabled):not(.active) {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .page-btn.active {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: #fff;
+        }
+
+        .page-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 16px;
+        }
+
+        .page-size-select {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            font-size: 14px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8c8c8c;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #595959;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* 加载状态 */
+        .loading-state {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            color: #8c8c8c;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #f0f0f0;
+            border-top: 2px solid #1890ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 题目详情弹窗 */
+        .question-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .question-modal.visible {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 8px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #8c8c8c;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #f0f0f0;
+            color: #262626;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .question-detail {
+            margin-bottom: 24px;
+        }
+
+        .question-content {
+            font-size: 16px;
+            color: #262626;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .question-options {
+            margin-bottom: 20px;
+        }
+
+        .option-detail {
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .option-detail.correct {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+        }
+
+        .option-detail.incorrect {
+            background: #fff2f0;
+            border: 1px solid #ffccc7;
+        }
+
+        .option-letter {
+            font-weight: 600;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .question-answer {
+            background: #f0f2f5;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .answer-label {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+
+        .answer-content {
+            color: #595959;
+            line-height: 1.6;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .results-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .results-container {
+                padding: 16px;
+            }
+
+            .results-controls {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .controls-left,
+            .controls-right {
+                justify-content: center;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .result-stats {
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-start;
+            }
+
+            .pagination {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .pagination-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .results-table {
+                font-size: 12px;
+            }
+
+            .results-table th,
+            .results-table td {
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="results-container">
+        <!-- 搜索结果头部 -->
+        <div class="results-header">
+            <div class="results-summary">
+                <div class="results-info">
+                    <div class="results-count">
+                        找到 <span class="highlight">1,247</span> 条符合条件的题目
+                    </div>
+                    <div class="search-conditions">
+                        <span class="condition-tag">单选题</span>
+                        <span class="condition-tag">中等难度</span>
+                        <span class="condition-tag">计算机网络</span>
+                        <span class="condition-tag">关键词: TCP协议</span>
+                    </div>
+                    <div class="search-time">搜索耗时: 0.342秒</div>
+                </div>
+            </div>
+
+            <!-- 控制栏 -->
+            <div class="results-controls">
+                <div class="controls-left">
+                    <!-- 视图切换 -->
+                    <div class="view-switcher">
+                        <button class="view-btn active" onclick="switchView('list')">
+                            <i class="fas fa-list"></i>
+                            <span>列表</span>
+                        </button>
+                        <button class="view-btn" onclick="switchView('grid')">
+                            <i class="fas fa-th"></i>
+                            <span>卡片</span>
+                        </button>
+                        <button class="view-btn" onclick="switchView('table')">
+                            <i class="fas fa-table"></i>
+                            <span>表格</span>
+                        </button>
+                    </div>
+
+                    <!-- 排序选择 -->
+                    <div class="sort-selector">
+                        <label>排序:</label>
+                        <select class="sort-select" onchange="sortResults(this.value)">
+                            <option value="relevance">相关度</option>
+                            <option value="date-desc">创建时间(最新)</option>
+                            <option value="date-asc">创建时间(最早)</option>
+                            <option value="usage-desc">使用次数(高到低)</option>
+                            <option value="usage-asc">使用次数(低到高)</option>
+                            <option value="difficulty">难度等级</option>
+                            <option value="rate-desc">正确率(高到低)</option>
+                            <option value="rate-asc">正确率(低到高)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="controls-right">
+                    <button class="btn btn-secondary" onclick="exportResults()">
+                        <i class="fas fa-download"></i>
+                        <span>导出结果</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="toggleBatchMode()">
+                        <i class="fas fa-check-square"></i>
+                        <span>批量操作</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 批量操作栏 -->
+            <div class="batch-actions" id="batch-actions">
+                <span class="selected-count" id="selected-count">已选择 0 道题目</span>
+                <button class="btn btn-secondary btn-sm">
+                    <i class="fas fa-copy"></i>
+                    复制
+                </button>
+                <button class="btn btn-secondary btn-sm">
+                    <i class="fas fa-edit"></i>
+                    批量编辑
+                </button>
+                <button class="btn btn-secondary btn-sm">
+                    <i class="fas fa-folder-plus"></i>
+                    移动到...
+                </button>
+                <button class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash"></i>
+                    删除
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="cancelBatchMode()">
+                    <i class="fas fa-times"></i>
+                    取消
+                </button>
+            </div>
+        </div>
+
+        <!-- 搜索结果内容 -->
+        <div class="results-content">
+            <!-- 列表视图 -->
+            <div class="results-list active" id="list-view">
+                <!-- 示例题目1 -->
+                <div class="result-item" onclick="selectItem(this, event)">
+                    <input type="checkbox" class="result-checkbox" onchange="updateSelection()">
+                    <div class="result-content">
+                        <div class="result-header">
+                            <div class="result-meta">
+                                <span class="meta-badge type-single">单选题</span>
+                                <span class="meta-badge difficulty-medium">中等</span>
+                                <span class="subject-tag">计算机网络</span>
+                            </div>
+                            <div class="result-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="viewQuestion(1)">
+                                    <i class="fas fa-eye"></i>
+                                    预览
+                                </button>
+                                <button class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                    编辑
+                                </button>
+                                <button class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-copy"></i>
+                                    复制
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="result-question">
+                            <span class="keyword-highlight">TCP协议</span>和UDP协议的主要区别是什么？
+                        </div>
+
+                        <div class="result-options">
+                            <div class="options-preview">
+                                <div class="option-item">
+                                    <span class="option-label">A.</span>
+                                    <span>TCP是面向连接的，UDP是无连接的</span>
+                                </div>
+                                <div class="option-item">
+                                    <span class="option-label">B.</span>
+                                    <span>TCP是无连接的，UDP是面向连接的</span>
+                                </div>
+                                <div class="option-item">
+                                    <span class="option-label">C.</span>
+                                    <span>两者都是面向连接的协议</span>
+                                </div>
+                                <div class="option-item correct-answer">
+                                    <span class="option-label">D.</span>
+                                    <span>两者都是无连接的协议 ✓</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="result-footer">
+                            <div class="result-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>张老师</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>2024-03-15</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>使用 234 次</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>正确率 78.5%</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>评分 4.2</span>
+                                </div>
+                            </div>
+                            <div class="result-tags">
+                                <span class="result-tag">网络协议</span>
+                                <span class="result-tag">传输层</span>
+                                <span class="result-tag">基础概念</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 示例题目2 -->
+                <div class="result-item" onclick="selectItem(this, event)">
+                    <input type="checkbox" class="result-checkbox" onchange="updateSelection()">
+                    <div class="result-content">
+                        <div class="result-header">
+                            <div class="result-meta">
+                                <span class="meta-badge type-multiple">多选题</span>
+                                <span class="meta-badge difficulty-hard">困难</span>
+                                <span class="subject-tag">数据结构</span>
+                            </div>
+                            <div class="result-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="viewQuestion(2)">
+                                    <i class="fas fa-eye"></i>
+                                    预览
+                                </button>
+                                <button class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                    编辑
+                                </button>
+                                <button class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-copy"></i>
+                                    复制
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="result-question">
+                            以下哪些是常见的排序算法？（多选）
+                        </div>
+
+                        <div class="result-options">
+                            <div class="options-preview">
+                                <div class="option-item correct-answer">
+                                    <span class="option-label">A.</span>
+                                    <span>冒泡排序 ✓</span>
+                                </div>
+                                <div class="option-item correct-answer">
+                                    <span class="option-label">B.</span>
+                                    <span>快速排序 ✓</span>
+                                </div>
+                                <div class="option-item">
+                                    <span class="option-label">C.</span>
+                                    <span>线性查找</span>
+                                </div>
+                                <div class="option-item correct-answer">
+                                    <span class="option-label">D.</span>
+                                    <span>归并排序 ✓</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="result-footer">
+                            <div class="result-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>李老师</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>2024-03-14</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>使用 156 次</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>正确率 65.2%</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>评分 4.5</span>
+                                </div>
+                            </div>
+                            <div class="result-tags">
+                                <span class="result-tag">算法</span>
+                                <span class="result-tag">排序</span>
+                                <span class="result-tag">重点题目</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 示例题目3 -->
+                <div class="result-item" onclick="selectItem(this, event)">
+                    <input type="checkbox" class="result-checkbox" onchange="updateSelection()">
+                    <div class="result-content">
+                        <div class="result-header">
+                            <div class="result-meta">
+                                <span class="meta-badge type-judge">判断题</span>
+                                <span class="meta-badge difficulty-easy">简单</span>
+                                <span class="subject-tag">操作系统</span>
+                            </div>
+                            <div class="result-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="viewQuestion(3)">
+                                    <i class="fas fa-eye"></i>
+                                    预览
+                                </button>
+                                <button class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                    编辑
+                                </button>
+                                <button class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-copy"></i>
+                                    复制
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="result-question">
+                            进程和线程是操作系统中的同一个概念。
+                        </div>
+
+                        <div class="result-options">
+                            <div class="options-preview">
+                                <div class="option-item">
+                                    <span class="option-label">A.</span>
+                                    <span>正确</span>
+                                </div>
+                                <div class="option-item correct-answer">
+                                    <span class="option-label">B.</span>
+                                    <span>错误 ✓</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="result-footer">
+                            <div class="result-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>王老师</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>2024-03-13</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>使用 89 次</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>正确率 92.1%</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>评分 4.8</span>
+                                </div>
+                            </div>
+                            <div class="result-tags">
+                                <span class="result-tag">进程管理</span>
+                                <span class="result-tag">基础概念</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片视图 -->
+            <div class="results-grid" id="grid-view">
+                <!-- 卡片视图的题目将通过JavaScript动态生成 -->
+            </div>
+
+            <!-- 表格视图 -->
+            <table class="results-table" id="table-view">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="table-checkbox" onchange="selectAllTable(this)"></th>
+                        <th>题目内容</th>
+                        <th>类型</th>
+                        <th>难度</th>
+                        <th>学科</th>
+                        <th>创建者</th>
+                        <th>使用次数</th>
+                        <th>正确率</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="table-checkbox" onchange="updateSelection()"></td>
+                        <td class="table-question">TCP协议和UDP协议的主要区别是什么？</td>
+                        <td><span class="meta-badge type-single">单选题</span></td>
+                        <td><span class="meta-badge difficulty-medium">中等</span></td>
+                        <td>计算机网络</td>
+                        <td>张老师</td>
+                        <td>234</td>
+                        <td>78.5%</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm" onclick="viewQuestion(1)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-secondary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="table-checkbox" onchange="updateSelection()"></td>
+                        <td class="table-question">以下哪些是常见的排序算法？（多选）</td>
+                        <td><span class="meta-badge type-multiple">多选题</span></td>
+                        <td><span class="meta-badge difficulty-hard">困难</span></td>
+                        <td>数据结构</td>
+                        <td>李老师</td>
+                        <td>156</td>
+                        <td>65.2%</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm" onclick="viewQuestion(2)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-secondary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" class="table-checkbox" onchange="updateSelection()"></td>
+                        <td class="table-question">进程和线程是操作系统中的同一个概念。</td>
+                        <td><span class="meta-badge type-judge">判断题</span></td>
+                        <td><span class="meta-badge difficulty-easy">简单</span></td>
+                        <td>操作系统</td>
+                        <td>王老师</td>
+                        <td>89</td>
+                        <td>92.1%</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm" onclick="viewQuestion(3)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-secondary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 分页器 -->
+            <div class="pagination">
+                <div class="pagination-info">
+                    显示第 1-20 条，共 1,247 条记录
+                </div>
+                <div class="pagination-controls">
+                    <button class="page-btn disabled">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <span>...</span>
+                    <button class="page-btn">63</button>
+                    <button class="page-btn">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <div class="page-size-selector">
+                        <span>每页显示</span>
+                        <select class="page-size-select">
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span>条</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 题目详情弹窗 -->
+    <div class="question-modal" id="question-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">题目详情</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="question-detail">
+                    <div class="question-content">
+                        TCP协议和UDP协议的主要区别是什么？
+                    </div>
+                    
+                    <div class="question-options">
+                        <div class="option-detail">
+                            <div class="option-letter">A</div>
+                            <div>TCP是面向连接的，UDP是无连接的</div>
+                        </div>
+                        <div class="option-detail">
+                            <div class="option-letter">B</div>
+                            <div>TCP是无连接的，UDP是面向连接的</div>
+                        </div>
+                        <div class="option-detail">
+                            <div class="option-letter">C</div>
+                            <div>两者都是面向连接的协议</div>
+                        </div>
+                        <div class="option-detail correct">
+                            <div class="option-letter">D</div>
+                            <div>两者都是无连接的协议</div>
+                        </div>
+                    </div>
+
+                    <div class="question-answer">
+                        <div class="answer-label">正确答案：A</div>
+                        <div class="answer-content">
+                            TCP（传输控制协议）是面向连接的协议，在数据传输前需要建立连接，提供可靠的数据传输服务。
+                            而UDP（用户数据报协议）是无连接的协议，不需要建立连接，传输速度快但不保证数据可靠性。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let batchMode = false;
+        let selectedCount = 0;
+
+        // 视图切换
+        function switchView(viewType) {
+            // 移除所有视图的活动状态
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 隐藏所有视图
+            document.querySelectorAll('#list-view, #grid-view, #table-view').forEach(view => {
+                view.classList.remove('active');
+            });
+            
+            // 激活当前视图按钮
+            event.target.closest('.view-btn').classList.add('active');
+            
+            // 显示对应视图
+            document.getElementById(viewType + '-view').classList.add('active');
+            
+            // 如果切换到卡片视图，生成卡片内容
+            if (viewType === 'grid') {
+                generateGridView();
+            }
+        }
+
+        // 生成卡片视图内容
+        function generateGridView() {
+            const gridView = document.getElementById('grid-view');
+            const listItems = document.querySelectorAll('#list-view .result-item');
+            
+            gridView.innerHTML = '';
+            
+            listItems.forEach((item, index) => {
+                const question = item.querySelector('.result-question').textContent;
+                const meta = item.querySelectorAll('.meta-badge');
+                const stats = item.querySelectorAll('.stat-item');
+                const tags = item.querySelectorAll('.result-tag');
+                
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <input type="checkbox" class="card-checkbox" onchange="updateSelection()">
+                    <div class="result-header">
+                        <div class="result-meta">
+                            ${Array.from(meta).map(badge => badge.outerHTML).join('')}
+                        </div>
+                    </div>
+                    <div class="result-question">${question}</div>
+                    <div class="result-footer">
+                        <div class="result-stats">
+                            ${Array.from(stats).map(stat => stat.outerHTML).join('')}
+                        </div>
+                        <div class="result-tags">
+                            ${Array.from(tags).map(tag => tag.outerHTML).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', function(e) {
+                    if (e.target.type !== 'checkbox') {
+                        selectItem(this, e);
+                    }
+                });
+                
+                gridView.appendChild(card);
+            });
+        }
+
+        // 排序结果
+        function sortResults(sortType) {
+            console.log('排序方式:', sortType);
+            // 在实际应用中，这里会重新请求数据或在客户端排序
+        }
+
+        // 导出结果
+        function exportResults() {
+            console.log('导出搜索结果');
+            // 实际应用中会触发文件下载
+        }
+
+        // 切换批量模式
+        function toggleBatchMode() {
+            batchMode = !batchMode;
+            const batchActions = document.getElementById('batch-actions');
+            const checkboxes = document.querySelectorAll('.result-checkbox, .card-checkbox, .table-checkbox');
+            
+            if (batchMode) {
+                batchActions.classList.add('visible');
+                checkboxes.forEach(checkbox => {
+                    checkbox.style.display = 'block';
+                });
+            } else {
+                cancelBatchMode();
+            }
+        }
+
+        // 取消批量模式
+        function cancelBatchMode() {
+            batchMode = false;
+            const batchActions = document.getElementById('batch-actions');
+            const checkboxes = document.querySelectorAll('.result-checkbox, .card-checkbox, .table-checkbox');
+            
+            batchActions.classList.remove('visible');
+            checkboxes.forEach(checkbox => {
+                checkbox.style.display = 'none';
+                checkbox.checked = false;
+            });
+            
+            // 移除所有选中状态
+            document.querySelectorAll('.result-item.selected, .result-card.selected').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            selectedCount = 0;
+            updateSelectedCount();
+        }
+
+        // 更新选择计数
+        function updateSelection() {
+            if (!batchMode) return;
+            
+            const checkboxes = document.querySelectorAll('.result-checkbox:checked, .card-checkbox:checked, .table-checkbox:checked');
+            selectedCount = checkboxes.length;
+            updateSelectedCount();
+        }
+
+        // 更新选择计数显示
+        function updateSelectedCount() {
+            const countElement = document.getElementById('selected-count');
+            countElement.textContent = `已选择 ${selectedCount} 道题目`;
+        }
+
+        // 选择项目
+        function selectItem(item, event) {
+            if (!batchMode) {
+                // 非批量模式下，点击查看题目详情
+                const questionId = Array.from(item.parentElement.children).indexOf(item) + 1;
+                viewQuestion(questionId);
+                return;
+            }
+            
+            if (event.target.type === 'checkbox') return;
+            
+            const checkbox = item.querySelector('.result-checkbox, .card-checkbox');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+            
+            updateSelection();
+        }
+
+        // 表格全选
+        function selectAllTable(checkbox) {
+            const tableCheckboxes = document.querySelectorAll('.results-table .table-checkbox');
+            tableCheckboxes.forEach(cb => {
+                if (cb !== checkbox) {
+                    cb.checked = checkbox.checked;
+                }
+            });
+            updateSelection();
+        }
+
+        // 查看题目详情
+        function viewQuestion(questionId) {
+            console.log('查看题目:', questionId);
+            document.getElementById('question-modal').classList.add('visible');
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('question-modal').classList.remove('visible');
+        }
+
+        // 点击弹窗外部关闭
+        document.getElementById('question-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // 键盘事件
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 隐藏复选框（非批量模式）
+            const checkboxes = document.querySelectorAll('.result-checkbox, .card-checkbox, .table-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置 - 考试管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #262626;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            margin: -20px -20px 30px -20px;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .settings-container {
+            display: flex;
+            gap: 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            min-height: calc(100vh - 200px);
+        }
+
+        .settings-sidebar {
+            width: 280px;
+            background: #fafafa;
+            border-right: 1px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+
+        .settings-nav {
+            padding: 20px 0;
+        }
+
+        .nav-group {
+            margin-bottom: 32px;
+        }
+
+        .nav-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #8c8c8c;
+            margin-bottom: 12px;
+            padding: 0 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #595959;
+            margin-bottom: 2px;
+        }
+
+        .nav-item:hover {
+            background: #f0f0f0;
+            color: #1890ff;
+        }
+
+        .nav-item.active {
+            background: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            margin-right: 12px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .settings-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .settings-panel {
+            display: none;
+        }
+
+        .settings-panel.active {
+            display: block;
+        }
+
+        .panel-header {
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .panel-header h2 {
+            font-size: 24px;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+
+        .panel-header p {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+
+        .settings-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .settings-group {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .settings-group h3 {
+            font-size: 18px;
+            color: #262626;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .settings-group h3::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: #1890ff;
+            border-radius: 2px;
+            margin-right: 12px;
+        }
+
+        .setting-items {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .setting-item.inline {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #262626;
+        }
+
+        .setting-desc {
+            font-size: 12px;
+            color: #8c8c8c;
+            line-height: 1.4;
+        }
+
+        .setting-input, .setting-select {
+            padding: 10px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .setting-input:focus, .setting-select:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+        }
+
+        .setting-value {
+            font-size: 14px;
+            color: #262626;
+            font-weight: 500;
+        }
+
+        .setting-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radio-option:hover {
+            border-color: #1890ff;
+            background: #f6f9ff;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .radio-checkmark {
+            position: relative;
+            height: 20px;
+            width: 20px;
+            background-color: #eee;
+            border-radius: 50%;
+            margin-right: 10px;
+            transition: all 0.2s;
+        }
+
+        .radio-option:hover .radio-checkmark {
+            background-color: #ccc;
+        }
+
+        .radio-option input:checked ~ .radio-checkmark {
+            background-color: #1890ff;
+        }
+
+        .radio-checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .radio-option input:checked ~ .radio-checkmark:after {
+            display: block;
+        }
+
+        .radio-option .radio-checkmark:after {
+            top: 6px;
+            left: 6px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .setting-toggle {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .setting-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #1890ff;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .input-with-unit {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-unit {
+            font-size: 14px;
+            color: #8c8c8c;
+            font-weight: 500;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding-top: 32px;
+            border-top: 1px solid #f0f0f0;
+            margin-top: 32px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #595959;
+            border: 1px solid #d9d9d9;
+        }
+
+        .btn-secondary:hover {
+            background: #e6f7ff;
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .btn-danger {
+            background: #ff4d4f;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff7875;
+        }
+
+        .btn-success {
+            background: #52c41a;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #73d13d;
+        }
+
+        /* 用户管理界面 */
+        .user-management {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .users-table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .users-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .users-table td {
+            color: #595959;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1890ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        .user-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+
+        .status-inactive {
+            background: #fff2e8;
+            color: #fa8c16;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn.edit {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .action-btn.delete {
+            background: #fff2f0;
+            color: #ff4d4f;
+        }
+
+        /* 系统日志界面 */
+        .log-container {
+            background: #000;
+            color: #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            height: 400px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            opacity: 0.9;
+        }
+
+        .log-timestamp {
+            color: #888;
+        }
+
+        .log-level {
+            font-weight: bold;
+            margin: 0 8px;
+        }
+
+        .log-level.info {
+            color: #00ff00;
+        }
+
+        .log-level.warn {
+            color: #ffff00;
+        }
+
+        .log-level.error {
+            color: #ff0000;
+        }
+
+        /* 备份还原界面 */
+        .backup-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .backup-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f0f0f0;
+        }
+
+        .backup-card h4 {
+            font-size: 16px;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+
+        .backup-card p {
+            color: #8c8c8c;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .backup-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .backup-info {
+            flex: 1;
+        }
+
+        .backup-name {
+            font-weight: 500;
+            color: #262626;
+        }
+
+        .backup-date {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+
+        .backup-size {
+            font-size: 12px;
+            color: #8c8c8c;
+            margin-right: 12px;
+        }
+
+        /* 消息提示 */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateX(400px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .message.show {
+            transform: translateX(0);
+        }
+
+        .message.success {
+            background: #52c41a;
+        }
+
+        .message.error {
+            background: #ff4d4f;
+        }
+
+        .message.warning {
+            background: #fa8c16;
+        }
+
+        .message.info {
+            background: #1890ff;
+        }
+
+        /* 学生辅导Agent样式 */
+        .student-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .student-item:hover {
+            background: #f0f7ff;
+            border-color: #e3f2fd;
+        }
+
+        .student-item.selected {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .student-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .student-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .student-score {
+            font-size: 12px;
+            color: #1976d2;
+            margin-top: 4px;
+        }
+
+        .coaching-message {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .coaching-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .coaching-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .coaching-avatar.ai {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .coaching-avatar.user {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .coaching-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .coaching-message.ai .coaching-bubble {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+
+        .coaching-message.user .coaching-bubble {
+            background: #1976d2;
+            color: white;
+        }
+
+        .quick-btn {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 0 4px 4px 0;
+        }
+
+        .quick-btn:hover {
+            background: #1976d2;
+            color: white;
+            border-color: #1976d2;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .settings-container {
+                flex-direction: column;
+            }
+
+            .settings-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .settings-nav {
+                display: flex;
+                overflow-x: auto;
+                padding: 10px 0;
+            }
+
+            .nav-group {
+                display: flex;
+                margin-right: 32px;
+                margin-bottom: 0;
+            }
+
+            .nav-title {
+                display: none;
+            }
+
+            .nav-item {
+                white-space: nowrap;
+                margin-right: 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .settings-content {
+                padding: 20px;
+            }
+
+            .settings-groups {
+                gap: 20px;
+            }
+
+            .settings-group {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <div class="header-content">
+                <h1 class="page-title">个人设置</h1>
+                <p class="page-subtitle">管理个人信息、教学偏好和工作环境</p>
+            </div>
+        </div>
+
+        <div class="settings-container">
+            <div class="settings-sidebar">
+                <div class="settings-nav">
+                    <div class="nav-group">
+                        <div class="nav-title">个人资料</div>
+                        <div class="nav-item active" onclick="showSettingsPanel('profile')">
+                            <i class="fas fa-user"></i>
+                            <span>基本信息</span>
+                        </div>
+                        <div class="nav-item" onclick="showSettingsPanel('security')">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>账户安全</span>
+                        </div>
+                    </div>
+                    <div class="nav-group">
+                        <div class="nav-title">教学设置</div>
+                        <div class="nav-item" onclick="showSettingsPanel('exam')">
+                            <i class="fas fa-file-alt"></i>
+                            <span>考试偏好</span>
+                        </div>
+                        <div class="nav-item" onclick="showSettingsPanel('class')">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>班级管理</span>
+                        </div>
+                        <div class="nav-item" onclick="showSettingsPanel('grading')">
+                            <i class="fas fa-star"></i>
+                            <span>评分设置</span>
+                        </div>
+                    </div>
+                    <div class="nav-group">
+                        <div class="nav-title">工作环境</div>
+                        <div class="nav-item" onclick="showSettingsPanel('interface')">
+                            <i class="fas fa-palette"></i>
+                            <span>界面偏好</span>
+                        </div>
+                        <div class="nav-item" onclick="showSettingsPanel('notification')">
+                            <i class="fas fa-bell"></i>
+                            <span>消息通知</span>
+                        </div>
+                        <div class="nav-item" onclick="showSettingsPanel('export')">
+                            <i class="fas fa-download"></i>
+                            <span>数据导出</span>
+                        </div>
+                    </div>
+                    <div class="nav-group">
+                        <div class="nav-title">帮助支持</div>
+                        <div class="nav-item" onclick="showSettingsPanel('help')">
+                            <i class="fas fa-question-circle"></i>
+                            <span>使用帮助</span>
+                        </div>
+                        <div class="nav-item" onclick="showSettingsPanel('feedback')">
+                            <i class="fas fa-comment"></i>
+                            <span>意见反馈</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-content">
+                <!-- 个人信息设置 -->
+                <div id="profile-settings" class="settings-panel active">
+                    <div class="panel-header">
+                        <h2>基本信息</h2>
+                        <p>管理您的个人资料和基本信息</p>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="settings-group">
+                            <h3>个人资料</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; font-weight: bold;">
+                                            张
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-secondary" onclick="changeAvatar()">
+                                                <i class="fas fa-camera"></i>
+                                                更换头像
+                                            </button>
+                                            <div class="setting-desc">支持 JPG、PNG 格式，建议尺寸 200x200px</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">姓名</label>
+                                    <input type="text" class="setting-input" value="张教师" placeholder="请输入您的姓名">
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">工号</label>
+                                    <div class="setting-value">T001</div>
+                                    <div class="setting-desc">工号由系统管理员分配，不可修改</div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">邮箱地址</label>
+                                    <input type="email" class="setting-input" value="zhang@university.edu.cn" placeholder="请输入邮箱地址">
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">手机号码</label>
+                                    <input type="tel" class="setting-input" value="13800138000" placeholder="请输入手机号码">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>教学信息</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">所属学院</label>
+                                    <select class="setting-select">
+                                        <option value="cs" selected>计算机学院</option>
+                                        <option value="math">数学学院</option>
+                                        <option value="physics">物理学院</option>
+                                        <option value="english">外国语学院</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">职称</label>
+                                    <select class="setting-select">
+                                        <option value="lecturer" selected>讲师</option>
+                                        <option value="associate">副教授</option>
+                                        <option value="professor">教授</option>
+                                        <option value="assistant">助教</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">主要课程</label>
+                                    <textarea class="setting-input" rows="3" placeholder="请输入您主要教授的课程">计算机网络、数据结构、操作系统</textarea>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">办公室</label>
+                                    <input type="text" class="setting-input" value="计算机楼 A301" placeholder="请输入办公室地址">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>联系方式</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">办公电话</label>
+                                    <input type="tel" class="setting-input" value="010-88888888" placeholder="请输入办公电话">
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">QQ号码</label>
+                                    <input type="text" class="setting-input" value="123456789" placeholder="请输入QQ号码">
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">微信号</label>
+                                    <input type="text" class="setting-input" value="teacher_zhang" placeholder="请输入微信号">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button class="btn btn-secondary" onclick="resetProfile()">
+                            <i class="fas fa-undo"></i>
+                            重置修改
+                        </button>
+                        <button class="btn btn-primary" onclick="saveProfile()">
+                            <i class="fas fa-save"></i>
+                            保存信息
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 考试偏好设置 -->
+                <div id="exam-settings" class="settings-panel">
+                    <div class="panel-header">
+                        <h2>考试偏好</h2>
+                        <p>设置您创建考试时的默认参数和偏好</p>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="settings-group">
+                            <h3>默认考试设置</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">默认考试时长</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" class="setting-input" value="120" min="30" max="300">
+                                        <span class="input-unit">分钟</span>
+                                    </div>
+                                    <div class="setting-desc">创建新考试时的默认时长</div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">默认试卷满分</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" class="setting-input" value="100" min="50" max="200">
+                                        <span class="input-unit">分</span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">默认及格分数</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" class="setting-input" value="60" min="40" max="80">
+                                        <span class="input-unit">分</span>
+                                    </div>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">允许学生提前交卷</label>
+                                        <div class="setting-desc">学生可以在时间结束前提交试卷</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">最早交卷时间</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" class="setting-input" value="30" min="5" max="60">
+                                        <span class="input-unit">分钟后</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>试题设置</h3>
+                            <div class="setting-items">
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">题目随机排序</label>
+                                        <div class="setting-desc">为不同学生随机排列题目顺序</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">选项随机排序</label>
+                                        <div class="setting-desc">随机打乱选择题的选项顺序</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">显示题目编号</label>
+                                        <div class="setting-desc">在试卷中显示题目序号</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">显示题目分值</label>
+                                        <div class="setting-desc">向学生显示每题的分值</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>阅卷和成绩</h3>
+                            <div class="setting-items">
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">自动阅卷客观题</label>
+                                        <div class="setting-desc">选择题和判断题自动批改</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">考试结束后立即公布成绩</label>
+                                        <div class="setting-desc">客观题成绩立即显示给学生</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">成绩显示精度</label>
+                                    <select class="setting-select">
+                                        <option value="0">整数显示</option>
+                                        <option value="1" selected>保留1位小数</option>
+                                        <option value="2">保留2位小数</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">显示答题统计</label>
+                                        <div class="setting-desc">向学生显示各题的正确率统计</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button class="btn btn-secondary" onclick="resetExamSettings()">
+                            <i class="fas fa-undo"></i>
+                            重置默认
+                        </button>
+                        <button class="btn btn-primary" onclick="saveExamSettings()">
+                            <i class="fas fa-save"></i>
+                            保存设置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 账户安全设置 -->
+                <div id="security-settings" class="settings-panel">
+                    <div class="panel-header">
+                        <h2>账户安全</h2>
+                        <p>管理您的账户密码和登录安全设置</p>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="settings-group">
+                            <h3>密码管理</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">当前密码</label>
+                                    <input type="password" class="setting-input" placeholder="请输入当前密码">
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">新密码</label>
+                                    <input type="password" class="setting-input" placeholder="请输入新密码">
+                                    <div class="setting-desc">密码长度至少8位，建议包含字母、数字和特殊符号</div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">确认新密码</label>
+                                    <input type="password" class="setting-input" placeholder="请再次输入新密码">
+                                </div>
+                                <div class="setting-item">
+                                    <button class="btn btn-primary" onclick="changePassword()">
+                                        <i class="fas fa-key"></i>
+                                        修改密码
+                                    </button>
+                                </div>
+                                <div class="setting-item">
+                                    <div style="background: #f6ffed; border: 1px solid #b7eb8f; border-radius: 6px; padding: 12px; font-size: 12px; color: #52c41a;">
+                                        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                                        上次密码修改时间：2024-02-15 10:30:25
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>登录安全</h3>
+                            <div class="setting-items">
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">启用双因素认证</label>
+                                        <div class="setting-desc">增强账户安全性，推荐开启</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" onchange="toggle2FA(this)">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">记住登录状态</label>
+                                        <div class="setting-desc">7天内免密码登录</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">登录异常通知</label>
+                                        <div class="setting-desc">异地登录或可疑行为时邮件通知</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>隐私设置</h3>
+                            <div class="setting-items">
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">允许其他教师查看我的联系方式</label>
+                                        <div class="setting-desc">在教师通讯录中显示您的联系信息</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">允许学生查看我的办公信息</label>
+                                        <div class="setting-desc">学生可以看到您的办公室和办公时间</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">显示在线状态</label>
+                                        <div class="setting-desc">其他用户可以看到您的在线状态</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>登录历史</h3>
+                            <div class="setting-items">
+                                <div style="background: white; border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden;">
+                                    <div style="padding: 12px 16px; background: #fafafa; border-bottom: 1px solid #f0f0f0; font-size: 14px; font-weight: 500;">最近登录记录</div>
+                                    <div style="max-height: 200px; overflow-y: auto;">
+                                        <div style="padding: 12px 16px; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between;">
+                                            <div>
+                                                <div style="font-size: 14px; color: #262626;">Chrome • Windows</div>
+                                                <div style="font-size: 12px; color: #8c8c8c;">IP: 192.168.1.100</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-size: 12px; color: #52c41a;">当前会话</div>
+                                                <div style="font-size: 12px; color: #8c8c8c;">2024-03-20 15:20</div>
+                                            </div>
+                                        </div>
+                                        <div style="padding: 12px 16px; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between;">
+                                            <div>
+                                                <div style="font-size: 14px; color: #262626;">Safari • iOS</div>
+                                                <div style="font-size: 12px; color: #8c8c8c;">IP: 192.168.1.105</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-size: 12px; color: #8c8c8c;">已退出</div>
+                                                <div style="font-size: 12px; color: #8c8c8c;">2024-03-20 08:30</div>
+                                            </div>
+                                        </div>
+                                        <div style="padding: 12px 16px; display: flex; justify-content: space-between;">
+                                            <div>
+                                                <div style="font-size: 14px; color: #262626;">Chrome • macOS</div>
+                                                <div style="font-size: 12px; color: #8c8c8c;">IP: 192.168.1.102</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <div style="font-size: 12px; color: #8c8c8c;">已退出</div>
+                                                <div style="font-size: 12px; color: #8c8c8c;">2024-03-19 16:45</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <button class="btn btn-secondary" onclick="clearLoginHistory()">
+                                        <i class="fas fa-trash"></i>
+                                        清除登录历史
+                                    </button>
+                                    <div class="setting-desc">清除后无法恢复</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="saveSecuritySettings()">
+                            <i class="fas fa-save"></i>
+                            保存安全设置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 班级管理设置 -->
+                <div id="class-settings" class="settings-panel">
+                    <div class="panel-header">
+                        <h2>班级管理</h2>
+                        <p>管理您任教的班级和学生信息</p>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="settings-group">
+                            <h3>我的班级</h3>
+                            <div class="backup-cards">
+                                <div class="backup-card">
+                                    <h4>计算机科学2021级1班</h4>
+                                    <p>学生人数：45人 | 专业：计算机科学与技术</p>
+                                    <div style="margin: 12px 0;">
+                                        <div style="font-size: 12px; color: #8c8c8c;">班主任：李老师 | 辅导员：王老师</div>
+                                    </div>
+                                    <div class="settings-actions">
+                                        <button class="btn btn-secondary" onclick="viewClassDetail('cs2021-1')">
+                                            <i class="fas fa-eye"></i>
+                                            查看详情
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="manageStudents('cs2021-1')">
+                                            <i class="fas fa-users"></i>
+                                            学生管理
+                                        </button>
+                                        <button class="btn btn-primary" onclick="openStudentCoaching('cs2021-1')">
+                                            <i class="fas fa-robot"></i>
+                                            AI辅导
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="backup-card">
+                                    <h4>计算机科学2021级2班</h4>
+                                    <p>学生人数：42人 | 专业：计算机科学与技术</p>
+                                    <div style="margin: 12px 0;">
+                                        <div style="font-size: 12px; color: #8c8c8c;">班主任：赵老师 | 辅导员：王老师</div>
+                                    </div>
+                                    <div class="settings-actions">
+                                        <button class="btn btn-secondary" onclick="viewClassDetail('cs2021-2')">
+                                            <i class="fas fa-eye"></i>
+                                            查看详情
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="manageStudents('cs2021-2')">
+                                            <i class="fas fa-users"></i>
+                                            学生管理
+                                        </button>
+                                        <button class="btn btn-primary" onclick="openStudentCoaching('cs2021-2')">
+                                            <i class="fas fa-robot"></i>
+                                            AI辅导
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="backup-card">
+                                    <h4>软件工程2020级</h4>
+                                    <p>学生人数：38人 | 专业：软件工程</p>
+                                    <div style="margin: 12px 0;">
+                                        <div style="font-size: 12px; color: #8c8c8c;">班主任：陈老师 | 辅导员：孙老师</div>
+                                    </div>
+                                    <div class="settings-actions">
+                                        <button class="btn btn-secondary" onclick="viewClassDetail('se2020')">
+                                            <i class="fas fa-eye"></i>
+                                            查看详情
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="manageStudents('se2020')">
+                                            <i class="fas fa-users"></i>
+                                            学生管理
+                                        </button>
+                                        <button class="btn btn-primary" onclick="openStudentCoaching('se2020')">
+                                            <i class="fas fa-robot"></i>
+                                            AI辅导
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>班级设置</h3>
+                            <div class="setting-items">
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">允许学生查看同班同学成绩排名</label>
+                                        <div class="setting-desc">学生可以看到班级内的成绩排名情况</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">自动发送考试通知给学生</label>
+                                        <div class="setting-desc">创建考试时自动通知相关班级学生</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">成绩公布后自动通知</label>
+                                        <div class="setting-desc">成绩录入完成后自动发送通知</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" onclick="saveClassSettings()">
+                            <i class="fas fa-save"></i>
+                            保存设置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 评分设置 -->
+                <div id="grading-settings" class="settings-panel">
+                    <div class="panel-header">
+                        <h2>评分设置</h2>
+                        <p>设置评分标准和成绩计算方式</p>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="settings-group">
+                            <h3>评分标准</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">评分制度</label>
+                                    <div class="setting-options">
+                                        <label class="radio-option">
+                                            <input type="radio" name="grading-system" value="percentage" checked>
+                                            <span class="radio-checkmark"></span>
+                                            <span>百分制 (0-100分)</span>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="grading-system" value="five-point">
+                                            <span class="radio-checkmark"></span>
+                                            <span>五分制 (A-F等级)</span>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="grading-system" value="gpa">
+                                            <span class="radio-checkmark"></span>
+                                            <span>GPA制 (4.0绩点)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">及格分数线</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" class="setting-input" value="60" min="0" max="100">
+                                        <span class="input-unit">分</span>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">优秀分数线</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" class="setting-input" value="85" min="60" max="100">
+                                        <span class="input-unit">分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>成绩计算</h3>
+                            <div class="setting-items">
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">启用成绩曲线调整</label>
+                                        <div class="setting-desc">根据班级整体表现调整个人成绩</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">小数点处理</label>
+                                        <div class="setting-desc">成绩计算时的小数点处理方式</div>
+                                    </div>
+                                    <select class="setting-select">
+                                        <option value="round">四舍五入</option>
+                                        <option value="floor">向下取整</option>
+                                        <option value="ceil">向上取整</option>
+                                        <option value="keep" selected>保留小数</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">成绩保留小数位数</label>
+                                    <select class="setting-select">
+                                        <option value="0">整数</option>
+                                        <option value="1" selected>1位小数</option>
+                                        <option value="2">2位小数</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>主观题评分</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">默认评分方式</label>
+                                    <select class="setting-select">
+                                        <option value="points" selected>按分值评分</option>
+                                        <option value="percentage">按百分比评分</option>
+                                        <option value="level">按等级评分</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">启用评分模板</label>
+                                        <div class="setting-desc">为常见答案创建快速评分模板</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">显示评分理由</label>
+                                        <div class="setting-desc">向学生显示主观题的评分理由</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button class="btn btn-secondary" onclick="resetGradingSettings()">
+                            <i class="fas fa-undo"></i>
+                            重置默认
+                        </button>
+                        <button class="btn btn-primary" onclick="saveGradingSettings()">
+                            <i class="fas fa-save"></i>
+                            保存设置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 界面偏好设置 -->
+                <div id="interface-settings" class="settings-panel">
+                    <div class="panel-header">
+                        <h2>界面偏好</h2>
+                        <p>个性化您的工作界面和操作习惯</p>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="settings-group">
+                            <h3>主题和外观</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">主题模式</label>
+                                    <div class="setting-options">
+                                        <label class="radio-option">
+                                            <input type="radio" name="theme" value="light" checked>
+                                            <span class="radio-checkmark"></span>
+                                            <span>浅色模式</span>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="theme" value="dark">
+                                            <span class="radio-checkmark"></span>
+                                            <span>深色模式</span>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="theme" value="auto">
+                                            <span class="radio-checkmark"></span>
+                                            <span>跟随系统</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">界面语言</label>
+                                    <select class="setting-select">
+                                        <option value="zh-CN" selected>简体中文</option>
+                                        <option value="zh-TW">繁体中文</option>
+                                        <option value="en-US">English</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">字体大小</label>
+                                    <select class="setting-select">
+                                        <option value="small">小号</option>
+                                        <option value="medium" selected>中号</option>
+                                        <option value="large">大号</option>
+                                        <option value="extra-large">特大号</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">启用动画效果</label>
+                                        <div class="setting-desc">界面切换和交互动画</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>工作区布局</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">侧边栏位置</label>
+                                    <div class="setting-options">
+                                        <label class="radio-option">
+                                            <input type="radio" name="sidebar" value="left" checked>
+                                            <span class="radio-checkmark"></span>
+                                            <span>左侧</span>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="sidebar" value="right">
+                                            <span class="radio-checkmark"></span>
+                                            <span>右侧</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">固定导航栏</label>
+                                        <div class="setting-desc">滚动页面时保持导航栏固定</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">显示面包屑导航</label>
+                                        <div class="setting-desc">在页面顶部显示当前位置</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>显示偏好</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">每页显示条目数</label>
+                                    <select class="setting-select">
+                                        <option value="10">10条</option>
+                                        <option value="20" selected>20条</option>
+                                        <option value="50">50条</option>
+                                        <option value="100">100条</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">显示操作确认对话框</label>
+                                        <div class="setting-desc">删除等重要操作前显示确认</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">显示操作提示</label>
+                                        <div class="setting-desc">鼠标悬停时显示功能说明</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button class="btn btn-secondary" onclick="resetInterfaceSettings()">
+                            <i class="fas fa-undo"></i>
+                            重置默认
+                        </button>
+                        <button class="btn btn-primary" onclick="saveInterfaceSettings()">
+                            <i class="fas fa-save"></i>
+                            保存设置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 消息通知设置 -->
+                <div id="notification-settings" class="settings-panel">
+                    <div class="panel-header">
+                        <h2>消息通知</h2>
+                        <p>管理各类通知的接收方式和频率</p>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="settings-group">
+                            <h3>通知方式</h3>
+                            <div class="setting-items">
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">邮件通知</label>
+                                        <div class="setting-desc">通过邮件接收重要通知</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">短信通知</label>
+                                        <div class="setting-desc">紧急情况下的短信通知</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">浏览器通知</label>
+                                        <div class="setting-desc">在浏览器中显示通知提醒</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">微信通知</label>
+                                        <div class="setting-desc">通过微信公众号推送通知</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>通知类型</h3>
+                            <div class="setting-items">
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">学生提交作业</label>
+                                        <div class="setting-desc">学生提交作业或考试时通知</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">考试即将开始</label>
+                                        <div class="setting-desc">考试开始前30分钟提醒</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">系统维护通知</label>
+                                        <div class="setting-desc">系统更新和维护相关通知</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">评分提醒</label>
+                                        <div class="setting-desc">有待评分的主观题提醒</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">数据统计报告</label>
+                                        <div class="setting-desc">周期性的教学数据统计报告</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>通知时间</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">免打扰时间段</label>
+                                    <div style="display: flex; gap: 12px; align-items: center;">
+                                        <input type="time" class="setting-input" value="22:00" style="width: auto;">
+                                        <span>至</span>
+                                        <input type="time" class="setting-input" value="08:00" style="width: auto;">
+                                    </div>
+                                    <div class="setting-desc">此时间段内不接收非紧急通知</div>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">周末免打扰</label>
+                                        <div class="setting-desc">周末不接收工作相关通知</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">通知汇总频率</label>
+                                    <select class="setting-select">
+                                        <option value="realtime" selected>实时通知</option>
+                                        <option value="hourly">每小时汇总</option>
+                                        <option value="daily">每日汇总</option>
+                                        <option value="weekly">每周汇总</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button class="btn btn-secondary" onclick="testNotification()">
+                            <i class="fas fa-bell"></i>
+                            测试通知
+                        </button>
+                        <button class="btn btn-primary" onclick="saveNotificationSettings()">
+                            <i class="fas fa-save"></i>
+                            保存设置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 数据导出设置 -->
+                <div id="export-settings" class="settings-panel">
+                    <div class="panel-header">
+                        <h2>数据导出</h2>
+                        <p>导出您的教学数据和统计信息</p>
+                    </div>
+                    
+                    <div class="backup-cards">
+                        <div class="backup-card">
+                            <h4>考试成绩导出</h4>
+                            <p>导出学生的考试成绩和统计数据</p>
+                            <div class="settings-actions">
+                                <button class="btn btn-primary" onclick="exportGrades()">
+                                    <i class="fas fa-download"></i>
+                                    导出成绩
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="backup-card">
+                            <h4>题库数据导出</h4>
+                            <p>导出您创建和管理的题目数据</p>
+                            <div class="settings-actions">
+                                <button class="btn btn-primary" onclick="exportQuestions()">
+                                    <i class="fas fa-download"></i>
+                                    导出题库
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="backup-card">
+                            <h4>教学统计报告</h4>
+                            <p>导出完整的教学数据统计报告</p>
+                            <div class="settings-actions">
+                                <button class="btn btn-primary" onclick="exportStatistics()">
+                                    <i class="fas fa-download"></i>
+                                    导出报告
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="backup-card">
+                            <h4>学生名单导出</h4>
+                            <p>导出班级学生名单和联系信息</p>
+                            <div class="settings-actions">
+                                <button class="btn btn-primary" onclick="exportStudents()">
+                                    <i class="fas fa-download"></i>
+                                    导出名单
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="settings-group">
+                            <h3>导出设置</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">默认导出格式</label>
+                                    <select class="setting-select">
+                                        <option value="xlsx" selected>Excel格式 (.xlsx)</option>
+                                        <option value="csv">CSV格式 (.csv)</option>
+                                        <option value="pdf">PDF格式 (.pdf)</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">时间范围</label>
+                                    <select class="setting-select">
+                                        <option value="current">当前学期</option>
+                                        <option value="all" selected>全部数据</option>
+                                        <option value="custom">自定义范围</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">包含学生个人信息</label>
+                                        <div class="setting-desc">导出数据中包含学生姓名、学号等</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="setting-item inline">
+                                    <div>
+                                        <label class="setting-label">包含统计分析</label>
+                                        <div class="setting-desc">在导出数据中包含统计图表</div>
+                                    </div>
+                                    <label class="setting-toggle">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 使用帮助设置 -->
+                <div id="help-settings" class="settings-panel">
+                    <div class="panel-header">
+                        <h2>使用帮助</h2>
+                        <p>获取系统使用指导和技术支持</p>
+                    </div>
+                    
+                    <div class="backup-cards">
+                        <div class="backup-card">
+                            <h4>新手指南</h4>
+                            <p>系统功能介绍和基础操作教程</p>
+                            <div class="settings-actions">
+                                <button class="btn btn-primary" onclick="showUserGuide()">
+                                    <i class="fas fa-play"></i>
+                                    开始教程
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="backup-card">
+                            <h4>功能说明</h4>
+                            <p>详细的功能说明文档和操作手册</p>
+                            <div class="settings-actions">
+                                <button class="btn btn-primary" onclick="viewDocumentation()">
+                                    <i class="fas fa-book"></i>
+                                    查看文档
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="backup-card">
+                            <h4>常见问题</h4>
+                            <p>用户常遇到的问题和解决方案</p>
+                            <div class="settings-actions">
+                                <button class="btn btn-primary" onclick="viewFAQ()">
+                                    <i class="fas fa-question-circle"></i>
+                                    查看FAQ
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="backup-card">
+                            <h4>联系技术支持</h4>
+                            <p>遇到问题时联系我们获得帮助</p>
+                            <div class="settings-actions">
+                                <button class="btn btn-primary" onclick="contactSupport()">
+                                    <i class="fas fa-headset"></i>
+                                    联系支持
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="settings-group">
+                            <h3>系统信息</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">系统版本</label>
+                                    <div class="setting-value">v2.1.0</div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">最后更新</label>
+                                    <div class="setting-value">2024-03-15</div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">技术支持邮箱</label>
+                                    <div class="setting-value">support@university.edu.cn</div>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">技术支持电话</label>
+                                    <div class="setting-value">400-123-4567</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 意见反馈设置 -->
+                <div id="feedback-settings" class="settings-panel">
+                    <div class="panel-header">
+                        <h2>意见反馈</h2>
+                        <p>向我们分享您的使用体验和改进建议</p>
+                    </div>
+                    
+                    <div class="settings-groups">
+                        <div class="settings-group">
+                            <h3>提交反馈</h3>
+                            <div class="setting-items">
+                                <div class="setting-item">
+                                    <label class="setting-label">反馈类型</label>
+                                    <select class="setting-select" id="feedback-type">
+                                        <option value="">请选择反馈类型</option>
+                                        <option value="bug">问题报告</option>
+                                        <option value="feature">功能建议</option>
+                                        <option value="improvement">改进建议</option>
+                                        <option value="praise">表扬建议</option>
+                                        <option value="other">其他</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">标题</label>
+                                    <input type="text" class="setting-input" placeholder="请输入反馈标题" id="feedback-title">
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">详细描述</label>
+                                    <textarea class="setting-input" rows="6" placeholder="请详细描述您的问题或建议..." id="feedback-content"></textarea>
+                                </div>
+                                <div class="setting-item">
+                                    <label class="setting-label">联系方式（可选）</label>
+                                    <input type="text" class="setting-input" placeholder="如需回复请留下联系方式" id="feedback-contact">
+                                </div>
+                                <div class="setting-item">
+                                    <button class="btn btn-primary" onclick="submitFeedback()">
+                                        <i class="fas fa-paper-plane"></i>
+                                        提交反馈
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>我的反馈记录</h3>
+                            <div style="background: white; border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden;">
+                                <div style="padding: 12px 16px; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between;">
+                                    <div>
+                                        <div style="font-size: 14px; color: #262626; font-weight: 500;">考试时间设置不够灵活</div>
+                                        <div style="font-size: 12px; color: #8c8c8c;">功能建议 • 2024-03-18 10:30</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 12px; color: #52c41a;">已处理</div>
+                                    </div>
+                                </div>
+                                <div style="padding: 12px 16px; border-bottom: 1px solid #f9f9f9; display: flex; justify-content: space-between;">
+                                    <div>
+                                        <div style="font-size: 14px; color: #262626; font-weight: 500;">批量导入题目时格式报错</div>
+                                        <div style="font-size: 12px; color: #8c8c8c;">问题报告 • 2024-03-15 16:20</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 12px; color: #52c41a;">已修复</div>
+                                    </div>
+                                </div>
+                                <div style="padding: 12px 16px; display: flex; justify-content: space-between;">
+                                    <div>
+                                        <div style="font-size: 14px; color: #262626; font-weight: 500;">系统界面很好用，谢谢开发团队</div>
+                                        <div style="font-size: 12px; color: #8c8c8c;">表扬建议 • 2024-03-10 09:15</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 12px; color: #1890ff;">已回复</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI学生辅导模态框 -->
+    <div id="studentCoachingModal" class="modal" style="display: none;">
+        <div class="modal-content" style="width: 80%; max-width: 1000px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-robot"></i> AI学生辅导助手</h2>
+                <button class="modal-close" onclick="closeStudentCoaching()">×</button>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div style="display: flex; height: 600px;">
+                    <!-- 学生列表 -->
+                    <div style="width: 300px; border-right: 1px solid #e0e0e0; background: #f8f9fa;">
+                        <div style="padding: 16px; border-bottom: 1px solid #e0e0e0;">
+                            <h3 style="margin: 0 0 12px 0; font-size: 16px;">班级学生</h3>
+                            <input type="text" placeholder="搜索学生..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <div class="student-list" id="studentList" style="height: calc(100% - 80px); overflow-y: auto; padding: 8px;">
+                            <!-- 学生列表将在这里显示 -->
+                        </div>
+                    </div>
+                    
+                    <!-- AI辅导界面 -->
+                    <div style="flex: 1; display: flex; flex-direction: column;">
+                        <div style="padding: 16px; border-bottom: 1px solid #e0e0e0; background: white;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h3 style="margin: 0; font-size: 16px;" id="currentStudentName">请选择要辅导的学生</h3>
+                                    <p style="margin: 4px 0 0 0; font-size: 14px; color: #666;" id="currentStudentInfo">从左侧列表中选择学生开始AI辅导</p>
+                                </div>
+                                <div>
+                                    <button class="btn btn-secondary btn-sm" onclick="exportCoachingPlan()" id="exportPlanBtn" style="display: none;">
+                                        <i class="fas fa-download"></i>
+                                        导出辅导方案
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 聊天区域 -->
+                        <div style="flex: 1; background: white; padding: 16px; overflow-y: auto;" id="coachingChatArea">
+                            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: #999; text-align: center;">
+                                <i class="fas fa-user-graduate" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <h4>AI个性化辅导</h4>
+                                <p>选择学生后，AI将基于该学生的学习数据<br>为您提供个性化的辅导建议和方案</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 输入区域 -->
+                        <div style="padding: 16px; border-top: 1px solid #e0e0e0; background: #f8f9fa;" id="coachingInputArea" style="display: none;">
+                            <div style="display: flex; gap: 12px;">
+                                <input type="text" id="coachingInput" placeholder="询问关于这位学生的任何问题..." style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 20px; outline: none;">
+                                <button class="btn btn-primary" onclick="sendCoachingMessage()">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                            <div style="margin-top: 8px;">
+                                <button class="quick-btn" onclick="askCoachingQuestion('这个学生的学习特点是什么？')">学习特点</button>
+                                <button class="quick-btn" onclick="askCoachingQuestion('如何提升他的薄弱环节？')">薄弱环节</button>
+                                <button class="quick-btn" onclick="askCoachingQuestion('制定个性化学习计划')">学习计划</button>
+                                <button class="quick-btn" onclick="askCoachingQuestion('推荐适合的学习方法')">学习方法</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示消息
+        function showMessage(text, type = 'info', duration = 3000) {
+            const existingMessage = document.querySelector('.message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.innerHTML = `
+                <i class="fas fa-${getMessageIcon(type)}"></i>
+                <span>${text}</span>
+            `;
+
+            document.body.appendChild(message);
+            setTimeout(() => message.classList.add('show'), 100);
+
+            setTimeout(() => {
+                message.classList.remove('show');
+                setTimeout(() => message.remove(), 300);
+            }, duration);
+        }
+
+        function getMessageIcon(type) {
+            const icons = {
+                success: 'check-circle',
+                error: 'exclamation-circle',
+                warning: 'exclamation-triangle',
+                info: 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        // 显示设置面板
+        function showSettingsPanel(panelId) {
+            // 隐藏所有面板
+            const panels = document.querySelectorAll('.settings-panel');
+            panels.forEach(panel => panel.classList.remove('active'));
+            
+            // 显示目标面板
+            const targetPanel = document.getElementById(panelId + '-settings');
+            if (targetPanel) {
+                targetPanel.classList.add('active');
+            }
+            
+            // 更新导航状态
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const targetNav = event.currentTarget;
+            targetNav.classList.add('active');
+        }
+
+        // 个人资料设置
+        function changeAvatar() {
+            showMessage('头像上传功能开发中...', 'info');
+        }
+
+        function saveProfile() {
+            showMessage('个人信息保存成功', 'success');
+        }
+
+        function resetProfile() {
+            if (confirm('确定要重置修改吗？')) {
+                showMessage('已重置修改', 'info');
+            }
+        }
+
+        // 考试设置
+        function saveExamSettings() {
+            showMessage('考试设置保存成功', 'success');
+        }
+
+        function resetExamSettings() {
+            if (confirm('确定要重置为默认设置吗？')) {
+                showMessage('已重置为默认设置', 'info');
+            }
+        }
+
+        // 安全设置
+        function changePassword() {
+            const currentPassword = document.querySelector('input[placeholder="请输入当前密码"]').value;
+            const newPassword = document.querySelector('input[placeholder="请输入新密码"]').value;
+            const confirmPassword = document.querySelector('input[placeholder="请再次输入新密码"]').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showMessage('请填写完整的密码信息', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showMessage('两次输入的新密码不一致', 'error');
+                return;
+            }
+            
+            showMessage('正在修改密码...', 'info');
+            setTimeout(() => {
+                showMessage('密码修改成功，下次登录请使用新密码', 'success');
+            }, 1500);
+        }
+
+        function toggle2FA(checkbox) {
+            if (checkbox.checked) {
+                showMessage('双因素认证已启用', 'success');
+            } else {
+                if (confirm('确定要关闭双因素认证吗？这会降低账户安全性。')) {
+                    showMessage('双因素认证已关闭', 'warning');
+                } else {
+                    checkbox.checked = true;
+                }
+            }
+        }
+
+        function clearLoginHistory() {
+            if (confirm('确定要清除登录历史吗？此操作无法撤销。')) {
+                showMessage('登录历史已清除', 'success');
+            }
+        }
+
+        function saveSecuritySettings() {
+            showMessage('安全设置保存成功', 'success');
+        }
+
+        // 班级管理
+        function viewClassDetail(classId) {
+            showMessage(`正在加载班级 ${classId} 详细信息...`, 'info');
+        }
+
+        function manageStudents(classId) {
+            showMessage(`正在进入班级 ${classId} 学生管理...`, 'info');
+        }
+
+        function saveClassSettings() {
+            showMessage('班级设置保存成功', 'success');
+        }
+
+        // 评分设置
+        function resetGradingSettings() {
+            if (confirm('确定要重置评分设置为默认值吗？')) {
+                showMessage('评分设置已重置为默认值', 'info');
+            }
+        }
+
+        function saveGradingSettings() {
+            showMessage('评分设置保存成功', 'success');
+        }
+
+        // 界面偏好设置
+        function resetInterfaceSettings() {
+            if (confirm('确定要重置界面偏好为默认设置吗？')) {
+                showMessage('界面偏好已重置为默认设置', 'info');
+            }
+        }
+
+        function saveInterfaceSettings() {
+            showMessage('界面偏好设置保存成功', 'success');
+        }
+
+        // 通知设置
+        function testNotification() {
+            showMessage('测试通知发送成功！', 'success');
+        }
+
+        function saveNotificationSettings() {
+            showMessage('通知设置保存成功', 'success');
+        }
+
+        // 数据导出
+        function exportGrades() {
+            showMessage('正在导出考试成绩...', 'info');
+            setTimeout(() => {
+                showMessage('成绩数据导出完成', 'success');
+            }, 2000);
+        }
+
+        function exportQuestions() {
+            showMessage('正在导出题库数据...', 'info');
+            setTimeout(() => {
+                showMessage('题库数据导出完成', 'success');
+            }, 1500);
+        }
+
+        function exportStatistics() {
+            showMessage('正在导出统计报告...', 'info');
+            setTimeout(() => {
+                showMessage('统计报告导出完成', 'success');
+            }, 3000);
+        }
+
+        function exportStudents() {
+            showMessage('正在导出学生名单...', 'info');
+            setTimeout(() => {
+                showMessage('学生名单导出完成', 'success');
+            }, 1000);
+        }
+
+        // 帮助支持
+        function showUserGuide() {
+            showMessage('正在加载新手指南...', 'info');
+        }
+
+        function viewDocumentation() {
+            showMessage('正在打开功能文档...', 'info');
+        }
+
+        function viewFAQ() {
+            showMessage('正在加载常见问题...', 'info');
+        }
+
+        function contactSupport() {
+            showMessage('正在连接技术支持...', 'info');
+        }
+
+        // 意见反馈
+        function submitFeedback() {
+            const type = document.getElementById('feedback-type').value;
+            const title = document.getElementById('feedback-title').value;
+            const content = document.getElementById('feedback-content').value;
+            const contact = document.getElementById('feedback-contact').value;
+            
+            if (!type || !title || !content) {
+                showMessage('请填写完整的反馈信息', 'error');
+                return;
+            }
+            
+            showMessage('正在提交反馈...', 'info');
+            setTimeout(() => {
+                showMessage('反馈提交成功，感谢您的建议！', 'success');
+                // 清空表单
+                document.getElementById('feedback-type').value = '';
+                document.getElementById('feedback-title').value = '';
+                document.getElementById('feedback-content').value = '';
+                document.getElementById('feedback-contact').value = '';
+            }, 1500);
+        }
+
+        // ==================== 学生辅导Agent功能 ====================
+        
+        let currentClass = '';
+        let currentStudent = null;
+        let coachingHistory = [];
+
+        // 打开学生辅导界面
+        function openStudentCoaching(classId) {
+            currentClass = classId;
+            const modal = document.getElementById('studentCoachingModal');
+            modal.style.display = 'flex';
+            
+            // 加载学生列表
+            loadStudentList(classId);
+            showMessage('正在加载班级学生信息...', 'info');
+        }
+
+        // 关闭学生辅导界面
+        function closeStudentCoaching() {
+            document.getElementById('studentCoachingModal').style.display = 'none';
+            currentStudent = null;
+            coachingHistory = [];
+            
+            // 重置界面
+            document.getElementById('currentStudentName').textContent = '请选择要辅导的学生';
+            document.getElementById('currentStudentInfo').textContent = '从左侧列表中选择学生开始AI辅导';
+            document.getElementById('coachingChatArea').innerHTML = `
+                <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: #999; text-align: center;">
+                    <i class="fas fa-user-graduate" style="font-size: 48px; margin-bottom: 16px;"></i>
+                    <h4>AI个性化辅导</h4>
+                    <p>选择学生后，AI将基于该学生的学习数据<br>为您提供个性化的辅导建议和方案</p>
+                </div>
+            `;
+            document.getElementById('coachingInputArea').style.display = 'none';
+            document.getElementById('exportPlanBtn').style.display = 'none';
+        }
+
+        // 加载学生列表
+        function loadStudentList(classId) {
+            const studentList = document.getElementById('studentList');
+            
+            // 模拟学生数据
+            const studentData = {
+                'cs2021-1': [
+                    { id: 'stu001', name: '张三', studentId: '2021001', avg: 85.2, weak: '多选题', strong: '单选题' },
+                    { id: 'stu002', name: '李四', studentId: '2021002', avg: 78.5, weak: '简答题', strong: '编程题' },
+                    { id: 'stu003', name: '王五', studentId: '2021003', avg: 92.1, weak: '概念理解', strong: '逻辑推理' },
+                    { id: 'stu004', name: '赵六', studentId: '2021004', avg: 67.8, weak: '数据结构', strong: '算法基础' },
+                    { id: 'stu005', name: '孙七', studentId: '2021005', avg: 88.9, weak: '系统设计', strong: '代码实现' }
+                ],
+                'cs2021-2': [
+                    { id: 'stu006', name: '周八', studentId: '2021006', avg: 79.3, weak: '网络协议', strong: '数据库' },
+                    { id: 'stu007', name: '吴九', studentId: '2021007', avg: 84.7, weak: '操作系统', strong: '编译原理' },
+                    { id: 'stu008', name: '郑十', studentId: '2021008', avg: 71.5, weak: '算法分析', strong: '程序设计' }
+                ],
+                'se2020': [
+                    { id: 'stu009', name: '陈一', studentId: '2020009', avg: 86.4, weak: '软件测试', strong: '需求分析' },
+                    { id: 'stu010', name: '林二', studentId: '2020010', avg: 91.2, weak: '项目管理', strong: '架构设计' }
+                ]
+            };
+
+            const students = studentData[classId] || [];
+            
+            studentList.innerHTML = students.map(student => `
+                <div class="student-item" onclick="selectStudent('${student.id}')">
+                    <div class="student-name">${student.name}</div>
+                    <div class="student-info">学号：${student.studentId}</div>
+                    <div class="student-score">平均分：${student.avg}分</div>
+                    <div class="student-info">
+                        <span style="color: #f5222d;">薄弱：${student.weak}</span> | 
+                        <span style="color: #52c41a;">优势：${student.strong}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            setTimeout(() => showMessage('学生信息加载完成', 'success'), 500);
+        }
+
+        // 选择学生
+        function selectStudent(studentId) {
+            // 更新选中状态
+            document.querySelectorAll('.student-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // 获取学生信息
+            const studentData = {
+                'stu001': { name: '张三', studentId: '2021001', avg: 85.2, weak: '多选题', strong: '单选题', detail: '理解能力强，但在多选题上容易遗漏选项' },
+                'stu002': { name: '李四', studentId: '2021002', avg: 78.5, weak: '简答题', strong: '编程题', detail: '逻辑思维清晰，但表达能力需要提升' },
+                'stu003': { name: '王五', studentId: '2021003', avg: 92.1, weak: '概念理解', strong: '逻辑推理', detail: '学习能力很强，但对一些抽象概念理解不够深入' },
+                'stu004': { name: '赵六', studentId: '2021004', avg: 67.8, weak: '数据结构', strong: '算法基础', detail: '基础知识掌握不够扎实，需要加强练习' },
+                'stu005': { name: '孙七', studentId: '2021005', avg: 88.9, weak: '系统设计', strong: '代码实现', detail: '动手能力强，但系统性思维需要培养' }
+            };
+
+            currentStudent = studentData[studentId];
+            if (!currentStudent) return;
+            
+            // 更新界面
+            document.getElementById('currentStudentName').textContent = `${currentStudent.name} (${currentStudent.studentId})`;
+            document.getElementById('currentStudentInfo').textContent = `平均分：${currentStudent.avg}分 | 薄弱环节：${currentStudent.weak} | 优势领域：${currentStudent.strong}`;
+            document.getElementById('exportPlanBtn').style.display = 'inline-flex';
+            document.getElementById('coachingInputArea').style.display = 'block';
+            
+            // 清空聊天区域并显示欢迎信息
+            const chatArea = document.getElementById('coachingChatArea');
+            chatArea.innerHTML = '';
+            coachingHistory = [];
+            
+            // 添加AI欢迎消息
+            setTimeout(() => {
+                addCoachingMessage('ai', `👋 您好！我是AI辅导助手，已经分析了${currentStudent.name}的学习数据：\n\n📊 **学习概况：**\n• 平均成绩：${currentStudent.avg}分\n• 优势领域：${currentStudent.strong}\n• 薄弱环节：${currentStudent.weak}\n• 学习特点：${currentStudent.detail}\n\n💡 我可以帮您：\n• 分析学生的具体学习问题\n• 制定个性化辅导方案\n• 推荐适合的学习方法和资源\n• 预测学习效果和改进建议\n\n请告诉我您想了解这位学生的什么问题？`);
+            }, 500);
+        }
+
+        // 发送辅导消息
+        function sendCoachingMessage() {
+            const input = document.getElementById('coachingInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentStudent) return;
+            
+            addCoachingMessage('user', message);
+            input.value = '';
+            
+            // 模拟AI响应
+            setTimeout(() => {
+                const aiResponse = generateCoachingResponse(message);
+                addCoachingMessage('ai', aiResponse);
+            }, 1000);
+        }
+
+        // 快速提问
+        function askCoachingQuestion(question) {
+            if (!currentStudent) return;
+            
+            addCoachingMessage('user', question);
+            
+            setTimeout(() => {
+                const aiResponse = generateCoachingResponse(question);
+                addCoachingMessage('ai', aiResponse);
+            }, 1000);
+        }
+
+        // 添加辅导消息
+        function addCoachingMessage(type, content) {
+            const chatArea = document.getElementById('coachingChatArea');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `coaching-message ${type}`;
+            
+            const avatar = type === 'ai' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+            
+            messageDiv.innerHTML = `
+                <div class="coaching-avatar ${type}">${avatar}</div>
+                <div class="coaching-bubble">${content.replace(/\n/g, '<br>')}</div>
+            `;
+            
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            
+            coachingHistory.push({ type, content });
+        }
+
+        // 生成辅导响应
+        function generateCoachingResponse(userMessage) {
+            if (!currentStudent) return "请先选择要辅导的学生。";
+            
+            const studentName = currentStudent.name;
+            const weak = currentStudent.weak;
+            const strong = currentStudent.strong;
+            const avg = currentStudent.avg;
+            
+            const coachingResponses = {
+                '学习特点': `📋 **${studentName}的学习特点分析：**\n\n🎯 **优势特征：**\n• 在${strong}方面表现优秀，说明具有相关的天赋和兴趣\n• 平均分${avg}分，整体学习能力${avg >= 85 ? '优秀' : avg >= 75 ? '良好' : '需要提升'}\n• 具有一定的学习主动性和自制力\n\n⚠️ **需要关注：**\n• ${weak}是当前最大的学习难点\n• 可能存在学习方法不够系统的问题\n• 需要加强薄弱环节的专项训练\n\n💡 **学习风格推测：**\n基于表现特点，${studentName}可能更适合${strong.includes('编程') || strong.includes('代码') ? '实践导向的学习方式' : strong.includes('逻辑') || strong.includes('推理') ? '逻辑思维型的学习方式' : '概念理解型的学习方式'}。`,
+
+                '薄弱环节': `🎯 **${studentName}的薄弱环节深度分析：**\n\n❌ **主要问题：${weak}**\n\n**具体表现：**\n${weak === '多选题' ? '• 容易遗漏正确选项\n• 对知识点之间的关联理解不够\n• 综合分析能力有待提升' : weak === '简答题' ? '• 表达能力需要加强\n• 逻辑组织不够清晰\n• 对概念的深度理解不足' : weak === '数据结构' ? '• 抽象思维能力需要培养\n• 算法原理理解不够深入\n• 实际应用能力较弱' : '• 需要更多的专项练习\n• 理论与实践结合不够\n• 系统性学习有待加强'}\n\n🚀 **改进策略：**\n• **短期目标**：针对${weak}进行专项训练\n• **中期目标**：结合${strong}优势，交叉强化学习\n• **长期目标**：建立完整的知识体系`,
+
+                '学习计划': `📅 **${studentName}个性化学习计划：**\n\n**第一阶段（1-2周）：基础强化**\n• 📖 每日30分钟${weak}专项学习\n• 📝 完成5-10道相关练习题\n• 🎯 目标：${weak}正确率提升10%\n\n**第二阶段（3-4周）：综合提升**\n• 📊 结合${strong}优势，交叉练习\n• 🔄 每周一次综合测试\n• 📈 目标：整体成绩提升5-8分\n\n**效果监控：**\n• 每周测试一次${weak}相关题目\n• 记录学习时长和完成质量`,
+
+                '学习方法': `🎓 **适合${studentName}的学习方法推荐：**\n\n**基于优势（${strong}）的学习策略：**\n${strong.includes('编程') || strong.includes('代码') ? '• 🖥️ **实践导向法**：通过编程项目加深理论理解\n• 🔧 **动手学习**：多做实验，边做边学' : strong.includes('逻辑') || strong.includes('推理') ? '• 🧩 **逻辑分析法**：将复杂问题分解成小步骤\n• 📊 **图表梳理**：用思维导图整理知识关系' : '• 📚 **概念建构法**：先理解基础概念再扩展\n• 🔗 **关联学习**：找出知识点之间的联系'}\n\n**针对薄弱环节（${weak}）的特殊方法：**\n${weak === '多选题' ? '• ✅ **排除法训练**：先排除明显错误选项\n• 🔄 **关联记忆**：将选项与知识点建立联系' : weak === '简答题' ? '• 📝 **模板学习**：掌握标准答题格式\n• 🗣️ **表达练习**：多进行口头表达训练' : '• 📚 **基础补强**：回顾相关的基础知识\n• 🎯 **专项训练**：集中时间进行弱项练习'}`
+            };
+
+            // 智能匹配关键词
+            for (const [key, response] of Object.entries(coachingResponses)) {
+                if (userMessage.includes(key)) {
+                    return response;
+                }
+            }
+
+            // 默认响应
+            return `基于${studentName}的学习数据，我分析认为：\n\n📊 **当前状况：**\n• 在${strong}方面表现优秀，这是很好的基础\n• ${weak}需要重点关注和改进\n• 整体学习能力处于${avg >= 85 ? '优秀' : avg >= 75 ? '中上' : '中等'}水平\n\n💡 **针对您的问题"${userMessage}"，我建议：**\n• 充分发挥${strong}的优势\n• 制定针对性的${weak}改进计划\n• 建立系统化的学习方法\n\n需要我为${studentName}制定更详细的学习方案吗？`;
+        }
+
+        // 导出辅导方案
+        function exportCoachingPlan() {
+            if (!currentStudent || coachingHistory.length === 0) {
+                showMessage('暂无辅导记录可导出', 'warning');
+                return;
+            }
+
+            let content = `AI个性化辅导方案\n学生：${currentStudent.name} (${currentStudent.studentId})\n生成时间：${new Date().toLocaleString()}\n\n`;
+            
+            content += `学生基本信息：\n• 平均成绩：${currentStudent.avg}分\n• 优势领域：${currentStudent.strong}\n• 薄弱环节：${currentStudent.weak}\n• 学习特点：${currentStudent.detail}\n\n辅导记录：\n`;
+            
+            coachingHistory.forEach((msg, index) => {
+                const role = msg.type === 'ai' ? 'AI辅导师' : '教师';
+                content += `${role}：${msg.content}\n\n`;
+            });
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentStudent.name}_辅导方案_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMessage('辅导方案导出成功', 'success');
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化功能
+            console.log('教师个人设置页面已加载');
+            
+            // 支持回车键发送辅导消息
+            const coachingInput = document.getElementById('coachingInput');
+            if (coachingInput) {
+                coachingInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendCoachingMessage();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

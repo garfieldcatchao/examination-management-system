@@ -1,0 +1,57 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 5015234 */
+  src: url("//at.alicdn.com/t/a/font_5015234_3uzshlz24na.woff2?t=1757119842926")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5015234_3uzshlz24na.woff?t=1757119842926")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5015234_3uzshlz24na.ttf?t=1757119842926")
+      format("truetype");
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-tianjia:before {
+  content: "\e66c";
+}
+
+.icon-fuzhi:before {
+  content: "\e64f";
+}
+
+.icon-daochu:before {
+  content: "\e637";
+}
+
+.icon-daoru:before {
+  content: "\e642";
+}
+
+.icon-kaishi1:before {
+  content: "\e622";
+}
+
+.icon-bianji:before {
+  content: "\e605";
+}
+
+.icon-kaishi1-copy:before {
+  content: "\e66d";
+}
+
+.icon-tianjia-copy:before {
+  content: "\e66e";
+}
+
+
+.template-management-tab-content{
+    background-color: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    /* box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1); */
+}

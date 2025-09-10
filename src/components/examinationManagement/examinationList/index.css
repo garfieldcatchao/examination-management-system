@@ -1,0 +1,360 @@
+.examination-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.examination-toolbar-left {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.examination-toolbar-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.examination-list-tab-content {
+  padding: 24px;
+  position: relative;
+}
+
+.examination-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(279px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.examination-list-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  transition: all 0.3s;
+  border: 1px solid #f0f0f0;
+  position: relative;
+  height: 383px;
+  display: flex;
+  flex-direction: column;
+}
+
+.examination-list-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  border-color: #1890ff;
+}
+
+.examination-list-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+  color: #fff;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.examination-list-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.examination-list-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.examination-list-status {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-upcoming {
+  background: rgba(250, 140, 22, 0.2);
+  color: #fa8c16;
+}
+
+.status-ongoing {
+  background: rgba(82, 196, 26, 0.2);
+  color: #52c41a;
+}
+
+.status-completed {
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.status-cancelled {
+  background: rgba(255, 77, 79, 0.2);
+  color: #ff4d4f;
+}
+
+.examination-list-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.examination-list-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #595959;
+}
+
+.info-item i {
+  color: #8c8c8c;
+  width: 16px;
+}
+
+.examination-list-progress {
+  margin-bottom: 12px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+  gap: 20px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1890ff, #40a9ff);
+  transition: width 0.3s;
+}
+
+.examination-list-stats {
+  display: flex;
+  justify-content: space-around;
+  background: #fafafa;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-top: 4px;
+}
+
+.examination-list-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 12px;
+  flex-shrink: 0;
+}
+
+.status-ongoing {
+  color: #52c41a;
+}
+
+.status-upcoming {
+  color: #fa8c16;
+}
+
+.status-completed {
+  color: #1890ff;
+}
+
+.status-cancelled {
+  color: #ff4d4f;
+}
+
+.status-cancelled {
+  color: #a8a8a8;
+}
+
+@font-face {
+  font-family: "examination-list-btn-iconfont"; /* Project id 5015803 */
+  src: url('//at.alicdn.com/t/a/font_5015803_6hvrv5hs21m.woff2?t=1757251795479') format('woff2'),
+       url('//at.alicdn.com/t/a/font_5015803_6hvrv5hs21m.woff?t=1757251795479') format('woff'),
+       url('//at.alicdn.com/t/a/font_5015803_6hvrv5hs21m.ttf?t=1757251795479') format('truetype');
+}
+
+.examination-list-btn-iconfont {
+  font-family: "examination-list-btn-iconfont" !important;
+  font-size: 12px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-tongjibaogao:before {
+  content: "\e6a2";
+}
+
+.icon-daochu:before {
+  content: "\e62e";
+}
+
+.icon-yuejuan:before {
+  content: "\e663";
+}
+
+.icon-daochu-copy:before {
+  content: "\e6a3";
+}
+
+.icon-tongjibaogao-copy:before {
+  content: "\e6a4";
+}
+
+.icon-yuejuan-copy:before {
+  content: "\e6a5";
+}
+
+.icon-fuzhi:before {
+  content: "\e621";
+}
+
+.icon-fuzhi-copy:before {
+  content: "\e68b";
+}
+
+.icon-yulan:before {
+  content: "\e613";
+  color: #595959 !important;
+}
+
+.icon-yulan-copy:before {
+  content: "\e687";
+  color: #595959 !important;
+}
+
+.icon-rili:before {
+  content: "\e600";
+}
+
+.icon-shanchu:before {
+  content: "\e601";
+}
+
+.icon-shishijiankong:before {
+  content: "\e62d";
+}
+
+.icon-fl-renyuan:before {
+  content: "\e625";
+}
+
+.icon-tongzhi:before {
+  content: "\e637";
+}
+
+.icon-fun-purchase-his:before {
+  content: "\e630";
+}
+
+.icon-dizhi:before {
+  content: "\e606";
+}
+
+.icon-shezhi:before {
+  content: "\e60f";
+  color: #595959 !important;
+}
+
+.icon-bianji:before {
+  content: "\e634";
+  color: #595959 !important;
+}
+
+.icon-kaishi1:before {
+  content: "\e622";
+}
+
+.icon-shijian:before {
+  content: "\e682";
+}
+
+.icon-shanchu-copy:before {
+  content: "\e6a6";
+}
+
+.icon-jieshu:before {
+  content: "\e626";
+}
+
+.icon-shishijiankong-copy:before {
+  content: "\e683";
+}
+
+.icon-shezhi-copy:before {
+  content: "\e684";
+  color: #595959 !important;
+}
+
+.icon-jieshu-copy:before {
+  content: "\e685";
+}
+
+.icon-kaishi1-copy:before {
+  content: "\e686";
+}
+
+.icon-bianji-copy:before {
+  content: "\e688";
+  color: #595959 !important;
+}
+
+.icon-tongzhi-copy:before {
+  content: "\e689";
+  color: #595959 !important;
+}
+
+.icon-bianji-copy1:before {
+  content: "\e68a";
+  color: #595959 !important;
+}
+
+.icon-bianji-copy-h:before {
+  content: "\e688";
+  color: #595959 !important;
+}
