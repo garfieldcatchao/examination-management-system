@@ -269,18 +269,18 @@ function ExaminationList() {
         info: [
           {
             label: "报名人数",
-            value: item.total_participants
+            value: item.total_participants,
           },
           {
             label: "确认参加",
-            value: item.confirmedCount
+            value: item.confirmedCount,
           },
           {
             label: "待确认",
-            value: item.registeredCount
-          }
-        ]
-      }
+            value: item.registeredCount,
+          },
+        ],
+      };
     }
 
     if (item.status === "cancelled") {
@@ -288,8 +288,8 @@ function ExaminationList() {
         icon: "status-cancelled",
         label: "已取消",
         progressLabel: null,
-        info: null
-      }
+        info: null,
+      };
     }
 
     if (item.status === "completed") {
@@ -300,18 +300,18 @@ function ExaminationList() {
         info: [
           {
             label: "参考人数",
-            value: item.confirmedCount
+            value: item.confirmedCount,
           },
           {
             label: "已阅卷",
-            value: item.gradedCount
+            value: item.gradedCount,
           },
           {
             label: "待阅卷",
-            value: item.ungradedCount
-          }
-        ]
-      }
+            value: item.ungradedCount,
+          },
+        ],
+      };
     }
 
     if (item.status === "ongoing") {
@@ -322,26 +322,39 @@ function ExaminationList() {
         info: [
           {
             label: "参考人数",
-            value: item.confirmedCount
+            value: item.confirmedCount,
           },
           {
             label: "在线人数",
-            value: item.onlineCount
+            value: item.onlineCount,
           },
           {
             label: "异常状态",
-            value: item.abnormalCount
-          }
-        ]
-      }
+            value: item.abnormalCount,
+          },
+        ],
+      };
     }
 
     return {
       icon: "status-draft",
       label: "草稿",
       progressLabel: "完善进度",
-      info: null
-    }
+      info: [
+        {
+          label: "预计人数",
+          value: item.totalParticipants,
+        },
+        {
+          label: "题目数量",
+          value: "--",
+        },
+        {
+          label: "总分",
+          value: item.totalScore,
+        },
+      ],
+    };
   };
 
   const renderExaminationInfo = (item: any) => {
@@ -387,14 +400,10 @@ function ExaminationList() {
           <span className="iconfont icon-gantanhao_icon"></span>
           <span>因故取消</span>
         </div>
-        {/* <div className="info-item">
-          <i className="fas fa-map-marker-alt"></i>
-          <span>{item.location}</span>
-        </div>
         <div className="info-item">
-          <i className="fas fa-user"></i>
-          <span>{item.teacherName}</span>
-        </div> */}
+          <span className="iconfont icon-gantanhao_icon"></span>
+          <span>因故取消</span>
+        </div>
       </div>
     );
   };
@@ -415,13 +424,15 @@ function ExaminationList() {
                 <div className="examination-list-subtitle">
                   {item.subTitle} · {item.subjectName}
                 </div>
-                
+
                 <div className={`examination-list-status ${examStatus.icon}`}>
                   {examStatus.label}
                 </div>
               </div>
               <div className="examination-list-content">
                 {renderExaminationInfo(item)}
+                {renderExaminationCancelled(item)}
+
                 <div className="examination-list-progress">
                   <div className="progress-header">
                     <span>{examStatus.progressLabel}</span>
@@ -435,16 +446,14 @@ function ExaminationList() {
                   </div>
                 </div>
                 <div className="examination-list-stats">
-                  {
-                    examStatus.info?.map((info: any) => {
-                      return (
-                        <div className="stat-item">
-                          <div className="stat-value">{info.value}</div>
-                          <div className="stat-label">{info.label}</div>
-                        </div>
-                      )
-                    })
-                  }
+                  {examStatus.info?.map((info: any) => {
+                    return (
+                      <div className="stat-item">
+                        <div className="stat-value">{info.value}</div>
+                        <div className="stat-label">{info.label}</div>
+                      </div>
+                    );
+                  })}
                   {/* <div className="stat-item">
                     <div className="stat-value">{item.total_participants}</div>
                     <div className="stat-label">参考人数</div>
@@ -494,59 +503,6 @@ function ExaminationList() {
             </div>
           );
         })}
-
-        <div className="exam-card">
-          <div className="exam-header">
-            <div className="exam-title">软件工程期中考试</div>
-            <div className="exam-subtitle">2024年春季学期 · 软件工程专业</div>
-            <div className="exam-status status-cancelled">已取消</div>
-          </div>
-          <div className="exam-content">
-            <div className="exam-info">
-              <div className="info-item">
-                <i className="fas fa-clock"></i>
-                <span>原定 10:00-12:00</span>
-              </div>
-              <div className="info-item">
-                <i className="fas fa-calendar"></i>
-                <span>2024-03-12</span>
-              </div>
-              <div className="info-item">
-                <i className="fas fa-exclamation-triangle"></i>
-                <span>因故取消</span>
-              </div>
-            </div>
-            <div
-              style={{
-                padding: "16px",
-                background: "#fff2f0",
-                borderRadius: "6px",
-                margin: "16px 0",
-                color: "#ff4d4f",
-                fontSize: "14px",
-              }}
-            >
-              <i className="fas fa-info-circle"></i>
-              取消原因：教学计划调整，考试时间另行通知
-            </div>
-            <div className="exam-actions">
-              <button
-                className="btn btn-secondary btn-sm"
-                // onclick="rescheduleExam()"
-              >
-                <i className="fas fa-calendar-plus"></i>
-                <span>重新安排</span>
-              </button>
-              <button
-                className="btn btn-secondary btn-sm"
-                // onclick="deleteExam()"
-              >
-                <i className="fas fa-trash"></i>
-                <span>删除</span>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     );
   };
