@@ -5,6 +5,6 @@ export interface ExaminationBtns {
     color?: string;
     active?: { backgroundColor?: string; color?: string; border?: string };
     normal?: { backgroundColor?: string; color?: string; border?: string };
-    
+    actionType?: string;
   }[];
 }

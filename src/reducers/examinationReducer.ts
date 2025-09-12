@@ -8,15 +8,11 @@ export const setActiveTabReducer = (state: any, action: PayloadAction<string>) =
 };
 
 export const  initExaminationListReducer = (state: any, action: PayloadAction<any>) => {
-  console.log("action.payload ======> ", action.payload);
-  
-  // 确保正确处理数据结构
   const payload = action.payload;
-  console.log("payload ======> ", payload);
   
   return {
     ...state,
-    totalCount: payload?.totalCount || 0,
+    totalCount: payload?.pagination?.totalItems || 0,
     examinationList: payload?.data || [],
   };
 };

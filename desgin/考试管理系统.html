@@ -1378,20 +1378,140 @@
                 </div>
 
                 <!-- 监控内容 -->
-                <div class="form-container">
-                    <div class="section-title">
+                <div class="form-container" id="monitor-container">
+                    <!-- 监控头部控制 -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: #f6f8fa; border-radius: 8px;">
+                        <div class="section-title" style="margin: 0;">
                         <i class="fas fa-desktop"></i>
                         实时监控面板
+                            <span id="monitor-status" style="color: #8c8c8c; font-size: 14px; margin-left: 12px;">监控已停止</span>
                     </div>
-                    <div style="text-align: center; padding: 60px; color: #8c8c8c;">
-                        <i class="fas fa-eye" style="font-size: 64px; margin-bottom: 24px; opacity: 0.5;"></i>
-                        <h3 style="margin-bottom: 12px;">监控功能开发中</h3>
-                        <p>实时监控功能正在开发中，敬请期待</p>
-                        <div style="margin-top: 24px;">
-                            <button class="btn btn-primary">
-                                <i class="fas fa-play"></i>
-                                <span>启动监控</span>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <span style="font-size: 14px; color: #595959;">自动刷新：</span>
+                            <select id="refresh-interval" class="form-select" style="width: auto; padding: 4px 8px; font-size: 12px;">
+                                <option value="1000">1秒</option>
+                                <option value="3000" selected>3秒</option>
+                                <option value="5000">5秒</option>
+                                <option value="10000">10秒</option>
+                            </select>
+                            <button class="btn btn-secondary btn-sm" onclick="toggleFullscreen()">
+                                <i class="fas fa-expand"></i> 全屏
                             </button>
+                            <button class="btn btn-primary btn-sm" id="start-monitor-btn" onclick="startMonitoring()">
+                                <i class="fas fa-play"></i> 启动监控
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 监控初始状态 -->
+                    <div id="monitor-placeholder" style="text-align: center; padding: 60px; color: #8c8c8c;">
+                        <i class="fas fa-eye" style="font-size: 64px; margin-bottom: 24px; opacity: 0.5;"></i>
+                        <h3 style="margin-bottom: 12px;">点击"启动监控"开始实时监控</h3>
+                        <p>系统将显示所有进行中考试的实时监控画面</p>
+                    </div>
+
+                    <!-- 实时监控内容 -->
+                    <div id="monitor-content" style="display: none;">
+                        <!-- 考试选择 -->
+                        <div style="margin-bottom: 20px;">
+                            <label class="form-label">选择监控考试：</label>
+                            <select id="exam-selector" class="form-select" style="width: 300px; margin-left: 12px;" onchange="switchExamMonitor()">
+                                <option value="network-exam">计算机网络期末考试 (45人在线)</option>
+                                <option value="algorithm-exam">算法设计与分析 (32人在线)</option>
+                                <option value="database-exam">数据库系统原理 (28人在线)</option>
+                            </select>
+                        </div>
+
+                        <!-- 监控网格 -->
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                            <!-- 左侧：考生监控网格 -->
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                    <h4 style="margin: 0; color: #262626;">考生监控画面</h4>
+                                    <div style="display: flex; gap: 12px; align-items: center;">
+                                        <span style="font-size: 14px; color: #595959;">显示模式：</span>
+                                        <select id="view-mode" class="form-select" style="width: auto; padding: 4px 8px; font-size: 12px;" onchange="changeViewMode()">
+                                            <option value="grid-4">4x4网格</option>
+                                            <option value="grid-6" selected>6x6网格</option>
+                                            <option value="grid-9">9x9网格</option>
+                                            <option value="list">列表模式</option>
+                                        </select>
+                                        <button class="btn btn-secondary btn-sm" onclick="refreshMonitorGrid()">
+                                            <i class="fas fa-sync-alt"></i>
+                            </button>
+                                    </div>
+                                </div>
+
+                                <!-- 监控网格容器 -->
+                                <div id="monitor-grid" class="monitor-grid" style="
+                                    display: grid; 
+                                    grid-template-columns: repeat(6, 1fr); 
+                                    gap: 8px; 
+                                    background: #f0f0f0; 
+                                    padding: 12px; 
+                                    border-radius: 8px;
+                                    max-height: 600px;
+                                    overflow-y: auto;
+                                ">
+                                    <!-- 动态生成的监控画面 -->
+                                </div>
+                            </div>
+
+                            <!-- 右侧：控制面板和异常提醒 -->
+                            <div>
+                                <!-- 实时统计 -->
+                                <div style="background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                                    <h4 style="margin: 0 0 12px 0; color: #262626;">实时统计</h4>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                        <div style="text-align: center; background: #f6f8fa; padding: 12px; border-radius: 6px;">
+                                            <div id="online-count" style="font-size: 20px; color: #52c41a; font-weight: 600;">42</div>
+                                            <div style="font-size: 12px; color: #8c8c8c;">在线人数</div>
+                                        </div>
+                                        <div style="text-align: center; background: #f6f8fa; padding: 12px; border-radius: 6px;">
+                                            <div id="progress-avg" style="font-size: 20px; color: #1890ff; font-weight: 600;">68%</div>
+                                            <div style="font-size: 12px; color: #8c8c8c;">平均进度</div>
+                                        </div>
+                                        <div style="text-align: center; background: #f6f8fa; padding: 12px; border-radius: 6px;">
+                                            <div id="alert-count" style="font-size: 20px; color: #fa8c16; font-weight: 600;">3</div>
+                                            <div style="font-size: 12px; color: #8c8c8c;">异常状态</div>
+                                        </div>
+                                        <div style="text-align: center; background: #f6f8fa; padding: 12px; border-radius: 6px;">
+                                            <div id="submitted-count" style="font-size: 20px; color: #722ed1; font-weight: 600;">5</div>
+                                            <div style="font-size: 12px; color: #8c8c8c;">已提交</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 异常提醒 -->
+                                <div style="background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                                    <h4 style="margin: 0 0 12px 0; color: #262626; display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-exclamation-triangle" style="color: #fa8c16;"></i>
+                                        异常提醒
+                                    </h4>
+                                    <div id="alert-list" style="max-height: 200px; overflow-y: auto;">
+                                        <!-- 动态生成的异常提醒 -->
+                                    </div>
+                                </div>
+
+                                <!-- 快速操作 -->
+                                <div style="background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; padding: 16px;">
+                                    <h4 style="margin: 0 0 12px 0; color: #262626;">快速操作</h4>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <button class="btn btn-secondary btn-sm" onclick="sendBroadcast()">
+                                            <i class="fas fa-bullhorn"></i> 发送广播
+                                        </button>
+                                        <button class="btn btn-warning btn-sm" onclick="pauseAllExams()">
+                                            <i class="fas fa-pause"></i> 暂停所有考试
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="emergencyStop()">
+                                            <i class="fas fa-stop"></i> 紧急停止
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" onclick="exportMonitorLog()">
+                                            <i class="fas fa-download"></i> 导出日志
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1652,7 +1772,187 @@
         }
 
         function batchOperation() {
-            showMessage('打开批量操作界面...', 'info');
+            // 创建批量操作模态框
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 800px; max-width: 80%; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="margin: 0; color: #262626;">
+                            <i class="fas fa-tasks" style="color: #1890ff; margin-right: 8px;"></i>
+                            批量操作
+                        </h3>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+                    </div>
+                    
+                    <!-- 操作类型选择 -->
+                    <div style="margin-bottom: 24px;">
+                        <label class="form-label">批量操作类型</label>
+                        <div style="display: flex; gap: 16px; margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="radio" name="batch-type" value="notify" checked> 发送通知
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="radio" name="batch-type" value="export"> 导出数据
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="radio" name="batch-type" value="delete"> 批量删除
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="radio" name="batch-type" value="reschedule"> 批量重排
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 考试选择列表 -->
+                    <div style="margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <label class="form-label">选择考试</label>
+                            <div>
+                                <button class="btn btn-secondary btn-sm" onclick="selectAllExams()">全选</button>
+                                <button class="btn btn-secondary btn-sm" onclick="deselectAllExams()">取消全选</button>
+                            </div>
+                        </div>
+                        <div id="batch-exam-list" style="
+                            border: 1px solid #f0f0f0;
+                            border-radius: 6px;
+                            max-height: 300px;
+                            overflow-y: auto;
+                        ">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: #fafafa; position: sticky; top: 0;">
+                                        <th style="padding: 12px; text-align: center; width: 50px;">选择</th>
+                                        <th style="padding: 12px; text-align: left;">考试名称</th>
+                                        <th style="padding: 12px; text-align: center;">状态</th>
+                                        <th style="padding: 12px; text-align: center;">日期</th>
+                                        <th style="padding: 12px; text-align: center;">参考人数</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="batch-exam-tbody">
+                                    <!-- 动态生成的考试列表 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- 批量通知内容 -->
+                    <div id="batch-notify-panel" style="margin-bottom: 24px;">
+                        <label class="form-label">通知内容</label>
+                        <textarea id="batch-notify-content" class="form-textarea" style="min-height: 100px;" placeholder="请输入要发送的通知内容...">考试时间已更新，请查看最新安排。</textarea>
+                        <div style="margin-top: 8px; display: flex; gap: 16px;">
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" checked> 系统通知
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" checked> 邮件通知
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox"> 短信通知
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 批量导出选项 -->
+                    <div id="batch-export-panel" style="margin-bottom: 24px; display: none;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label class="form-label">导出格式</label>
+                                <select class="form-select">
+                                    <option>Excel (.xlsx)</option>
+                                    <option>CSV (.csv)</option>
+                                    <option>PDF (.pdf)</option>
+                                    <option>JSON (.json)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">导出内容</label>
+                                <select class="form-select">
+                                    <option>基本信息</option>
+                                    <option>详细数据</option>
+                                    <option>统计报告</option>
+                                    <option>完整数据包</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 批量删除警告 -->
+                    <div id="batch-delete-panel" style="margin-bottom: 24px; display: none;">
+                        <div style="background: #fff2f0; border: 1px solid #ffccc7; padding: 16px; border-radius: 6px;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                <i class="fas fa-exclamation-triangle" style="color: #ff4d4f; font-size: 20px;"></i>
+                                <span style="color: #ff4d4f; font-weight: 500;">危险操作警告</span>
+                            </div>
+                            <p style="margin: 0; color: #595959;">批量删除操作不可恢复，将永久移除所选考试及其相关数据。</p>
+                            <div style="margin-top: 12px;">
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="delete-confirm-checkbox"> 我已了解此操作的风险，并确认要删除所选考试
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 批量重排选项 -->
+                    <div id="batch-reschedule-panel" style="margin-bottom: 24px; display: none;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label class="form-label">延期天数</label>
+                                <select class="form-select">
+                                    <option>1天</option>
+                                    <option>3天</option>
+                                    <option>7天</option>
+                                    <option>14天</option>
+                                    <option>自定义</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">通知考生</label>
+                                <select class="form-select">
+                                    <option>立即通知</option>
+                                    <option>手动通知</option>
+                                    <option>不通知</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <label class="form-label">重排原因</label>
+                            <textarea class="form-textarea" style="min-height: 80px;">由于教学安排调整，需要重新安排考试时间。</textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn btn-primary" id="batch-action-btn" onclick="executeBatchOperation()">
+                            <i class="fas fa-check"></i>
+                            <span>执行操作</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+            
+            // 初始化考试列表
+            generateBatchExamList();
+            
+            // 添加操作类型切换事件
+            const radioButtons = modal.querySelectorAll('input[name="batch-type"]');
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', updateBatchOperationPanels);
+            });
+            
+            // 初始化面板显示
+            updateBatchOperationPanels();
+            
+            showMessage('批量操作界面已打开', 'info');
         }
 
         function exportExams() {
@@ -1668,56 +1968,146 @@
         }
 
         // 考试操作
-        function monitorExam() {
-            showMessage('进入实时监控模式...', 'info');
+        function monitorExam(examName = '计算机网络期末考试') {
+            showMessage('正在进入监控模式...', 'info');
+            setTimeout(() => {
+                const monitorData = {
+                    onlineStudents: Math.floor(Math.random() * 5) + 40,
+                    totalStudents: 45,
+                    avgProgress: Math.floor(Math.random() * 20) + 60,
+                    alerts: Math.floor(Math.random() * 5)
+                };
+                
+                showMessage(`${examName} 监控已开启`, 'success');
+                updateMonitoringStats(monitorData);
+                
+                // 模拟切换到监控标签页
+                setTimeout(() => {
+                    switchTab('exam-monitor');
+                }, 1000);
+            }, 1500);
         }
 
-        function examSettings() {
-            showMessage('打开考试设置界面...', 'info');
+        function examSettings(examName = '当前考试') {
+            showMessage('加载考试设置...', 'info');
+            setTimeout(() => {
+                const settingsModal = createSettingsModal(examName);
+                document.body.appendChild(settingsModal);
+            }, 800);
         }
 
-        function stopExam() {
-            if (confirm('确定要结束这场考试吗？')) {
-                showMessage('考试已结束', 'warning');
-            }
+        function stopExam(examName = '计算机网络期末考试') {
+            const modal = createConfirmModal(
+                '结束考试确认',
+                `确定要结束"${examName}"吗？\n\n注意：考试结束后无法恢复，请确保所有考生已提交。`,
+                () => {
+                    showMessage('正在结束考试...', 'warning');
+                    simulateProgressAction('结束考试', () => {
+                        showMessage('考试已成功结束', 'success');
+                        updateExamStatus(examName, 'completed');
+                    });
+                }
+            );
+            document.body.appendChild(modal);
         }
 
-        function startExam() {
-            showMessage('考试已开始，进入监控模式...', 'success');
+        function startExam(examName = '数据结构算法测试') {
+            const modal = createConfirmModal(
+                '开始考试确认',
+                `确定要开始"${examName}"吗？\n\n考试开始后考生将收到通知并可以进入考试。`,
+                () => {
+                    showMessage('正在开始考试...', 'info');
+                    simulateProgressAction('开始考试', () => {
+                        showMessage('考试已成功开始，正在通知考生...', 'success');
+                        updateExamStatus(examName, 'ongoing');
+                        // 自动跳转到监控
+                        setTimeout(() => monitorExam(examName), 2000);
+                    });
+                }
+            );
+            document.body.appendChild(modal);
         }
 
-        function editExam() {
-            showMessage('打开编辑考试界面...', 'info');
+        function editExam(examName = '数据结构算法测试') {
+            showMessage('加载考试编辑界面...', 'info');
+            setTimeout(() => {
+                const editData = {
+                    name: examName,
+                    subject: '数据结构',
+                    date: '2024-03-16',
+                    startTime: '19:00',
+                    endTime: '20:30',
+                    participants: 38
+                };
+                showEditModal(editData);
+            }, 1000);
         }
 
-        function previewExam() {
-            showMessage('打开考试预览界面...', 'info');
+        function previewExam(examName = '数据结构算法测试') {
+            showMessage('生成考试预览...', 'info');
+            setTimeout(() => {
+                const previewWindow = window.open('', '_blank', 'width=1200,height=800');
+                previewWindow.document.write(generateExamPreview(examName));
+                showMessage('预览已在新窗口中打开', 'success');
+            }, 1200);
         }
 
-        function notifyStudents() {
-            showMessage('正在发送考试通知...', 'info');
+        function notifyStudents(examName = '数据结构算法测试', studentCount = 38) {
+            const modal = createNotificationModal(examName, studentCount);
+            document.body.appendChild(modal);
         }
 
-        function gradeExam() {
-            showMessage('打开阅卷界面...', 'info');
+        function gradeExam(examName = '操作系统原理考试') {
+            showMessage('打开阅卷系统...', 'info');
+            setTimeout(() => {
+                const gradingData = {
+                    examName: examName,
+                    totalStudents: 42,
+                    gradedCount: 31,
+                    pendingCount: 11,
+                    avgScore: 78.5
+                };
+                showGradingModal(gradingData);
+            }, 1000);
         }
 
-        function viewReport() {
-            showMessage('打开考试报告...', 'info');
+        function viewReport(examName = '操作系统原理考试') {
+            showMessage('生成考试报告...', 'info');
+            simulateProgressAction('生成报告', () => {
+                const reportData = generateExamReport(examName);
+                showReportModal(reportData);
+                showMessage('考试报告已生成', 'success');
+            });
         }
 
-        function exportResults() {
-            showMessage('正在导出考试结果...', 'info');
+        function exportResults(examName = '操作系统原理考试', format = 'excel') {
+            const modal = createExportModal(examName);
+            document.body.appendChild(modal);
         }
 
-        function rescheduleExam() {
-            showMessage('打开重新安排界面...', 'info');
+        function rescheduleExam(examName = '软件工程期中考试') {
+            showMessage('加载重新安排界面...', 'info');
+            setTimeout(() => {
+                const rescheduleModal = createRescheduleModal(examName);
+                document.body.appendChild(rescheduleModal);
+            }, 800);
         }
 
-        function deleteExam() {
-            if (confirm('确定要删除这场考试吗？')) {
+        function deleteExam(examName = '软件工程期中考试') {
+            const modal = createConfirmModal(
+                '删除考试确认',
+                `确定要永久删除"${examName}"吗？\n\n此操作无法撤销，所有相关数据将被清除。`,
+                () => {
+                    showMessage('正在删除考试...', 'warning');
+                    setTimeout(() => {
                 showMessage('考试已删除', 'success');
-            }
+                        // 从界面中移除卡片
+                        removeExamCard(examName);
+                    }, 1500);
+                },
+                'danger'
+            );
+            document.body.appendChild(modal);
         }
 
         // 创建考试功能
@@ -1744,10 +2134,1317 @@
             }, 2000);
         }
 
+        // 辅助功能函数
+        function createConfirmModal(title, message, onConfirm, type = 'warning') {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                background: white; border-radius: 8px; padding: 24px;
+                min-width: 400px; max-width: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            `;
+            
+            dialog.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <i class="fas fa-${type === 'danger' ? 'exclamation-triangle' : 'question-circle'}" 
+                       style="font-size: 20px; color: ${type === 'danger' ? '#ff4d4f' : '#fa8c16'};"></i>
+                    <h3 style="margin: 0; color: #262626;">${title}</h3>
+                </div>
+                <p style="color: #595959; line-height: 1.6; white-space: pre-line; margin-bottom: 24px;">${message}</p>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                    <button class="btn btn-${type === 'danger' ? 'danger' : 'primary'}" onclick="confirmAction()">确认</button>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            modal.appendChild(dialog);
+            
+            // 添加确认事件
+            modal.confirmAction = () => {
+                modal.remove();
+                onConfirm();
+            };
+            
+            // 全局暴露确认函数
+            window.confirmAction = modal.confirmAction;
+            
+            return modal;
+        }
+
+        function simulateProgressAction(actionName, callback, duration = 2000) {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    callback();
+                } else {
+                    showMessage(`${actionName}中... ${Math.min(100, Math.floor(progress))}%`, 'info', 500);
+                }
+            }, duration / 10);
+        }
+
+        function updateMonitoringStats(data) {
+            // 模拟更新监控面板的统计数据
+            const statsCards = document.querySelectorAll('#exam-monitor .stats-card');
+            if (statsCards.length >= 2) {
+                statsCards[1].querySelector('.stats-value').textContent = data.onlineStudents;
+            }
+        }
+
+        function updateExamStatus(examName, newStatus) {
+            // 模拟更新考试状态
+            const cards = document.querySelectorAll('.exam-card');
+            cards.forEach(card => {
+                const title = card.querySelector('.exam-title');
+                if (title && title.textContent === examName) {
+                    const statusEl = card.querySelector('.exam-status');
+                    if (statusEl) {
+                        statusEl.className = `exam-status status-${newStatus}`;
+                        statusEl.textContent = getStatusText(newStatus);
+                    }
+                }
+            });
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'ongoing': '进行中',
+                'completed': '已完成',
+                'upcoming': '即将开始',
+                'cancelled': '已取消'
+            };
+            return statusMap[status] || status;
+        }
+
+        function createSettingsModal(examName) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 600px; max-width: 800px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="margin: 0; color: #262626;">
+                            <i class="fas fa-cog" style="color: #1890ff; margin-right: 8px;"></i>
+                            ${examName} - 设置
+                        </h3>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+                    </div>
+                    
+                    <div class="proctoring-settings">
+                        <div class="setting-item">
+                            <span class="setting-label">启用摄像头监控</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">启用屏幕录制</span>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">禁止切换窗口</span>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">随机题目顺序</span>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn btn-primary" onclick="saveExamSettings('${examName}')">保存设置</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            return modal;
+        }
+
+        function saveExamSettings(examName) {
+            showMessage('正在保存设置...', 'info');
+            setTimeout(() => {
+                showMessage(`${examName} 设置已保存`, 'success');
+                document.querySelector('.modal-overlay').remove();
+            }, 1000);
+        }
+
+        function createNotificationModal(examName, studentCount) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 500px;">
+                    <h3 style="margin: 0 0 16px 0; color: #262626;">
+                        <i class="fas fa-bell" style="color: #1890ff; margin-right: 8px;"></i>
+                        发送考试通知
+                    </h3>
+                    <p style="color: #595959; margin-bottom: 20px;">向 ${studentCount} 名考生发送"${examName}"的考试通知</p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label class="form-label">通知类型</label>
+                        <div style="display: flex; gap: 12px; margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 6px;">
+                                <input type="checkbox" checked> 系统消息
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px;">
+                                <input type="checkbox" checked> 邮件通知
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px;">
+                                <input type="checkbox"> 短信通知
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label class="form-label">通知内容</label>
+                        <textarea class="form-textarea" style="min-height: 80px;">${examName} 将于明天 19:00-20:30 举行，请提前准备并准时参加。考试地点：机房B305。</textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn btn-primary" onclick="sendNotification('${examName}', ${studentCount})">发送通知</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            return modal;
+        }
+
+        function sendNotification(examName, studentCount) {
+            document.querySelector('.modal-overlay').remove();
+            showMessage('正在发送通知...', 'info');
+            
+            let sent = 0;
+            const interval = setInterval(() => {
+                sent += Math.floor(Math.random() * 5) + 1;
+                if (sent >= studentCount) {
+                    clearInterval(interval);
+                    showMessage(`通知已成功发送给 ${studentCount} 名考生`, 'success');
+                } else {
+                    showMessage(`正在发送通知... ${sent}/${studentCount}`, 'info', 300);
+                }
+            }, 200);
+        }
+
+        function generateExamPreview(examName) {
+            return `
+                <html>
+                <head><title>${examName} - 预览</title>
+                <style>body{font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; line-height: 1.6;}</style>
+                </head>
+                <body>
+                    <h1>${examName}</h1>
+                    <div style="background: #f0f2f5; padding: 16px; border-radius: 6px; margin: 16px 0;">
+                        <h3>考试信息</h3>
+                        <p><strong>考试时间：</strong>2024-03-16 19:00-20:30</p>
+                        <p><strong>考试时长：</strong>90分钟</p>
+                        <p><strong>考试地点：</strong>机房B305</p>
+                        <p><strong>参考人数：</strong>38人</p>
+                    </div>
+                    <h3>题目预览</h3>
+                    <div style="border: 1px solid #d9d9d9; padding: 16px; margin: 8px 0; border-radius: 4px;">
+                        <p><strong>1. 选择题 (20分)</strong></p>
+                        <p>以下关于栈的描述正确的是：</p>
+                        <div style="margin-left: 20px;">
+                            <p>A. 栈是先进先出的数据结构</p>
+                            <p>B. 栈是后进先出的数据结构</p>
+                            <p>C. 栈没有固定的访问顺序</p>
+                            <p>D. 栈可以随机访问元素</p>
+                        </div>
+                    </div>
+                    <p style="color: #8c8c8c; text-align: center; margin-top: 40px;">这是预览模式，仅显示部分内容</p>
+                </body>
+                </html>
+            `;
+        }
+
         // 日历功能
         function viewExamDetail() {
-            showMessage('打开考试详情...', 'info');
+            showMessage('加载考试详情...', 'info');
+            setTimeout(() => {
+                const detailModal = createExamDetailModal();
+                document.body.appendChild(detailModal);
+            }, 500);
+        }
+        
+        // ================== 批量操作功能 ==================
+        // 生成批量操作的考试列表
+        function generateBatchExamList() {
+            const tbody = document.getElementById('batch-exam-tbody');
+            const examData = [
+                { id: 1, name: '计算机网络期末考试', status: 'ongoing', date: '2024-03-15', students: 45 },
+                { id: 2, name: '数据结构算法测试', status: 'upcoming', date: '2024-03-16', students: 38 },
+                { id: 3, name: '操作系统原理考试', status: 'completed', date: '2024-03-10', students: 42 },
+                { id: 4, name: '软件工程期中考试', status: 'cancelled', date: '2024-03-12', students: 40 },
+                { id: 5, name: 'Java程序设计实验', status: 'upcoming', date: '2024-03-18', students: 36 },
+                { id: 6, name: '数据库系统原理', status: 'upcoming', date: '2024-03-20', students: 39 },
+                { id: 7, name: '计算机组成原理', status: 'completed', date: '2024-03-08', students: 44 }
+            ];
+            
+            const statusText = {
+                'ongoing': '进行中',
+                'upcoming': '即将开始',
+                'completed': '已完成',
+                'cancelled': '已取消'
+            };
+            
+            const statusClass = {
+                'ongoing': 'status-ongoing',
+                'upcoming': 'status-upcoming',
+                'completed': 'status-completed',
+                'cancelled': 'status-cancelled'
+            };
+            
+            tbody.innerHTML = examData.map(exam => `
+                <tr style="border-bottom: 1px solid #f0f0f0;">
+                    <td style="padding: 12px; text-align: center;">
+                        <input type="checkbox" class="batch-exam-checkbox" value="${exam.id}" 
+                            ${exam.status === 'cancelled' ? 'disabled' : ''}>
+                    </td>
+                    <td style="padding: 12px;">${exam.name}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        <span class="${statusClass[exam.status]}" style="
+                            padding: 4px 8px;
+                            border-radius: 10px;
+                            font-size: 12px;
+                            display: inline-block;
+                        ">${statusText[exam.status]}</span>
+                    </td>
+                    <td style="padding: 12px; text-align: center;">${exam.date}</td>
+                    <td style="padding: 12px; text-align: center;">${exam.students}</td>
+                </tr>
+            `).join('');
+        }
+        
+        // 更新批量操作面板显示
+        function updateBatchOperationPanels() {
+            const selectedType = document.querySelector('input[name="batch-type"]:checked').value;
+            
+            // 隐藏所有面板
+            document.getElementById('batch-notify-panel').style.display = 'none';
+            document.getElementById('batch-export-panel').style.display = 'none';
+            document.getElementById('batch-delete-panel').style.display = 'none';
+            document.getElementById('batch-reschedule-panel').style.display = 'none';
+            
+            // 显示选中的面板
+            document.getElementById(`batch-${selectedType}-panel`).style.display = 'block';
+            
+            // 更新按钮文本
+            const actionBtn = document.getElementById('batch-action-btn');
+            switch (selectedType) {
+                case 'notify':
+                    actionBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 发送通知';
+                    actionBtn.className = 'btn btn-primary';
+                    break;
+                case 'export':
+                    actionBtn.innerHTML = '<i class="fas fa-download"></i> 导出数据';
+                    actionBtn.className = 'btn btn-primary';
+                    break;
+                case 'delete':
+                    actionBtn.innerHTML = '<i class="fas fa-trash"></i> 删除考试';
+                    actionBtn.className = 'btn btn-danger';
+                    break;
+                case 'reschedule':
+                    actionBtn.innerHTML = '<i class="fas fa-calendar-alt"></i> 重新安排';
+                    actionBtn.className = 'btn btn-primary';
+                    break;
+                default:
+                    actionBtn.innerHTML = '<i class="fas fa-check"></i> 执行操作';
+                    actionBtn.className = 'btn btn-primary';
+            }
+        }
+        
+        // 全选/取消全选
+        function selectAllExams() {
+            const checkboxes = document.querySelectorAll('.batch-exam-checkbox:not([disabled])');
+            checkboxes.forEach(checkbox => checkbox.checked = true);
+        }
+        
+        function deselectAllExams() {
+            const checkboxes = document.querySelectorAll('.batch-exam-checkbox');
+            checkboxes.forEach(checkbox => checkbox.checked = false);
+        }
+        
+        // 执行批量操作
+        function executeBatchOperation() {
+            const selectedType = document.querySelector('input[name="batch-type"]:checked').value;
+            const selectedExams = Array.from(document.querySelectorAll('.batch-exam-checkbox:checked')).map(cb => cb.value);
+            
+            if (selectedExams.length === 0) {
+                showMessage('请至少选择一个考试', 'warning');
+                return;
+            }
+            
+            // 删除操作需要确认
+            if (selectedType === 'delete') {
+                const confirmed = document.getElementById('delete-confirm-checkbox').checked;
+                if (!confirmed) {
+                    showMessage('请确认删除操作', 'warning');
+                    return;
+                }
+            }
+            
+            // 关闭模态框
+            document.querySelector('.modal-overlay').remove();
+            
+            // 根据操作类型执行不同的批量操作
+            switch (selectedType) {
+                case 'notify':
+                    executeBatchNotify(selectedExams);
+                    break;
+                case 'export':
+                    executeBatchExport(selectedExams);
+                    break;
+                case 'delete':
+                    executeBatchDelete(selectedExams);
+                    break;
+                case 'reschedule':
+                    executeBatchReschedule(selectedExams);
+                    break;
+            }
+        }
+        
+        // 批量通知
+        function executeBatchNotify(examIds) {
+            const content = document.getElementById('batch-notify-content').value;
+            showMessage(`正在向${examIds.length}场考试的考生发送通知...`, 'info');
+            
+            let progress = 0;
+            const total = examIds.length;
+            const interval = setInterval(() => {
+                progress++;
+                showMessage(`正在发送通知... ${progress}/${total}`, 'info');
+                
+                if (progress >= total) {
+                    clearInterval(interval);
+                    showMessage(`已成功向${total}场考试的考生发送通知`, 'success');
+                }
+            }, 800);
+        }
+        
+        // 批量导出
+        function executeBatchExport(examIds) {
+            showMessage(`正在导出${examIds.length}场考试的数据...`, 'info');
+            
+            simulateProgressAction('导出数据', () => {
+                showMessage(`${examIds.length}场考试的数据已成功导出`, 'success');
+            });
+        }
+        
+        // 批量删除
+        function executeBatchDelete(examIds) {
+            showMessage(`正在删除${examIds.length}场考试...`, 'warning');
+            
+            let progress = 0;
+            const total = examIds.length;
+            const interval = setInterval(() => {
+                progress++;
+                showMessage(`正在删除考试... ${progress}/${total}`, 'warning');
+                
+                if (progress >= total) {
+                    clearInterval(interval);
+                    showMessage(`已成功删除${total}场考试`, 'success');
+                    
+                    // 从界面上移除考试卡片
+                    examIds.forEach(id => {
+                        const examCards = document.querySelectorAll('.exam-card');
+                        if (examCards.length > id - 1) {
+                            const card = examCards[id - 1];
+                            card.style.animation = 'fadeOut 0.3s ease-out';
+                            setTimeout(() => {
+                                card.remove();
+                            }, 300);
+                        }
+                    });
+                }
+            }, 600);
+        }
+        
+        // 批量重排
+        function executeBatchReschedule(examIds) {
+            showMessage(`正在重新安排${examIds.length}场考试...`, 'info');
+            
+            simulateProgressAction('重新安排考试', () => {
+                showMessage(`${examIds.length}场考试已成功重新安排`, 'success');
+            });
+        }
+
+        function createExamDetailModal() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 600px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="margin: 0; color: #262626;">考试详情</h3>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                        <div><strong>考试名称：</strong>计算机网络期末考试</div>
+                        <div><strong>考试状态：</strong><span style="color: #52c41a;">进行中</span></div>
+                        <div><strong>考试时间：</strong>2024-03-15 14:00-16:00</div>
+                        <div><strong>考试地点：</strong>教学楼A201</div>
+                        <div><strong>监考老师：</strong>张老师</div>
+                        <div><strong>参考人数：</strong>45人</div>
+                    </div>
+                    <div style="background: #f6f8fa; padding: 16px; border-radius: 6px;">
+                        <h4>实时统计</h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center;">
+                            <div>
+                                <div style="font-size: 24px; color: #1890ff; font-weight: 600;">42</div>
+                                <div style="color: #8c8c8c;">在线人数</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 24px; color: #1890ff; font-weight: 600;">65%</div>
+                                <div style="color: #8c8c8c;">平均进度</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 24px; color: #ff4d4f; font-weight: 600;">3</div>
+                                <div style="color: #8c8c8c;">异常状态</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            return modal;
+        }
+
+        // 阅卷相关功能
+        function showGradingModal(gradingData) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 700px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="margin: 0; color: #262626;">
+                            <i class="fas fa-clipboard-check" style="color: #1890ff; margin-right: 8px;"></i>
+                            ${gradingData.examName} - 阅卷系统
+                        </h3>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+                        <div style="text-align: center; background: #f6f8fa; padding: 16px; border-radius: 6px;">
+                            <div style="font-size: 24px; color: #1890ff; font-weight: 600;">${gradingData.totalStudents}</div>
+                            <div style="color: #8c8c8c;">总人数</div>
+                        </div>
+                        <div style="text-align: center; background: #f6f8fa; padding: 16px; border-radius: 6px;">
+                            <div style="font-size: 24px; color: #52c41a; font-weight: 600;">${gradingData.gradedCount}</div>
+                            <div style="color: #8c8c8c;">已阅卷</div>
+                        </div>
+                        <div style="text-align: center; background: #f6f8fa; padding: 16px; border-radius: 6px;">
+                            <div style="font-size: 24px; color: #fa8c16; font-weight: 600;">${gradingData.pendingCount}</div>
+                            <div style="color: #8c8c8c;">待阅卷</div>
+                        </div>
+                        <div style="text-align: center; background: #f6f8fa; padding: 16px; border-radius: 6px;">
+                            <div style="font-size: 24px; color: #1890ff; font-weight: 600;">${gradingData.avgScore}</div>
+                            <div style="color: #8c8c8c;">平均分</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 20px;">
+                        <button class="btn btn-primary" onclick="startGrading('${gradingData.examName}')">
+                            <i class="fas fa-play"></i> 开始阅卷
+                        </button>
+                        <button class="btn btn-secondary" onclick="autoGrade('${gradingData.examName}')">
+                            <i class="fas fa-magic"></i> 自动阅卷
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportGrades('${gradingData.examName}')">
+                            <i class="fas fa-download"></i> 导出成绩
+                        </button>
+                    </div>
+                    
+                    <div style="background: #fff2e8; border: 1px solid #ffec9e; padding: 12px; border-radius: 6px; color: #d46b08;">
+                        <i class="fas fa-info-circle"></i> 
+                        提示：客观题已自动批改完成，主观题需要人工阅卷
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        function startGrading(examName) {
+            document.querySelector('.modal-overlay').remove();
+            showMessage('正在启动阅卷界面...', 'info');
+            setTimeout(() => {
+                showMessage('阅卷界面已打开，可以开始阅卷', 'success');
+            }, 1500);
+        }
+
+        function autoGrade(examName) {
+            showMessage('正在执行自动阅卷...', 'info');
+            simulateProgressAction('自动阅卷', () => {
+                showMessage('客观题自动阅卷完成', 'success');
+            }, 3000);
+        }
+
+        function exportGrades(examName) {
+            document.querySelector('.modal-overlay').remove();
+            exportResults(examName);
+        }
+
+        // 报告相关功能
+        function generateExamReport(examName) {
+            return {
+                examName: examName,
+                totalStudents: 42,
+                averageScore: 78.5,
+                passRate: 85.7,
+                excellentRate: 23.8,
+                difficultyAnalysis: {
+                    easy: 35,
+                    medium: 45,
+                    hard: 20
+                }
+            };
+        }
+
+        function showReportModal(reportData) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 800px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="margin: 0; color: #262626;">
+                            <i class="fas fa-chart-bar" style="color: #1890ff; margin-right: 8px;"></i>
+                            ${reportData.examName} - 考试报告
+                        </h3>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+                        <div style="text-align: center; background: #f6f8fa; padding: 20px; border-radius: 8px;">
+                            <div style="font-size: 32px; color: #1890ff; font-weight: 600;">${reportData.totalStudents}</div>
+                            <div style="color: #8c8c8c; margin-top: 8px;">参考人数</div>
+                        </div>
+                        <div style="text-align: center; background: #f6f8fa; padding: 20px; border-radius: 8px;">
+                            <div style="font-size: 32px; color: #52c41a; font-weight: 600;">${reportData.averageScore}</div>
+                            <div style="color: #8c8c8c; margin-top: 8px;">平均得分</div>
+                        </div>
+                        <div style="text-align: center; background: #f6f8fa; padding: 20px; border-radius: 8px;">
+                            <div style="font-size: 32px; color: #fa8c16; font-weight: 600;">${reportData.passRate}%</div>
+                            <div style="color: #8c8c8c; margin-top: 8px;">及格率</div>
+                        </div>
+                        <div style="text-align: center; background: #f6f8fa; padding: 20px; border-radius: 8px;">
+                            <div style="font-size: 32px; color: #722ed1; font-weight: 600;">${reportData.excellentRate}%</div>
+                            <div style="color: #8c8c8c; margin-top: 8px;">优秀率</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="color: #1890ff; margin-bottom: 12px;">题目难度分析</h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                            <div style="text-align: center;">
+                                <div style="color: #52c41a; font-size: 20px; font-weight: 600;">${reportData.difficultyAnalysis.easy}%</div>
+                                <div>简单题</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="color: #fa8c16; font-size: 20px; font-weight: 600;">${reportData.difficultyAnalysis.medium}%</div>
+                                <div>中等题</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="color: #ff4d4f; font-size: 20px; font-weight: 600;">${reportData.difficultyAnalysis.hard}%</div>
+                                <div>困难题</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <button class="btn btn-primary" onclick="downloadReport('${reportData.examName}')">
+                            <i class="fas fa-download"></i> 下载报告
+                        </button>
+                        <button class="btn btn-secondary" onclick="shareReport('${reportData.examName}')">
+                            <i class="fas fa-share"></i> 分享报告
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        function downloadReport(examName) {
+            showMessage('正在生成PDF报告...', 'info');
+            setTimeout(() => {
+                showMessage('报告下载完成', 'success');
+            }, 2000);
+        }
+
+        function shareReport(examName) {
+            showMessage('报告分享链接已复制到剪贴板', 'success');
+        }
+
+        // 导出相关功能
+        function createExportModal(examName) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 500px;">
+                    <h3 style="margin: 0 0 20px 0; color: #262626;">
+                        <i class="fas fa-download" style="color: #1890ff; margin-right: 8px;"></i>
+                        导出 ${examName} 数据
+                    </h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label class="form-label">导出格式</label>
+                        <select class="form-select" id="exportFormat" style="margin-top: 8px;">
+                            <option value="excel">Excel (.xlsx)</option>
+                            <option value="csv">CSV (.csv)</option>
+                            <option value="pdf">PDF (.pdf)</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label class="form-label">导出内容</label>
+                        <div style="margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <input type="checkbox" checked> 考生基本信息
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <input type="checkbox" checked> 考试成绩
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <input type="checkbox"> 详细答题情况
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox"> 统计分析数据
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn btn-primary" onclick="executeExport('${examName}')">
+                            <i class="fas fa-download"></i> 开始导出
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            return modal;
+        }
+
+        function executeExport(examName) {
+            const format = document.getElementById('exportFormat').value;
+            document.querySelector('.modal-overlay').remove();
+            
+            showMessage(`正在导出${format.toUpperCase()}格式数据...`, 'info');
+            simulateProgressAction('导出数据', () => {
+                showMessage(`${examName}数据导出完成`, 'success');
+            }, 2500);
+        }
+
+        // 重新安排相关功能
+        function createRescheduleModal(examName) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 600px;">
+                    <h3 style="margin: 0 0 20px 0; color: #262626;">
+                        <i class="fas fa-calendar-plus" style="color: #1890ff; margin-right: 8px;"></i>
+                        重新安排 ${examName}
+                    </h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">新考试日期</label>
+                            <input type="date" class="form-input" value="2024-03-20">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">考试时间</label>
+                            <select class="form-select">
+                                <option>09:00-11:00</option>
+                                <option>14:00-16:00</option>
+                                <option>19:00-21:00</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">考试地点</label>
+                            <select class="form-select">
+                                <option>教学楼A201</option>
+                                <option>教学楼B305</option>
+                                <option>机房C102</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">监考老师</label>
+                            <select class="form-select">
+                                <option>张老师</option>
+                                <option>李老师</option>
+                                <option>王老师</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label class="form-label">重新安排原因</label>
+                        <textarea class="form-textarea" placeholder="请说明重新安排考试的原因..." style="min-height: 80px;">由于教学安排调整，原定考试时间冲突，现重新安排考试时间。</textarea>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" checked> 自动通知所有考生时间变更
+                        </label>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn btn-primary" onclick="executeReschedule('${examName}')">
+                            <i class="fas fa-check"></i> 确认重新安排
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            return modal;
+        }
+
+        function executeReschedule(examName) {
+            document.querySelector('.modal-overlay').remove();
+            showMessage('正在重新安排考试...', 'info');
+            
+            setTimeout(() => {
+                showMessage('考试已重新安排，正在通知考生...', 'info');
+                setTimeout(() => {
+                    showMessage(`${examName}重新安排完成，通知已发送`, 'success');
+                    updateExamStatus(examName, 'upcoming');
+                }, 2000);
+            }, 1500);
+        }
+
+        // 编辑考试相关功能
+        function showEditModal(editData) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 700px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="margin: 0; color: #262626;">
+                            <i class="fas fa-edit" style="color: #1890ff; margin-right: 8px;"></i>
+                            编辑考试 - ${editData.name}
+                        </h3>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">考试名称</label>
+                            <input type="text" class="form-input" value="${editData.name}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">考试科目</label>
+                            <input type="text" class="form-input" value="${editData.subject}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">考试日期</label>
+                            <input type="date" class="form-input" value="${editData.date}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">开始时间</label>
+                            <input type="time" class="form-input" value="${editData.startTime}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">结束时间</label>
+                            <input type="time" class="form-input" value="${editData.endTime}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">参与人数</label>
+                            <input type="number" class="form-input" value="${editData.participants}">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn btn-primary" onclick="saveExamEdit('${editData.name}')">
+                            <i class="fas fa-save"></i> 保存修改
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        function saveExamEdit(examName) {
+            document.querySelector('.modal-overlay').remove();
+            showMessage('正在保存修改...', 'info');
+            setTimeout(() => {
+                showMessage(`${examName}修改已保存`, 'success');
+            }, 1000);
+        }
+
+        // 删除卡片功能
+        function removeExamCard(examName) {
+            const cards = document.querySelectorAll('.exam-card');
+            cards.forEach(card => {
+                const title = card.querySelector('.exam-title');
+                if (title && title.textContent === examName) {
+                    card.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => {
+                        card.remove();
+                    }, 300);
+                }
+            });
+        }
+
+        // ================== 实时监控功能 ==================
+        let monitoringActive = false;
+        let monitoringInterval = null;
+        let currentExam = 'network-exam';
+
+        // 启动监控
+        function startMonitoring() {
+            if (monitoringActive) {
+                stopMonitoring();
+                return;
+            }
+
+            monitoringActive = true;
+            const btn = document.getElementById('start-monitor-btn');
+            const status = document.getElementById('monitor-status');
+            const placeholder = document.getElementById('monitor-placeholder');
+            const content = document.getElementById('monitor-content');
+
+            // 更新UI状态
+            btn.innerHTML = '<i class="fas fa-stop"></i> 停止监控';
+            btn.className = 'btn btn-danger btn-sm';
+            status.textContent = '监控运行中';
+            status.style.color = '#52c41a';
+
+            // 显示监控内容
+            placeholder.style.display = 'none';
+            content.style.display = 'block';
+
+            // 生成监控网格
+            generateMonitorGrid();
+            generateAlertList();
+
+            // 开始数据自动刷新
+            const interval = parseInt(document.getElementById('refresh-interval').value);
+            monitoringInterval = setInterval(updateMonitoringData, interval);
+
+            showMessage('实时监控已启动', 'success');
+        }
+
+        // 停止监控
+        function stopMonitoring() {
+            monitoringActive = false;
+            const btn = document.getElementById('start-monitor-btn');
+            const status = document.getElementById('monitor-status');
+            const placeholder = document.getElementById('monitor-placeholder');
+            const content = document.getElementById('monitor-content');
+
+            // 更新UI状态
+            btn.innerHTML = '<i class="fas fa-play"></i> 启动监控';
+            btn.className = 'btn btn-primary btn-sm';
+            status.textContent = '监控已停止';
+            status.style.color = '#8c8c8c';
+
+            // 隐藏监控内容
+            placeholder.style.display = 'block';
+            content.style.display = 'none';
+
+            // 停止数据刷新
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+            }
+
+            showMessage('实时监控已停止', 'info');
+        }
+
+        // 生成监控网格
+        function generateMonitorGrid() {
+            const grid = document.getElementById('monitor-grid');
+            const examData = {
+                'network-exam': { name: '计算机网络期末考试', students: 45 },
+                'algorithm-exam': { name: '算法设计与分析', students: 32 },
+                'database-exam': { name: '数据库系统原理', students: 28 }
+            };
+
+            const exam = examData[currentExam];
+            const studentCount = exam.students;
+            
+            grid.innerHTML = '';
+            
+            for (let i = 1; i <= studentCount; i++) {
+                const studentCard = document.createElement('div');
+                const status = Math.random() > 0.9 ? 'warning' : (Math.random() > 0.95 ? 'danger' : 'normal');
+                const progress = Math.floor(Math.random() * 40 + 50);
+                
+                studentCard.className = 'monitor-student-card';
+                studentCard.style.cssText = `
+                    background: #fff;
+                    border-radius: 6px;
+                    padding: 8px;
+                    border: 2px solid ${status === 'danger' ? '#ff4d4f' : status === 'warning' ? '#fa8c16' : '#52c41a'};
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    position: relative;
+                    aspect-ratio: 4/3;
+                `;
+
+                studentCard.innerHTML = `
+                    <div style="
+                        background: ${status === 'danger' ? '#ffe7e6' : status === 'warning' ? '#fff7e6' : '#f0f7ff'};
+                        height: 60%;
+                        border-radius: 4px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #8c8c8c;
+                        font-size: 12px;
+                        margin-bottom: 6px;
+                    ">
+                        <i class="fas fa-user" style="font-size: 16px;"></i>
+                    </div>
+                    <div style="font-size: 10px; color: #262626; font-weight: 500; text-align: center;">
+                        学生${String(i).padStart(3, '0')}
+                    </div>
+                    <div style="font-size: 9px; color: #8c8c8c; text-align: center; margin-top: 2px;">
+                        进度: ${progress}%
+                    </div>
+                    <div style="
+                        position: absolute;
+                        top: 4px;
+                        right: 4px;
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 50%;
+                        background: ${status === 'danger' ? '#ff4d4f' : status === 'warning' ? '#fa8c16' : '#52c41a'};
+                    "></div>
+                `;
+
+                studentCard.onclick = () => showStudentDetail(i, status, progress);
+                grid.appendChild(studentCard);
+            }
+        }
+
+        // 显示学生详情
+        function showStudentDetail(studentId, status, progress) {
+            const statusText = {
+                'normal': '正常',
+                'warning': '需要关注',
+                'danger': '异常状态'
+            };
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 600px; max-width: 800px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0; color: #262626;">学生${String(studentId).padStart(3, '0')} - 监控详情</h3>
+                        <button onclick="this.closest('.modal-overlay').remove()" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4>基本信息</h4>
+                            <div style="background: #f6f8fa; padding: 12px; border-radius: 6px;">
+                                <p><strong>学号：</strong>2024${String(studentId).padStart(4, '0')}</p>
+                                <p><strong>姓名：</strong>学生${studentId}</p>
+                                <p><strong>状态：</strong><span style="color: ${status === 'danger' ? '#ff4d4f' : status === 'warning' ? '#fa8c16' : '#52c41a'};">${statusText[status]}</span></p>
+                                <p><strong>答题进度：</strong>${progress}%</p>
+                                <p><strong>剩余时间：</strong>${120 - Math.floor(progress * 1.2)}分钟</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4>监控画面</h4>
+                            <div style="background: #f0f0f0; height: 200px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #8c8c8c;">
+                                <div style="text-align: center;">
+                                    <i class="fas fa-video" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                    <p>摄像头监控画面</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 12px; justify-content: center;">
+                        <button class="btn btn-primary btn-sm" onclick="sendMessageToStudent(${studentId})">
+                            <i class="fas fa-comment"></i> 发送消息
+                        </button>
+                        <button class="btn btn-warning btn-sm" onclick="flagStudent(${studentId})">
+                            <i class="fas fa-flag"></i> 标记异常
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="viewStudentScreen(${studentId})">
+                            <i class="fas fa-desktop"></i> 查看屏幕
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        // 生成异常提醒列表
+        function generateAlertList() {
+            const alertList = document.getElementById('alert-list');
+            const alerts = [
+                { student: '学生005', type: '离开座位', time: '2分钟前', level: 'warning' },
+                { student: '学生023', type: '检测到外部程序', time: '5分钟前', level: 'danger' },
+                { student: '学生034', type: '网络连接不稳定', time: '7分钟前', level: 'warning' }
+            ];
+
+            alertList.innerHTML = alerts.map(alert => `
+                <div style="
+                    display: flex; 
+                    justify-content: space-between; 
+                    align-items: center; 
+                    padding: 8px 12px; 
+                    margin-bottom: 8px;
+                    background: ${alert.level === 'danger' ? '#fff2f0' : '#fff7e6'};
+                    border-left: 3px solid ${alert.level === 'danger' ? '#ff4d4f' : '#fa8c16'};
+                    border-radius: 4px;
+                    font-size: 12px;
+                ">
+                    <div>
+                        <div style="font-weight: 500; color: #262626;">${alert.student}</div>
+                        <div style="color: ${alert.level === 'danger' ? '#ff4d4f' : '#fa8c16'};">${alert.type}</div>
+                    </div>
+                    <div style="color: #8c8c8c; font-size: 10px;">${alert.time}</div>
+                </div>
+            `).join('');
+        }
+
+        // 更新监控数据
+        function updateMonitoringData() {
+            if (!monitoringActive) return;
+
+            // 更新统计数据
+            document.getElementById('online-count').textContent = Math.floor(Math.random() * 5) + 40;
+            document.getElementById('progress-avg').textContent = Math.floor(Math.random() * 10) + 65 + '%';
+            document.getElementById('alert-count').textContent = Math.floor(Math.random() * 3) + 2;
+            document.getElementById('submitted-count').textContent = Math.floor(Math.random() * 3) + 4;
+
+            // 更新监控网格状态
+            const cards = document.querySelectorAll('.monitor-student-card');
+            cards.forEach(card => {
+                if (Math.random() > 0.95) {
+                    const border = card.style.borderColor;
+                    card.style.borderColor = '#fa8c16';
+                    setTimeout(() => {
+                        card.style.borderColor = border;
+                    }, 1000);
+                }
+            });
+        }
+
+        // 切换考试监控
+        function switchExamMonitor() {
+            const selector = document.getElementById('exam-selector');
+            currentExam = selector.value;
+            
+            showMessage('正在切换考试监控...', 'info');
+            setTimeout(() => {
+                generateMonitorGrid();
+                showMessage('考试监控已切换', 'success');
+            }, 1000);
+        }
+
+        // 改变显示模式
+        function changeViewMode() {
+            const viewMode = document.getElementById('view-mode').value;
+            const grid = document.getElementById('monitor-grid');
+            
+            const columns = {
+                'grid-4': 4,
+                'grid-6': 6,
+                'grid-9': 9,
+                'list': 1
+            };
+            
+            grid.style.gridTemplateColumns = `repeat(${columns[viewMode]}, 1fr)`;
+            showMessage(`已切换到${viewMode.replace('grid-', '').replace('list', '列表')}显示模式`, 'info');
+        }
+
+        // 刷新监控网格
+        function refreshMonitorGrid() {
+            showMessage('正在刷新监控画面...', 'info');
+            setTimeout(() => {
+                generateMonitorGrid();
+                generateAlertList();
+                showMessage('监控画面已刷新', 'success');
+            }, 800);
+        }
+
+        // 快速操作功能
+        function sendBroadcast() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.5); z-index: 1001;
+                display: flex; align-items: center; justify-content: center;
+            `;
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 24px; min-width: 500px;">
+                    <h3 style="margin: 0 0 16px 0; color: #262626;">
+                        <i class="fas fa-bullhorn" style="color: #1890ff; margin-right: 8px;"></i>
+                        发送广播消息
+                    </h3>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label class="form-label">广播内容</label>
+                        <textarea class="form-textarea" placeholder="请输入要广播的消息..." style="min-height: 100px;">请注意考试时间，还有30分钟结束，请合理安排答题时间。</textarea>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" checked> 语音播报
+                        </label>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">取消</button>
+                        <button class="btn btn-primary" onclick="executeBroadcast()">发送广播</button>
+                    </div>
+                </div>
+            `;
+
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+
+        function executeBroadcast() {
+            document.querySelector('.modal-overlay').remove();
+            showMessage('正在发送广播消息...', 'info');
+            setTimeout(() => {
+                showMessage('广播消息已发送到所有考生', 'success');
+            }, 1500);
+        }
+
+        function pauseAllExams() {
+            if (confirm('确定要暂停所有正在进行的考试吗？')) {
+                showMessage('正在暂停所有考试...', 'warning');
+                setTimeout(() => {
+                    showMessage('所有考试已暂停', 'success');
+                }, 2000);
+            }
+        }
+
+        function emergencyStop() {
+            if (confirm('紧急停止将立即终止所有考试，确定要执行吗？')) {
+                showMessage('正在执行紧急停止...', 'error');
+                setTimeout(() => {
+                    showMessage('紧急停止已执行，所有考试已终止', 'error');
+                    stopMonitoring();
+                }, 1500);
+            }
+        }
+
+        function exportMonitorLog() {
+            showMessage('正在生成监控日志...', 'info');
+            setTimeout(() => {
+                showMessage('监控日志导出完成', 'success');
+            }, 2000);
+        }
+
+        function toggleFullscreen() {
+            const container = document.getElementById('monitor-container');
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+                showMessage('已退出全屏模式', 'info');
+            } else {
+                container.requestFullscreen();
+                showMessage('已进入全屏模式', 'info');
+            }
+        }
+
+        // 学生操作功能
+        function sendMessageToStudent(studentId) {
+            showMessage(`正在向学生${String(studentId).padStart(3, '0')}发送消息...`, 'info');
+            setTimeout(() => {
+                showMessage('消息发送成功', 'success');
+                document.querySelector('.modal-overlay').remove();
+            }, 1000);
+        }
+
+        function flagStudent(studentId) {
+            showMessage(`学生${String(studentId).padStart(3, '0')}已标记为异常状态`, 'warning');
+        }
+
+        function viewStudentScreen(studentId) {
+            showMessage(`正在加载学生${String(studentId).padStart(3, '0')}的屏幕画面...`, 'info');
         }
     </script>
+
+    <!-- 添加CSS动画 -->
+    <style>
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
+        }
+    </style>
 </body>
 </html>

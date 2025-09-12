@@ -39,7 +39,7 @@
   transition: all 0.3s;
   border: 1px solid #f0f0f0;
   position: relative;
-  height: 383px;
+  max-height: 400px;
   display: flex;
   flex-direction: column;
 }
@@ -357,4 +357,11 @@
 .icon-bianji-copy-h:before {
   content: "\e688";
   color: #595959 !important;
+}
+
+.pagination-wrapper{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }

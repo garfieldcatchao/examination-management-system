@@ -26,8 +26,6 @@ class HttpRequest {
 
   constructor(config: AxiosRequestConfig = {}) {
     // 创建axios实例
-    console.log(process.env);
-
     this.instance = axios.create({
       baseURL: process.env.REACT_APP_API_BASE_URL || "/api",
       timeout: 10000,

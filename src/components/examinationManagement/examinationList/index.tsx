@@ -8,6 +8,7 @@ import EmptyComponent from "../../common/EmptyComponent";
 import {
   initExaminationListAction,
   fetchExaminationListAction,
+  deleteExaminationAction,
 } from "../../../actions/examinations";
 import {
   formatDateTime,
@@ -16,7 +17,7 @@ import {
 } from "../../../utils";
 import { ExaminationBtns } from "../../../interface/examinationsFace";
 import "./index.css";
-import { Pagination, Spin } from "antd";
+import { message, Pagination, Spin } from "antd";
 import { scrollToTop } from "../../../utils";
 
 const EXAMINATION_BTN_MAP: ExaminationBtns = {
@@ -50,6 +51,7 @@ const EXAMINATION_BTN_MAP: ExaminationBtns = {
     },
     {
       label: "删除",
+      actionType: "delete",
       icon: "icon-shanchu-copy",
       active: {
         backgroundColor: "#ff4d4f",
@@ -167,6 +169,7 @@ const EXAMINATION_BTN_MAP: ExaminationBtns = {
     },
     {
       label: "删除",
+      actionType: "delete",
       icon: "icon-shanchu",
       active: {
         backgroundColor: "#ff4d4f",
@@ -240,9 +243,33 @@ function ExaminationList() {
     );
   };
 
-  const monitorExam = (): void => {
+  const monitorExam = (actionType: string, item: any): void => {
+    switch (actionType) {
+      case "delete":
+        deleteExam(item.id);
+        break;
+      default:
+      // monitorExam();
+    }
     //   throw new Error("Function not implemented.");
   };
+
+  const deleteExam = (id: string): void => {
+    setLoading(true);
+    deleteExaminationAction(id).then((res) => {
+      console.log("删除考试", res);
+      if (!res || !res.success) {
+        message.error(res.message || "删除失败！请稍后再重试");
+      } else {
+        message.success("删除成功！");
+        initExaminationListAction().then((res: any) => {
+          dispatch(initExaminationList(res));
+          setLoading(false);
+        });
+      }
+    });
+  };
+
   const examSettings = (): void => {
     //   throw new Error("Function not implemented.");
   };
@@ -362,23 +389,23 @@ function ExaminationList() {
     return (
       <div className="examination-list-info">
         <div className="info-item">
-          <i className="fas fa-clock"></i>
+          <span className="iconfont icon-shishijiankong-copy"></span>
           <span>
             {formatDateTime(item.startTime, "HH:mm")} -{" "}
             {formatDateTime(item.endTime, "HH:mm")}
           </span>
         </div>
         <div className="info-item">
-          <i className="fas fa-calendar"></i>
+          <span className="iconfont icon-rili"></span>
           <span>{formatDateTime(item.startTime, "YYYY-MM-DD")}</span>
         </div>
         <div className="info-item">
-          <i className="fas fa-map-marker-alt"></i>
+          <span className="iconfont icon-dizhi"></span>
           <span>{item.location}</span>
         </div>
         <div className="info-item">
-          <i className="fas fa-user"></i>
-          <span>{item.teacherName}</span>
+          <span className="iconfont icon-fl-renyuan"></span>
+          <span>{item.invigilator}</span>
         </div>
       </div>
     );
@@ -398,12 +425,30 @@ function ExaminationList() {
         </div>
         <div className="info-item">
           <span className="iconfont icon-gantanhao_icon"></span>
-          <span>因故取消</span>
+          <span>{formatDateTime(item.startTime, "YYYY-MM-DD")}</span>
         </div>
         <div className="info-item">
           <span className="iconfont icon-gantanhao_icon"></span>
           <span>因故取消</span>
         </div>
+      </div>
+    );
+  };
+
+  const renderExamStatus = (exam: any) => {
+    if (!exam || !exam.info) {
+      return null;
+    }
+    return (
+      <div className="examination-list-stats">
+        {exam?.info?.map((info: any) => {
+          return (
+            <div className="stat-item">
+              <div className="stat-value">{info.value}</div>
+              <div className="stat-label">{info.label}</div>
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -445,28 +490,7 @@ function ExaminationList() {
                     <span>{timeProgress.progress}%</span>
                   </div>
                 </div>
-                <div className="examination-list-stats">
-                  {examStatus.info?.map((info: any) => {
-                    return (
-                      <div className="stat-item">
-                        <div className="stat-value">{info.value}</div>
-                        <div className="stat-label">{info.label}</div>
-                      </div>
-                    );
-                  })}
-                  {/* <div className="stat-item">
-                    <div className="stat-value">{item.total_participants}</div>
-                    <div className="stat-label">参考人数</div>
-                  </div>
-                  <div className="stat-item">
-                    <div className="stat-value">{item.activeCount}</div>
-                    <div className="stat-label">在线人数</div>
-                  </div>
-                  <div className="stat-item">
-                    <div className="stat-value">{item.abnormalCount}</div>
-                    <div className="stat-label">异常状态</div>
-                  </div> */}
-                </div>
+                {renderExamStatus(examStatus)}
                 <div className="examination-list-actions">
                   {(EXAMINATION_BTN_MAP[item.status as string] || [])?.map(
                     (btn: any) => {
@@ -482,7 +506,7 @@ function ExaminationList() {
                               btn.normal?.border ||
                               "none",
                           }}
-                          onClick={() => monitorExam()}
+                          onClick={() => monitorExam(btn.actionType, item)}
                         >
                           <span
                             className={`examination-list-btn-iconfont ${btn.icon}`}
@@ -521,14 +545,16 @@ function ExaminationList() {
       <Spin spinning={loading}>
         {createToolbar()}
         {examinationList.length > 0 ? renderExaminationList() : emptyStatus()}
-        <Pagination
-          showSizeChanger
-          onChange={onPaginationChange}
-          defaultCurrent={1}
-          defaultPageSize={10}
-          total={totalCount}
-          style={{ marginTop: "20px" }}
-        />
+        <div className="pagination-wrapper">
+          <Pagination
+            showSizeChanger
+            onChange={onPaginationChange}
+            defaultCurrent={1}
+            defaultPageSize={9}
+            total={totalCount}
+            style={{ marginTop: "20px" }}
+          />
+        </div>
       </Spin>
     </div>
   );
