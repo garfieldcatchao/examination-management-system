@@ -149,18 +149,63 @@
   .create-examination-grid {
     flex-direction: column;
   }
-  
+
   .create-examination-form-item {
     width: 100%;
   }
 }
 
 .d-l-c {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
-.w-fit-content{
-    width: fit-content;
+.w-fit-content {
+  width: fit-content;
+}
+
+.create-examination-buttom {
+  justify-content: space-between;
+}
+
+.preview-config {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  color: #595959;
+  cursor: pointer;
+}
+
+.d-l-c {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.p-8-20 {
+  padding: 8px 20px;
+}
+
+.create-exam {
+  background: #1890ff;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-left: 10px;
+}
+
+.save-draft {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  color: #595959;
+  cursor: pointer;
+}
+
+.selected-paper-card-modal {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+  color: white;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

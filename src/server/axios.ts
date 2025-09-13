@@ -79,11 +79,11 @@ class HttpRequest {
         } else if (data.code === 401) {
           // token过期或未授权
           this.handleTokenExpired();
-          return Promise.reject(new Error(data.message || "登录状态已过期"));
+          return Promise.reject(data.message || "登录状态已过期");
         } else {
           // 其他业务错误
           message.error(data.message || "请求失败");
-          return Promise.reject(new Error(data.message || "请求失败"));
+          return Promise.reject(data.message || "请求失败");
         }
       },
       (error: AxiosError) => {
@@ -109,7 +109,7 @@ class HttpRequest {
   /**
    * 统一错误处理
    */
-  private handleError(error: AxiosError): Promise<never> {
+  private handleError(error: AxiosError): void {
     let errorMessage = "网络请求失败";
 
     if (error.response) {
@@ -141,7 +141,7 @@ class HttpRequest {
     }
 
     message.error(errorMessage);
-    return Promise.reject(new Error(errorMessage));
+    // return Promise.reject(errorMessage);
   }
 
   /**

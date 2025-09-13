@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   initExaminationList,
+  setActiveTab,
   updateExaminationList,
 } from "../../../store/examinationStore";
 import EmptyComponent from "../../common/EmptyComponent";
@@ -196,8 +197,9 @@ function ExaminationList() {
   }, []);
 
   const createExam = () => {
-    console.log("创建考试");
+    dispatch(setActiveTab("create-exam"));
   };
+  
   const batchOperation = () => {
     console.log("批量操作");
   };
