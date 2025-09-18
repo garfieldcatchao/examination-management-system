@@ -41,3 +41,14 @@ export interface CreateExaminationRequest {
   randomQuestion: boolean;       // 随机题目顺序 默认false
   randomOption: boolean;         // 随机选项顺序 默认false
 }
+
+
+export interface DataType {
+  key: React.Key;
+  username: string;
+  studentId: string | number;
+  department: string;
+  phone: string;
+  email: string;
+  address: string;
+}

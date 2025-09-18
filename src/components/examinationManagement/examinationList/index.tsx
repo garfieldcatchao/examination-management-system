@@ -189,7 +189,7 @@ function ExaminationList() {
   const dispatch = useDispatch();
   console.log("============ examinationList ============", examinationList);
   useEffect(() => {
-    // setLoading(true);
+    setLoading(true);
     initExaminationListAction().then((res: any) => {
       dispatch(initExaminationList(res));
       setLoading(false);
@@ -221,23 +221,23 @@ function ExaminationList() {
             <span>创建考试</span>
           </button>
           <button
-            className="btn btn-secondary"
+            className="btn btn-secondary btn-custom"
             onClick={() => batchOperation()}
           >
             <i className="fas fa-check-square"></i>
             <span>批量操作</span>
           </button>
-          <button className="btn btn-secondary" onClick={() => exportExams()}>
+          <button className="btn btn-secondary btn-custom" onClick={() => exportExams()}>
             <i className="fas fa-download"></i>
             <span>导出数据</span>
           </button>
         </div>
         <div className="examination-toolbar-right">
-          <button className="btn btn-secondary" onClick={() => filterExams()}>
+          <button className="btn btn-secondary btn-custom" onClick={() => filterExams()}>
             <i className="fas fa-filter"></i>
             <span>筛选</span>
           </button>
-          <button className="btn btn-secondary" onClick={() => refreshExams()}>
+          <button className="btn btn-secondary btn-custom" onClick={() => refreshExams()}>
             <i className="fas fa-sync-alt"></i>
           </button>
         </div>
@@ -498,7 +498,7 @@ function ExaminationList() {
                     (btn: any) => {
                       return (
                         <button
-                          className="btn btn-warning btn-sm"
+                          className=" btn-warning btn-sm btn-custom"
                           style={{
                             backgroundColor:
                               btn.active?.backgroundColor ||

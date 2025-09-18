@@ -14,6 +14,11 @@ function ExaminationPaperManagement() {
     (state: any) => state.examinationPaper
   );
   const dispatch = useDispatch();
+  
+  // 添加调试信息
+  console.log("ExaminationPaperManagement - activeTab:", activeTab);
+  console.log("ExaminationPaperManagement - examPaperTabList:", examPaperTabList);
+  console.log("Should render ExaminationPaper:", activeTab === "paper-list");
 
   const switchTab = (tab: string) => {
     console.log(tab);

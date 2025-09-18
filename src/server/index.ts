@@ -9,6 +9,10 @@ export const api = {
     logout: () => http.post("/user/logout"),
     getUserInfo: () => http.get("/user/info"),
     updateUserInfo: (data: any) => http.put("/user/info", data),
+    searchByClass: (data: any) => http.post("/users/class", data),
+    searchClasses: (data: any) => http.post("/classes/query", data),
+    searchByRole: (data: any) => http.get("/users", data),
+    search: (data: any) => http.post("/users/search", data),
   },
 
   // 试题管理
@@ -22,11 +26,14 @@ export const api = {
 
   // 试卷管理
   paper: {
-    getList: (params: any) => http.get("/paper/list", params),
-    create: (data: any) => http.post("/paper", data),
-    update: (id: string, data: any) => http.put(`/paper/${id}`, data),
-    delete: (id: string) => http.delete(`/paper/${id}`),
-    publish: (id: string) => http.post(`/paper/${id}/publish`),
+    getList: (params: any) => http.get("/examinations/papers", params),
+    create: (data: any) => http.post("/examinations/papers", data),
+    update: (id: string, data: any) =>
+      http.put(`/examinations/papers/${id}`, data),
+    delete: (id: string) => http.delete(`/examinations/papers/${id}`),
+    publish: (id: string) => http.post(`/examinations/papers/${id}/publish`),
+    search: (params: any) => http.post("/examinations/papers/search", params),
+    // getDetail: (id: string) => http.get(`/examinations/papers/${id}`),
   },
 
   // 考试管理
@@ -43,7 +50,8 @@ export const api = {
   score: {
     getList: (params: any) => http.get("/score/list", params),
     getDetail: (id: string) => http.get(`/score/${id}`),
-    export: (params: any) => http.download("/score/export", params, "成绩统计.xlsx"),
+    export: (params: any) =>
+      http.download("/score/export", params, "成绩统计.xlsx"),
   },
 
   // 统计分析

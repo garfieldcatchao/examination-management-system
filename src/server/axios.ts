@@ -72,7 +72,7 @@ class HttpRequest {
     this.instance.interceptors.response.use(
       (response: any) => {
         const { data } = response;
-
+        console.log('handleError', data)
         // 统一处理响应
         if (data.code === 200 || data.success) {
           return data;

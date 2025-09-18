@@ -1,0 +1,36 @@
+.individual-container {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.selected-student-panel {
+  padding: 12px 0;
+  text-align: center;
+  color: #666;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+/* 确保表格加载状态下表头仍然可见 */
+.individual-container :global(.ant-table-thead) {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.selected-total-panel {
+  position: fixed;
+  bottom: 13px;
+  left: 0;
+  padding: 16px 20px;
+}
+
+.search-panel {
+  gap: 20px;
+  box-shadow: none;
+}
+
+.d-l-s- {
+  justify-content: space-between;
+}

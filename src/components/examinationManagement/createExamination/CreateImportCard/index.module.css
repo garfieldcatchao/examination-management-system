@@ -1,0 +1,126 @@
+.time-line-container {
+  margin: 20px 0 30px;
+}
+
+.d-l-c {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.d-l {
+  justify-content: center;
+}
+
+.set-progress {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: #8c8c8c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.set-progress-active {
+  background-color: #1890ff;
+  color: #fff;
+}
+
+.set-progress-line {
+  width: 60px;
+  height: 2px;
+  background: #f0f0f0;
+  margin: 0 10px;
+}
+
+.set-progress-line-active {
+  background: #1890ff;
+}
+
+.set-progress-complate {
+  background-color: #52c41a;
+}
+
+.ant-upload-drag-icon {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.tips-conatiner {
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 6px;
+  padding: 20px;
+  text-align: left;
+  width: 600px;
+}
+
+.tips-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.iconfont-tips {
+  font-family: "iconfont-tips" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: "iconfont-tips"; /* Project id 5021073 */
+  src: url("//at.alicdn.com/t/a/font_5021073_1vojx9yig8.woff2?t=1757775018486")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5021073_1vojx9yig8.woff?t=1757775018486")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5021073_1vojx9yig8.ttf?t=1757775018486")
+      format("truetype");
+}
+
+.icon-zhuyi:before {
+  content: "\e633";
+  color: #fa8c16;
+}
+
+.icon-shuoming-mian:before {
+  content: "\e60b";
+}
+
+.icon-shuoming-mian-copy:before {
+  content: "\e60c";
+  color: #1890ff;
+}
+
+.tips-line {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #91d5ff;
+  font-size: 13px;
+  color: #8c8c8c;
+}
+
+.tips-line-active {
+  font-size: 13px;
+  border-top: 1px solid #52c41a;
+}
+
+.tips-title {
+  margin-left: 5px;
+  color: #1890ff;
+}
+
+.icon-gou1:before {
+  content: "\e714";
+}
+
+.icon-gou1-copy:before {
+  content: "\e715";
+  color: #fff;
+}

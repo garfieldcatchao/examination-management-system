@@ -96,8 +96,8 @@
 }
 
 .tab-content {
-  /* padding: 24px; */
-  /* display: none; */
+  padding: 24px;
+  display: block; /* 确保内容可见 */
 }
 
 .tab-content.active {
@@ -670,4 +670,10 @@
     grid-template-columns: 1fr;
     gap: 8px;
   }
+}
+
+
+.paper-btn{
+  padding: 4px 8px !important;
+  gap: 4px !important;
 }

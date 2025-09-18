@@ -1,0 +1,87 @@
+.upload-result-container {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+}
+
+@font-face {
+  font-family: "success-iconfont"; /* Project id 5021106 */
+  src: url("//at.alicdn.com/t/a/font_5021106_vi42se1vk1o.woff2?t=1757778728826")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5021106_vi42se1vk1o.woff?t=1757778728826")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5021106_vi42se1vk1o.ttf?t=1757778728826")
+      format("truetype");
+}
+
+.success-iconfont {
+  font-family: "success-iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-chenggong:before {
+  content: "\e742";
+}
+
+.import-success-title {
+  margin: 0 0 12px 0;
+  color: #262626;
+  width: fit-content;
+}
+
+.import-success-label {
+  margin: 0 0 32px 0;
+  color: #8c8c8c;
+  font-size: 16px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.result-import {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: "12px";
+}
+
+.result-success-container {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 32px;
+  width: 75%;
+}
+
+.import-success {
+  color: #8c8c8c;
+}
+
+.import-success-value {
+  font-weight: 600;
+  color: #52c41a;
+}
+
+.result-tongji {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.result-tongji-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-action {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}

@@ -39,7 +39,7 @@
   transition: all 0.3s;
   border: 1px solid #f0f0f0;
   position: relative;
-  max-height: 400px;
+  /* max-height: 400px; */
   display: flex;
   flex-direction: column;
 }
@@ -213,9 +213,12 @@
 
 @font-face {
   font-family: "examination-list-btn-iconfont"; /* Project id 5015803 */
-  src: url('//at.alicdn.com/t/a/font_5015803_6hvrv5hs21m.woff2?t=1757251795479') format('woff2'),
-       url('//at.alicdn.com/t/a/font_5015803_6hvrv5hs21m.woff?t=1757251795479') format('woff'),
-       url('//at.alicdn.com/t/a/font_5015803_6hvrv5hs21m.ttf?t=1757251795479') format('truetype');
+  src: url("//at.alicdn.com/t/a/font_5015803_6hvrv5hs21m.woff2?t=1757251795479")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5015803_6hvrv5hs21m.woff?t=1757251795479")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5015803_6hvrv5hs21m.ttf?t=1757251795479")
+      format("truetype");
 }
 
 .examination-list-btn-iconfont {
@@ -359,9 +362,24 @@
   color: #595959 !important;
 }
 
-.pagination-wrapper{
+.pagination-wrapper {
   width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+}
+
+.btn-custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #d7d7d7 !important;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  -webkit-user-select: none;
+  user-select: none;
 }

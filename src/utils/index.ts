@@ -264,7 +264,29 @@ function parseTimeInput(timeInput: DateInput): Date {
   throw new Error(`无法解析的时间格式: ${timeInput}`);
 }
 
-
 export const scrollToTop = () => {
   window.scrollTo(0, 0);
 };
+
+export function debounce<T extends any[], U>(
+  func: (...args: T) => U,
+  wait: number,
+  immediate: boolean = false
+): (...args: T) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return function (this: any, ...args: T) {
+    const context = this;
+    const later = () => {
+      timeout = null;
+      if (!immediate) {
+        func.apply(context, args);
+      }
+    };
+    const callNow = immediate && !timeout;
+    clearTimeout(timeout as any);
+    timeout = setTimeout(later, wait);
+    if (callNow) {
+      func.apply(context, args);
+    }
+  };
+}

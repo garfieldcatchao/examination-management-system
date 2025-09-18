@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { setSelectedTabReducer } from "../reducers/examinationPaperReducer";
+import { setSelectedTabReducer, getExaminationPaperListReducer, getClassesReducer, getUserListReducer, initConfigReducer, selectedListReducer } from "../reducers/examinationPaperReducer";
 
 const examinationPaperSlice = createSlice({
   name: "examinationPaper",
@@ -21,11 +21,23 @@ const examinationPaperSlice = createSlice({
       label: "模板管理",
       value: "template-manage",
     }],
-  },
+    page: 1,
+    pageSize: 10,
+    totalCount: 1,
+    classMenu: [],
+    classes: [],
+    students: [],
+    selectedList: [],
+  } as any,
   reducers: {
     setActiveTab: setSelectedTabReducer,
+    initConfig: initConfigReducer,
+    getExaminationPaperList: getExaminationPaperListReducer,
+    getClasses: getClassesReducer,
+    getStudents: getUserListReducer,
+    setSelectedList: selectedListReducer,
   },
 });
 
-export const { setActiveTab } = examinationPaperSlice.actions;
+export const { setActiveTab, getExaminationPaperList, getClasses, getStudents, initConfig, setSelectedList } = examinationPaperSlice.actions;
 export default examinationPaperSlice.reducer;

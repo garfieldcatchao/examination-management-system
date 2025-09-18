@@ -1,0 +1,319 @@
+.create-examination-container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.create-examination-form {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    padding: 24px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.create-examination-form-section {
+    /* margin-bottom: 24px; */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.create-examination-form-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #262626;
+    margin-bottom: 16px;
+    /* display: flex;
+    align-items: center; */
+    gap: 35px;
+}
+
+/* .create-examination-form-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: space-between;
+} */
+
+.create-examination-form-item {
+    /* display: flex;
+    gap: 8px; */
+    width: 304px;
+}
+
+.create-examination-grid {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.create-examination-form-textArea {
+    width: 100%;
+}
+
+.m-t-20 {
+    margin-top: 20px;
+}
+
+.create-examination-participants {
+    border: 1px solid #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.create-examination-participants-header {
+    background: #fafafa;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.m-l-10 {
+    margin-left: 10px;
+}
+
+@font-face {
+    font-family: "iconfont";
+    /* Project id 5015347 */
+    src: url("//at.alicdn.com/t/a/font_5015347_pyexxj3r0y.woff2?t=1757139515801") format("woff2"),
+        url("//at.alicdn.com/t/a/font_5015347_pyexxj3r0y.woff?t=1757139515801") format("woff"),
+        url("//at.alicdn.com/t/a/font_5015347_pyexxj3r0y.ttf?t=1757139515801") format("truetype");
+}
+
+.iconfont {
+    font-family: "iconfont" !important;
+    font-size: 16px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-user-plus:before {
+    content: "\f139";
+}
+
+.icon-user-plus-copy:before {
+    content: "\f13a";
+}
+
+.create-examination-jiankao-setting {
+    background: #f6f8fa;
+    border-radius: 6px;
+    padding: 16px;
+    /* margin-top: 16px; */
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+/* 试卷选择相关样式 */
+.paper-selection-card {
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.paper-selection-card:hover {
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.selected-paper-info {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .create-examination-grid {
+        flex-direction: column;
+    }
+
+    .create-examination-form-item {
+        width: 100%;
+    }
+}
+
+.d-l-c {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.w-fit-content {
+    width: fit-content;
+}
+
+.create-examination-buttom {
+    justify-content: space-between;
+}
+
+.preview-config {
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    color: #595959;
+    cursor: pointer;
+}
+
+.p-8-20 {
+    padding: 8px 20px;
+}
+
+.create-exam {
+    background: #1890ff;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 6px;
+    margin-left: 10px;
+}
+
+.save-draft {
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    color: #595959;
+    cursor: pointer;
+}
+
+
+
+.modal-menu {
+    display: flex;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    margin: -24px -24px 24px -24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.modal-menu-item {
+    flex: 1;
+    padding: 16px 0;
+    text-align: center;
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    color: #595959;
+    transition: all 0.3s;
+    border-bottom: 2px solid transparent;
+}
+
+.modal-menu-item:hover {
+    color: #1890ff;
+    background: rgb(255, 255, 255);
+}
+
+.modal-menu-item-active {
+    color: #1890ff;
+    border-bottom-color: #1890ff;
+    background: #fff;
+}
+
+.cancel-btn {
+    color: #595959;
+    border: 1px solid #d9d9d9;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    user-select: none;
+}
+
+.confirm-btn {
+    background: #1890ff;
+    color: #fff;
+    border-color: #1890ff;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    margin-left: 20px;
+    user-select: none;
+}
+
+.d-l-c {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.m-t-20 {
+    margin-top: 20px;
+}
+
+.pos-f {
+    position: sticky;
+    top: 0px;
+    left: 0px;
+    z-index: 100;
+}
+
+.pos-f-56 {
+    top: 56px;
+}
+
+
+
+.selected-total-panel {
+    position: fixed;
+    bottom: 13px;
+    left: 0;
+    padding: 16px 20px;
+}
+
+.search-panel{
+    gap: 20px;
+    box-shadow: none;
+}
+
+.d-l-s-{
+    justify-content: space-between;
+}
+
+.j-f-e{
+    justify-content: flex-end;
+}
+
+.paper-list-wrapper::webkit-scrollbar{
+    display: none;
+    width: 0;
+}
+
+.paper-list-wrapper{
+    padding: 16px 0;
+}

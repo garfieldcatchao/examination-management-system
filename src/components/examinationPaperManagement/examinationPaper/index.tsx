@@ -7,7 +7,11 @@ import "./index.css";
 function ExaminationPaper(props: any) {
     const { activeTab, examPaperTabList } = useSelector((state: any) => state.examinationPaper);
     const dispatch = useDispatch();
-  //   const { activeTab } = useSelector((state: any) => state.examinationPaper);
+    
+    // 添加调试信息
+    console.log("ExaminationPaper component rendered");
+    console.log("activeTab:", activeTab);
+    console.log("examPaperTabList:", examPaperTabList);
   const editPaper = () => {
     console.log("editPaper");
   };
@@ -40,6 +44,7 @@ function ExaminationPaper(props: any) {
     console.log("commentPaper");
   };
   const renderPaperCard = () => {
+    console.log("renderPaperCard function called");
     return (
       <div className="paper-grid" id="paper-grid">
         {/* <!-- 试卷卡片1 --> */}
@@ -180,28 +185,28 @@ function ExaminationPaper(props: any) {
             </div>
             <div className="paper-actions">
               <button
-                className="btn btn-primary btn-sm"
+                className="btn btn-primary btn-sm paper-btn"
                 onClick={() => continuePaper()}
               >
                 <i className="fas fa-play"></i>
                 <span>继续编辑</span>
               </button>
               <button
-                className="btn btn-secondary btn-sm"
+                className="btn btn-secondary btn-sm paper-btn"
                 onClick={() => previewPaper()}
               >
                 <i className="fas fa-eye"></i>
                 <span>预览</span>
               </button>
               <button
-                className="btn btn-success btn-sm"
+                className="btn btn-success btn-sm paper-btn"
                 onClick={() => publishPaper()}
               >
                 <i className="fas fa-paper-plane"></i>
                 <span>发布</span>
               </button>
               <button
-                className="btn btn-danger btn-sm"
+                className="btn btn-danger btn-sm paper-btn"
                 onClick={() => deletePaper()}
               >
                 <i className="fas fa-trash"></i>

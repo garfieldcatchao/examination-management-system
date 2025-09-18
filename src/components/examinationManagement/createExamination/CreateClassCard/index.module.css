@@ -1,0 +1,101 @@
+.class-card-container {
+  padding: 10px 10px;
+  gap: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  
+}
+
+.class-card-item-content {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.class-card-item {
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: white;
+  position: relative;
+  min-width: 320px;
+}
+
+.class-card-item-title-text {
+  margin: 0;
+  color: #262626;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.class-card-item-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.class-card-item-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 5px;
+  border-top: 1px solid #979797;
+  padding-top: 12px;
+}
+
+.class-footer-label {
+  font-size: 14px;
+  color: #595959;
+}
+
+.class-footer-value {
+  background: #f6ffed;
+  color: #52c41a;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.class-card-item-title-label {
+  color: #595959;
+  font-size: 14px;
+  margin-bottom: 8px;
+  margin-left: 10px;
+}
+
+@font-face {
+  font-family: "examination-card"; /* Project id 5021032 */
+  src: url("//at.alicdn.com/t/a/font_5021032_r041ianhpjq.woff2?t=1757764412079")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5021032_r041ianhpjq.woff?t=1757764412079")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5021032_r041ianhpjq.ttf?t=1757764412079")
+      format("truetype");
+}
+
+.examination-card {
+  font-family: "examination-card" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-rili:before {
+  content: "\e620";
+  color: rgb(82, 196, 26);
+}
+
+.icon-boshimao-F:before {
+  content: "\e639";
+  color: rgb(24, 144, 255);
+}

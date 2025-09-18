@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./index.css";
+import "./index.less";
 import {
   Input,
   Select,
@@ -12,11 +12,34 @@ import {
   Tag,
   TimePicker,
   message,
+  Table,
+  Pagination,
 } from "antd";
-import type { DatePickerProps } from "antd";
+import { DataType } from "../../../interface/examinationsFace";
+import CommonModal from "../../common/Modal";
 import { CreateExaminationRequest } from "../../../interface/examinationsFace";
 import { createExamination } from "../../../actions/examinations";
-
+import CreateClassCard from "./CreateClassCard";
+import type { TableColumnsType } from "antd";
+import CreateStudentPanel from "./CreateStudentPanel";
+import { CreateImportCard } from "./CreateImportCard";
+import { useDispatch, useSelector } from "react-redux";
+import Loading from "../../common/Loading";
+import {
+  getExaminationPaperListAction,
+  searchClassesAction,
+  searchExaminationPaper,
+} from "../../../actions/examinationPaper";
+import {
+  getClasses,
+  getExaminationPaperList,
+  getStudents,
+  initConfig,
+  setSelectedList,
+} from "../../../store/examinationPaperStore";
+import { debounce, isTrue } from "../../../utils";
+import EmptyComponent from "../../common/EmptyComponent";
+import { getUserByClass, searchUsers } from "../../../actions/users";
 const { TextArea } = Input;
 
 // 模拟试卷数据
@@ -79,10 +102,103 @@ const mockPapers = [
   },
 ];
 
+const columns: TableColumnsType<DataType> = [
+  {
+    title: "学号",
+    dataIndex: "studentId",
+    // render: (text: string) => <a>{text}</a>,
+  },
+  {
+    title: "姓名",
+    dataIndex: "username",
+  },
+  {
+    title: "班级",
+    dataIndex: "department",
+  },
+  {
+    title: "手机号",
+    dataIndex: "phone",
+  },
+  {
+    title: "邮箱",
+    dataIndex: "email",
+  },
+];
+
+const data: DataType[] = [
+  {
+    key: "1",
+    studentId: "20240001",
+    username: "张三",
+    department: "计算机科学1班",
+    phone: "13800138001",
+    email: "zhangsan@example.com",
+    address: "北京市海淀区",
+  },
+  {
+    key: "2",
+    studentId: "20240002",
+    username: "李四",
+    department: "计算机科学2班",
+    phone: "13800138002",
+    email: "lisi@example.com",
+    address: "北京市朝阳区",
+  },
+  {
+    key: "3",
+    studentId: "20240003",
+    username: "王五",
+    department: "软件工程1班",
+    phone: "13800138003",
+    email: "wangwu@example.com",
+    address: "北京市西城区",
+  },
+  {
+    key: "4",
+    studentId: "20240004",
+    username: "赵六",
+    department: "软件工程2班",
+    phone: "13800138004",
+    email: "zhaoliu@example.com",
+    address: "北京市东城区",
+  },
+  {
+    key: "5",
+    studentId: "20240005",
+    username: "钱七",
+    department: "网络工程1班",
+    phone: "13800138005",
+    email: "qianqi@example.com",
+    address: "北京市丰台区",
+  },
+  {
+    key: "6",
+    studentId: "20240005",
+    username: "钱七",
+    department: "网络工程1班",
+    phone: "13800138005",
+    email: "qianqi@example.com",
+    address: "北京市丰台区",
+  },
+  {
+    key: "7",
+    studentId: "20240005",
+    username: "钱七",
+    department: "网络工程1班",
+    phone: "13800138005",
+    email: "qianqi@example.com",
+    address: "北京市丰台区",
+  },
+];
+
 function CreateExamination() {
   // 状态管理
   const [selectedPaper, setSelectedPaper] = useState<any>(null);
   const [paperModalVisible, setPaperModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("individual");
   const [examForm, setExamForm] = useState({
     examName: "",
     subject: "",
@@ -103,13 +219,93 @@ function CreateExamination() {
     randomQuestion: false,
     randomOption: false,
   });
+  const dispatch = useDispatch();
+  const { examPaperList, totalCount, classes, students, page, classMenu } =
+    useSelector((state: any) => state.examinationPaper);
+  console.log("examPaperList ======> ", classMenu);
+
+  useEffect(() => {
+    if (isTrue(paperModalVisible)) {
+      fetchPaperList();
+    }
+  }, [paperModalVisible]);
+
+  useEffect(() => {
+    setLoading(true);
+    if (isTrue(visible)) {
+      fetchClasses();
+      fetchStudentUsers({ role: "student" });
+    }
+  }, [visible]);
+
+  const fetchClasses = (params?: any) => {
+    searchClassesAction(params)
+      .then((res: any) => {
+        if (res) {
+          console.log(
+            "fetch class",
+            res?.data?.map((item: any) => ({
+              label: item.class_name,
+              value: item.class_name,
+            }))
+          );
+          dispatch(
+            initConfig(
+              res?.data?.map((item: any) => ({
+                label: item.class_name,
+                value: item.class_name,
+              }))
+            )
+          );
+          dispatch(getClasses(res));
+        } else {
+          dispatch(getClasses({ data: [] }));
+        }
+      })
+      .catch((error) => {
+        console.error("获取班级数据失败:", error);
+        dispatch(getClasses({ data: [] }));
+      });
+  };
+
+  const handleStudentSelect = (selectedStudents: any[]) => {
+    dispatch(setSelectedList(selectedStudents));
+  };
+
+  const fetchStudentUsers = (params?: {
+    role?: string;
+    className?: string;
+    keyword?: string;
+  }) => {
+    searchUsers(params)
+      .then((res: any) => {
+        if (res) {
+          dispatch(getStudents(res));
+        } else {
+          dispatch(getStudents({ data: [] }));
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("获取学生数据失败:", error);
+        dispatch(getStudents({ data: [] }));
+        setLoading(false);
+      });
+  };
+
+  const fetchPaperList = (params?: { page?: number; pageSize?: number }) => {
+    const { page, pageSize } = params || { page: 1, pageSize: 10 };
+    getExaminationPaperListAction({ page, pageSize }).then((res: any) => {
+      dispatch(getExaminationPaperList(res));
+    });
+  };
 
   function importStudents(): void {
     throw new Error("Function not implemented.");
   }
 
   function addStudents(): void {
-    throw new Error("Function not implemented.");
+    setVisible(true);
   }
 
   function onchangeCameraSetting(
@@ -124,6 +320,7 @@ function CreateExamination() {
   // 选择试卷
   const selectPaper = (paper: any) => {
     setSelectedPaper(paper);
+    console.log("选择了试卷：", paper);
     setExamForm((prev) => ({
       ...prev,
       paperId: paper.id,
@@ -206,7 +403,21 @@ function CreateExamination() {
     }
   };
 
+  const onSearchPaper = debounce((value: any) => {
+    searchExaminationPaper({
+      page: 1,
+      pageSize: 10,
+      name: value?.target?.value,
+    }).then((res: any) => {
+      dispatch(getExaminationPaperList(res));
+    });
+  }, 300);
+
   const renderSelectedPaperModal = () => {
+    if (!isTrue(paperModalVisible)) {
+      return null;
+    }
+
     return (
       <Modal
         title={
@@ -225,21 +436,24 @@ function CreateExamination() {
         bodyStyle={{ maxHeight: "60vh", overflowY: "auto" }}
       >
         <div style={{ marginBottom: "16px" }}>
-          <Input.Search
+          <Input
             placeholder="搜索试卷名称、科目或创建者..."
             style={{ marginBottom: "16px" }}
             allowClear
+            onChange={(value: any) => onSearchPaper(value)}
           />
           <div style={{ fontSize: "14px", color: "#666" }}>
-            共找到 {mockPapers.length} 份试卷，请选择一份作为考试试卷：
+            共找到 {totalCount} 份试卷，请选择一份作为考试试卷：
           </div>
         </div>
-
-        <div style={{ maxHeight: "400px", overflowY: "auto" }}>
-          {mockPapers.map((paper) => renderPaperCard(paper))}
+        <div
+          className="paper-list-wrapper"
+          style={{ maxHeight: "400px", overflowY: "auto" }}
+        >
+          {renderPaperCard(examPaperList)}
         </div>
-
-        {mockPapers.length === 0 && (
+        Loading
+        {examPaperList.length === 0 && (
           <div style={{ textAlign: "center", padding: "40px", color: "#999" }}>
             <i
               className="fas fa-inbox"
@@ -255,113 +469,277 @@ function CreateExamination() {
             </Button>
           </div>
         )}
+        <div className="d-l-c j-f-e">
+          <Pagination
+            total={totalCount}
+            pageSize={10}
+            current={page}
+            onChange={(page, pageSize) => {
+              fetchPaperList({ page, pageSize });
+            }}
+          />
+        </div>
       </Modal>
     );
+  };
+
+  const handleSelectedTab = (tab: string) => {
+    setSelectedTab(tab);
+  };
+
+  const handleSelectedStudent = () => {
+    onStudentClose();
+  };
+
+  const handleSelectedStudentCancel = () => {
+    onStudentClose();
+  };
+
+  const onStudentClose = () => {
+    setVisible(false);
+  };
+
+  const onSearchByClasses = (value: string) => {
+    initSeachStatus();
+
+    if (selectedTab === "class") {
+      fetchClasses({
+        keyword: value,
+      });
+      return;
+    }
+
+    fetchStudentUsers({
+      className: value,
+      role: "student",
+    });
+  };
+
+  const onSearch = debounce((item: any) => {
+    initSeachStatus();
+
+    if (selectedTab === "class") {
+      fetchClasses({
+        keyword: item.target.value,
+      });
+      return;
+    }
+
+    fetchStudentUsers({
+      keyword: item.target.value,
+      role: "student",
+    });
+  }, 1000);
+
+  const initSeachStatus = () => {
+    setLoading(true);
+    dispatch(getStudents({ data: [] }));
   };
 
   const renderSelectedPaperCardModal = () => {
     return (
-      <Modal  visible={true} style={{ width: "1200px", padding: "20px 24px" }}>
-        <div className="selected-paper-card-modal">111111</div>
-      </Modal>
+      <CommonModal
+        visible={visible}
+        onClose={onStudentClose}
+        title={
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <i
+              className="fas fa-user-plus"
+              style={{ marginRight: "12px", color: "#1890ff" }}
+            ></i>
+            添加考试参与人员
+          </div>
+        }
+        footer={
+          <div className=" m-t-20">
+            <div></div>
+            <div>
+              <span
+                className="cancel-btn"
+                onClick={handleSelectedStudentCancel}
+              >
+                取消
+              </span>
+              <span className="confirm-btn" onClick={handleSelectedStudent}>
+                确定
+              </span>
+            </div>
+          </div>
+        }
+        style={{
+          width: "1200px",
+          height: "600px", // 添加固定高度
+          padding: 0,
+          overflow: "hidden",
+        }}
+      >
+        <div className="d-l-c pos-f">
+          {[
+            {
+              label: "逐个添加考生",
+              value: "individual",
+            },
+            {
+              label: "按班级添加",
+              value: "class",
+            },
+            {
+              label: "批量导入",
+              value: "batch",
+            },
+          ].map((item) => (
+            <div
+              className={`modal-menu-item ${
+                selectedTab === item.value ? "modal-menu-item-active" : ""
+              }`}
+              key={item.value}
+              onClick={() => handleSelectedTab(item.value)}
+            >
+              <span>{item.label}</span>
+            </div>
+          ))}
+        </div>
+        {selectedTab === "batch" ? null : (
+          <div className="search-panel d-l-c pos-f pos-f-56 m-t-20 d-l-s-b">
+            <Input
+              style={{
+                width: "944px",
+                height: "44px",
+                marginLeft: "3px",
+              }}
+              placeholder="搜索学号、姓名或者班级"
+              onChange={(value: any) => onSearch(value)}
+            />
+            <Select
+              // mode="tags"
+              style={{ width: "200px", height: "44px" }}
+              placeholder="选择班级"
+              onChange={(value: string) => onSearchByClasses(value)}
+              options={classMenu}
+            />
+          </div>
+        )}
+
+        <div className="m-t-20">
+          {selectedTab === "individual" && (
+            <CreateStudentPanel
+              loading={loading}
+              onStudentSelect={handleStudentSelect}
+            />
+          )}
+          {selectedTab === "class" && <CreateClassCard />}
+          {selectedTab === "batch" && <CreateImportCard />}
+        </div>
+        <div className="selected-total-panel">已选择: 考生 0 人，班级 0 个</div>
+      </CommonModal>
     );
   };
 
+  const onChooicePaper = (paper: any) => {
+    console.log("选择了试卷：", paper);
+  };
+
   // 渲染试卷卡片
-  const renderPaperCard = (paper: any) => (
-    <Card
-      key={paper.id}
-      className="paper-selection-card"
-      hoverable
-      onClick={() => selectPaper(paper)}
-      style={{ marginBottom: 16 }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-        }}
+  const renderPaperCard = (examPaperList: any[]) => {
+    if (!examPaperList || !examPaperList.length) {
+      return <EmptyComponent />;
+    }
+
+    return examPaperList.map((paper: any) => (
+      <Card
+        key={paper.id}
+        className="paper-selection-card"
+        hoverable
+        onClick={() => selectPaper(paper)}
+        style={{ marginBottom: 16 }}
       >
-        <div style={{ flex: 1 }}>
-          <h4
-            style={{ margin: "0 0 8px 0", fontSize: "16px", fontWeight: 600 }}
-          >
-            {paper.title}
-          </h4>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "12px",
-              marginBottom: "8px",
-            }}
-          >
-            <span>
-              <i
-                className="fas fa-book"
-                style={{ marginRight: "4px", color: "#1890ff" }}
-              ></i>
-              {paper.subject}
-            </span>
-            <span>
-              <i
-                className="fas fa-user"
-                style={{ marginRight: "4px", color: "#52c41a" }}
-              ></i>
-              {paper.creator}
-            </span>
-            <span>
-              <i
-                className="fas fa-clock"
-                style={{ marginRight: "4px", color: "#fa8c16" }}
-              ></i>
-              {paper.duration}分钟
-            </span>
-            <span>
-              <i
-                className="fas fa-star"
-                style={{ marginRight: "4px", color: "#fadb14" }}
-              ></i>
-              {paper.totalScore}分
-            </span>
-            <span>
-              <i
-                className="fas fa-list"
-                style={{ marginRight: "4px", color: "#722ed1" }}
-              ></i>
-              {paper.questionCount}题
-            </span>
-          </div>
-          <p style={{ margin: "8px 0", color: "#666", fontSize: "13px" }}>
-            {paper.description}
-          </p>
-          <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
-            {paper.tags.map((tag: string, index: number) => (
-              <Tag key={index}>{tag}</Tag>
-            ))}
-            <Tag
-              color={
-                paper.difficulty === "困难"
-                  ? "red"
-                  : paper.difficulty === "中等"
-                  ? "orange"
-                  : "green"
-              }
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <h4
+              style={{ margin: "0 0 8px 0", fontSize: "16px", fontWeight: 600 }}
             >
-              {paper.difficulty}
-            </Tag>
-            <Tag color={paper.status === "published" ? "blue" : "default"}>
-              {paper.status === "published" ? "已发布" : "草稿"}
-            </Tag>
+              {paper.title}
+            </h4>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "12px",
+                marginBottom: "8px",
+              }}
+            >
+              <span>
+                <i
+                  className="fas fa-book"
+                  style={{ marginRight: "4px", color: "#1890ff" }}
+                ></i>
+                {paper.subjectName}
+              </span>
+              <span>
+                <i
+                  className="fas fa-user"
+                  style={{ marginRight: "4px", color: "#52c41a" }}
+                ></i>
+                {paper.creatorName || ""}
+              </span>
+              <span>
+                <i
+                  className="fas fa-clock"
+                  style={{ marginRight: "4px", color: "#fa8c16" }}
+                ></i>
+                {paper.duration}分钟
+              </span>
+              <span>
+                <i
+                  className="fas fa-star"
+                  style={{ marginRight: "4px", color: "#fadb14" }}
+                ></i>
+                {paper.total_score}分
+              </span>
+              <span>
+                <i
+                  className="fas fa-list"
+                  style={{ marginRight: "4px", color: "#722ed1" }}
+                ></i>
+                {paper.question_count}题
+              </span>
+            </div>
+            <p style={{ margin: "8px 0", color: "#666", fontSize: "13px" }}>
+              {paper.description}
+            </p>
+            <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+              {paper?.tags?.map((tag: string, index: number) => (
+                <Tag key={index}>{tag}</Tag>
+              ))}
+              <Tag
+                color={
+                  paper.difficulty === "困难"
+                    ? "red"
+                    : paper.difficulty === "中等"
+                    ? "orange"
+                    : "green"
+                }
+              >
+                {paper.difficulty}
+              </Tag>
+              <Tag color={paper.status === "published" ? "blue" : "default"}>
+                {paper.status === "published" ? "已发布" : "草稿"}
+              </Tag>
+            </div>
           </div>
+          <Button type="primary" size="small">
+            选择此试卷
+          </Button>
         </div>
-        <Button type="primary" size="small">
-          选择此试卷
-        </Button>
-      </div>
-    </Card>
-  );
+      </Card>
+    ));
+  };
 
   const chooiceExamDate = (value: any, mode: string | string[]) => {
     console.log("选择日期：", value, mode);
@@ -426,6 +804,28 @@ function CreateExamination() {
             <Select
               placeholder="请选择考试类型"
               style={{ width: "100%", height: "34px", marginTop: "10px" }}
+              options={[
+                {
+                  label: "期末考试",
+                  value: "Final",
+                },
+                {
+                  label: "期中考试",
+                  value: "Midterm",
+                },
+                {
+                  label: "章节测试",
+                  value: "Quiz",
+                },
+                {
+                  label: "补考",
+                  value: "Makeup",
+                },
+                {
+                  label: "模拟考试",
+                  value: "Practice",
+                },
+              ]}
             />
           </div>
         </div>
@@ -473,8 +873,8 @@ function CreateExamination() {
                       ✓ {selectedPaper.title}
                     </h4>
                     <div style={{ fontSize: "12px", color: "#666" }}>
-                      <span>{selectedPaper.subject} | </span>
-                      <span>{selectedPaper.creator} | </span>
+                      <span>{selectedPaper.subjectName} | </span>
+                      <span>{selectedPaper.creatorName} | </span>
                       <span>{selectedPaper.duration}分钟 | </span>
                       <span>{selectedPaper.totalScore}分 | </span>
                       <span>{selectedPaper.questionCount}题</span>
