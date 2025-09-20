@@ -16,6 +16,10 @@ const columns: TableColumnsType<DataType> = [
     // render: (text: string) => <a>{text}</a>,
   },
   {
+    title: "年级",
+    dataIndex: "grade",
+  },
+  {
     title: "姓名",
     dataIndex: "username",
   },
@@ -64,17 +68,25 @@ function CreateStudentPanel(props: CreateStudentPanelProps) {
       (item: {
         id: string;
         studentId: string;
+        grade: string;
         username: string;
         className: string;
         phone: string;
         email: string;
+        avatar: string;
+        createdAt: string;
+        updatedAt: string;
       }) => ({
         key: item.id,
         studentId: item.studentId,
+        grade: item.grade,
         username: item.username,
         className: item.className,
         phone: item.phone,
         email: item.email,
+        avatar: item.avatar,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
       })
     );
   }, [students]);

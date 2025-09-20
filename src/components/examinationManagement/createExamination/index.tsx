@@ -4,7 +4,6 @@ import {
   Input,
   Select,
   DatePicker,
-  InputNumber,
   Switch,
   Button,
   Modal,
@@ -12,19 +11,18 @@ import {
   Tag,
   TimePicker,
   message,
-  Table,
   Pagination,
 } from "antd";
-import { DataType } from "../../../interface/examinationsFace";
 import CommonModal from "../../common/Modal";
 import { CreateExaminationRequest } from "../../../interface/examinationsFace";
-import { createExamination } from "../../../actions/examinations";
+import {
+  createExamination,
+  getExaminationResourcesAction,
+} from "../../../actions/examinations";
 import CreateClassCard from "./CreateClassCard";
-import type { TableColumnsType } from "antd";
 import CreateStudentPanel from "./CreateStudentPanel";
 import { CreateImportCard } from "./CreateImportCard";
 import { useDispatch, useSelector } from "react-redux";
-import Loading from "../../common/Loading";
 import {
   getExaminationPaperListAction,
   searchClassesAction,
@@ -39,158 +37,9 @@ import {
 } from "../../../store/examinationPaperStore";
 import { debounce, isTrue } from "../../../utils";
 import EmptyComponent from "../../common/EmptyComponent";
-import { getUserByClass, searchUsers } from "../../../actions/users";
+import { searchUsers } from "../../../actions/users";
+import { setExamResources } from "../../../store/examinationStore";
 const { TextArea } = Input;
-
-// 模拟试卷数据
-const mockPapers = [
-  {
-    id: "1",
-    title: "计算机网络期末考试",
-    subject: "计算机网络",
-    creator: "张老师",
-    duration: 120,
-    totalScore: 100,
-    questionCount: 50,
-    difficulty: "中等",
-    status: "published",
-    createTime: "2024-03-15",
-    tags: ["期末考试", "综合测试", "重点考试"],
-    description: "涵盖TCP/IP协议、网络分层、路由算法等核心知识点",
-  },
-  {
-    id: "2",
-    title: "数据结构章节测试",
-    subject: "数据结构",
-    creator: "李老师",
-    duration: 90,
-    totalScore: 80,
-    questionCount: 30,
-    difficulty: "简单",
-    status: "draft",
-    createTime: "2024-03-12",
-    tags: ["章节测试", "基础题目"],
-    description: "测试线性表、栈、队列等基础数据结构",
-  },
-  {
-    id: "3",
-    title: "操作系统综合测试",
-    subject: "操作系统",
-    creator: "王老师",
-    duration: 150,
-    totalScore: 120,
-    questionCount: 60,
-    difficulty: "困难",
-    status: "published",
-    createTime: "2024-03-10",
-    tags: ["综合测试", "难度较大"],
-    description: "进程管理、内存管理、文件系统全面测试",
-  },
-  {
-    id: "4",
-    title: "软件工程项目实践",
-    subject: "软件工程",
-    creator: "赵老师",
-    duration: 180,
-    totalScore: 150,
-    questionCount: 40,
-    difficulty: "中等",
-    status: "published",
-    createTime: "2024-03-08",
-    tags: ["项目实践", "应用题"],
-    description: "软件开发流程、需求分析、系统设计实践题目",
-  },
-];
-
-const columns: TableColumnsType<DataType> = [
-  {
-    title: "学号",
-    dataIndex: "studentId",
-    // render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: "姓名",
-    dataIndex: "username",
-  },
-  {
-    title: "班级",
-    dataIndex: "department",
-  },
-  {
-    title: "手机号",
-    dataIndex: "phone",
-  },
-  {
-    title: "邮箱",
-    dataIndex: "email",
-  },
-];
-
-const data: DataType[] = [
-  {
-    key: "1",
-    studentId: "20240001",
-    username: "张三",
-    department: "计算机科学1班",
-    phone: "13800138001",
-    email: "zhangsan@example.com",
-    address: "北京市海淀区",
-  },
-  {
-    key: "2",
-    studentId: "20240002",
-    username: "李四",
-    department: "计算机科学2班",
-    phone: "13800138002",
-    email: "lisi@example.com",
-    address: "北京市朝阳区",
-  },
-  {
-    key: "3",
-    studentId: "20240003",
-    username: "王五",
-    department: "软件工程1班",
-    phone: "13800138003",
-    email: "wangwu@example.com",
-    address: "北京市西城区",
-  },
-  {
-    key: "4",
-    studentId: "20240004",
-    username: "赵六",
-    department: "软件工程2班",
-    phone: "13800138004",
-    email: "zhaoliu@example.com",
-    address: "北京市东城区",
-  },
-  {
-    key: "5",
-    studentId: "20240005",
-    username: "钱七",
-    department: "网络工程1班",
-    phone: "13800138005",
-    email: "qianqi@example.com",
-    address: "北京市丰台区",
-  },
-  {
-    key: "6",
-    studentId: "20240005",
-    username: "钱七",
-    department: "网络工程1班",
-    phone: "13800138005",
-    email: "qianqi@example.com",
-    address: "北京市丰台区",
-  },
-  {
-    key: "7",
-    studentId: "20240005",
-    username: "钱七",
-    department: "网络工程1班",
-    phone: "13800138005",
-    email: "qianqi@example.com",
-    address: "北京市丰台区",
-  },
-];
 
 function CreateExamination() {
   // 状态管理
@@ -205,13 +54,15 @@ function CreateExamination() {
     examType: "",
     paperId: "",
     description: "",
-    examDate: null,
-    startTime: null,
-    endTime: null,
+    examDate: "",
+    startTime: "",
+    endTime: "",
     duration: "",
     lateLimit: "30",
     earlySubmit: "30",
     supervisor: "",
+    subjectId: null,
+    subjectCode: "",
     cameraEnabled: true,
     screenRecord: true,
     preventSwitch: true,
@@ -219,12 +70,15 @@ function CreateExamination() {
     randomQuestion: false,
     randomOption: false,
   });
+  const [paperLoading, setPaperLoading] = useState(false);
   const dispatch = useDispatch();
-  const { examPaperList, totalCount, classes, students, page, classMenu, selectedList } =
+  const { examPaperList, totalCount, page, classMenu, selectedList } =
     useSelector((state: any) => state.examinationPaper);
-  console.log("examPaperList selectedList ======> ", selectedList);
+  const { resources } = useSelector((state: any) => state.examination);
+  console.log("examPaperList selectedList ======> ", resources, selectedList);
 
   useEffect(() => {
+    setPaperLoading(true);
     if (isTrue(paperModalVisible)) {
       fetchPaperList();
     }
@@ -237,6 +91,13 @@ function CreateExamination() {
       fetchStudentUsers({ role: "student" });
     }
   }, [visible]);
+
+  useEffect(() => {
+    getExaminationResourcesAction().then((res: any) => {
+      dispatch(setExamResources(res));
+      console.log("获取考试资源", res);
+    });
+  }, []);
 
   const fetchClasses = (params?: any) => {
     searchClassesAction(params)
@@ -297,6 +158,7 @@ function CreateExamination() {
     const { page, pageSize } = params || { page: 1, pageSize: 10 };
     getExaminationPaperListAction({ page, pageSize }).then((res: any) => {
       dispatch(getExaminationPaperList(res));
+      setPaperLoading(false);
     });
   };
 
@@ -324,7 +186,6 @@ function CreateExamination() {
     setExamForm((prev) => ({
       ...prev,
       paperId: paper.id,
-      subject: paper.subject,
       duration: paper.duration.toString(),
     }));
     setPaperModalVisible(false);
@@ -343,7 +204,7 @@ function CreateExamination() {
         message.error("请输入考试名称");
         return;
       }
-      if (!examForm.subject) {
+      if (!examForm.subjectId) {
         message.error("请选择考试科目");
         return;
       }
@@ -356,26 +217,21 @@ function CreateExamination() {
         return;
       }
 
-      // 构建请求参数
       const requestData: CreateExaminationRequest = {
-        // 基本信息
         examName: examForm.examName,
         subject: examForm.subject,
         examType: examForm.examType || "期末考试",
         paperId: examForm.paperId,
         description: examForm.description,
 
-        // 时间信息
-        examDate: examForm.examDate, // moment对象需要转换为字符串
-        startTime: examForm.startTime, // moment对象需要转换为字符串
-        endTime: examForm.endTime, // moment对象需要转换为字符串
+        examDate: examForm.examDate,
+        startTime: examForm.startTime,
+        endTime: examForm.endTime,
         duration: examForm.duration,
 
-        // 限制设置
         lateLimit: examForm.lateLimit,
         earlySubmit: examForm.earlySubmit,
 
-        // 监考设置
         supervisor: examForm.supervisor,
         cameraEnabled: examForm.cameraEnabled,
         screenRecord: examForm.screenRecord,
@@ -383,9 +239,9 @@ function CreateExamination() {
         preventCopy: examForm.preventCopy,
         randomQuestion: examForm.randomQuestion,
         randomOption: examForm.randomOption,
-
-        // 参与人员 (如果已选择)
-        // studentIds: selectedStudents?.map((s: any) => s.id) || [],
+        subjectId: examForm.subjectId || 0,
+        subjectCode: examForm.subjectCode || "",
+        studentIds: selectedList?.map((s: any) => s.studentId) || [],
         // classIds: selectedClasses?.map((c: any) => c.id) || []
       };
 
@@ -453,7 +309,7 @@ function CreateExamination() {
           {renderPaperCard(examPaperList)}
         </div>
         Loading
-        {examPaperList.length === 0 && (
+        {!examPaperList.length && (
           <div style={{ textAlign: "center", padding: "40px", color: "#999" }}>
             <i
               className="fas fa-inbox"
@@ -630,7 +486,9 @@ function CreateExamination() {
           {selectedTab === "class" && <CreateClassCard />}
           {selectedTab === "batch" && <CreateImportCard />}
         </div>
-        <div className="selected-total-panel">已选择: 考生 0 人，班级 0 个</div>
+        <div className="selected-total-panel">
+          已选择: 考生 {selectedList.length} 人，班级 0 个
+        </div>
       </CommonModal>
     );
   };
@@ -742,33 +600,83 @@ function CreateExamination() {
   };
 
   const chooiceExamDate = (value: any, mode: string | string[]) => {
+    const timeString = Array.isArray(mode) ? mode[0] : mode;
     console.log("选择日期：", value, mode);
+    setExamForm({
+      ...examForm,
+      examDate: timeString,
+    });
   };
 
   const chooiceExamStartTime = (value: any, dateString: string | string[]) => {
-    console.log("选择开始时间：", value, dateString);
+    const timeString = Array.isArray(dateString) ? dateString[0] : dateString;
+    console.log("选择开始时间：", value, timeString);
+    setExamForm({
+      ...examForm,
+      startTime: timeString,
+    });
   };
 
   const chooiceExamEndTime = (value: any, dateString: string | string[]) => {
-    console.log("选择结束时间：", value, dateString);
+    const timeString = Array.isArray(dateString) ? dateString[0] : dateString;
+    console.log("选择结束时间：", value, timeString);
+    setExamForm({
+      ...examForm,
+      endTime: timeString,
+    });
+  };
+
+  const handleDeleteStudent = (item: any) => {
+    console.log(`删除id为${item.id}的考生信息`);
   };
 
   const renderExamStudentList = () => {
-    return (
-      <div className="create-examination-student-list">
-        <div className="create-examination-student-item">
-          <div className="create-student-avatar">头像</div>
-          <div className="create-student-info">
-            <div className="create-student-name">姓名</div>
-            <div className="create-student-detail">20021 · 计算机科学1班</div>
+    if (!selectedList || !selectedList.length) {
+      return (
+        <div style={{ padding: "40px", textAlign: "center", color: "#8c8c8c" }}>
+          <span
+            className="iconfont icon-user-plus-copy"
+            style={{
+              fontSize: "48px",
+              marginBottom: "16px",
+              opacity: "0.5",
+            }}
+          ></span>
+          <p>还没有添加考生，点击上方按钮添加</p>
+        </div>
+      );
+    }
+
+    return selectedList.map((item: any) => {
+      return (
+        <div className="create-examination-student-list">
+          <div className="create-examination-student-item">
+            {item.avatar ? (
+              <div className="create-student-avatar">{item.avatar}</div>
+            ) : (
+              <span className="createStudent icon-bianzubeifen3"></span>
+            )}
+            <div className="create-student-info">
+              <div className="create-student-name">{item.username}</div>
+              <div className="create-student-detail">
+                {item.grade} · {item.className}
+              </div>
+            </div>
+          </div>
+          <div onClick={() => handleDeleteStudent(item)}>
+            <span className="createStudent icon-guanbi close-icon"></span>
           </div>
         </div>
-        <div>
-          <div>操作</div>
-        </div>
-      </div>
-    );
+      );
+    });
   };
+
+  const teachers = resources?.teachers?.map(
+    (supervisor: { realName: string; username: string }) => ({
+      label: supervisor.realName,
+      value: supervisor.username,
+    })
+  );
 
   return (
     <div className="create-examination-container">
@@ -800,18 +708,25 @@ function CreateExamination() {
             <Select
               placeholder="请选择考试科目"
               value={examForm.subject || undefined}
-              onChange={(value) =>
-                setExamForm((prev) => ({ ...prev, subject: value }))
-              }
+              onChange={(value, option: any) => {
+                setExamForm((prev) => ({
+                  ...prev,
+                  subjectId: option?.value,
+                  subjectCode: option?.code,
+                }));
+              }}
               style={{ width: "100%", height: "34px", marginTop: "10px" }}
-              options={[
-                { label: "计算机网络", value: "计算机网络" },
-                { label: "数据结构", value: "数据结构" },
-                { label: "操作系统", value: "操作系统" },
-                { label: "软件工程", value: "软件工程" },
-                { label: "数据库", value: "数据库" },
-                { label: "算法设计", value: "算法设计" },
-              ]}
+              options={resources?.subjects?.map(
+                (sub: {
+                  name: string;
+                  id: number;
+                  code: string;
+                }): { label: string; value: number; code: string } => ({
+                  label: sub.name,
+                  value: sub.id,
+                  code: sub.code,
+                })
+              )}
             />
           </div>
           <div className="create-examination-form-item">
@@ -821,28 +736,21 @@ function CreateExamination() {
             <Select
               placeholder="请选择考试类型"
               style={{ width: "100%", height: "34px", marginTop: "10px" }}
-              options={[
-                {
-                  label: "期末考试",
-                  value: "Final",
-                },
-                {
-                  label: "期中考试",
-                  value: "Midterm",
-                },
-                {
-                  label: "章节测试",
-                  value: "Quiz",
-                },
-                {
-                  label: "补考",
-                  value: "Makeup",
-                },
-                {
-                  label: "模拟考试",
-                  value: "Practice",
-                },
-              ]}
+              onChange={(value) => {
+                setExamForm({
+                  ...examForm,
+                  examType: value,
+                });
+              }}
+              options={resources?.examTypes?.map(
+                (exam: {
+                  name: string;
+                  type: string;
+                }): { label: string; value: string } => ({
+                  label: exam.name,
+                  value: exam.type,
+                })
+              )}
             />
           </div>
         </div>
@@ -854,6 +762,12 @@ function CreateExamination() {
             <TextArea
               placeholder="请输入考试说明"
               style={{ width: "100%", height: "80px", marginTop: "10px" }}
+              onChange={(item) => {
+                setExamForm({
+                  ...examForm,
+                  description: item.target.value,
+                });
+              }}
             />
           </div>
         </div>
@@ -1009,6 +923,12 @@ function CreateExamination() {
                 { label: "开考后不允许入场", value: "0" },
               ]}
               style={{ width: "259px", height: "34px", marginTop: "10px" }}
+              onChange={(value) => {
+                setExamForm({
+                  ...examForm,
+                  lateLimit: Array.isArray(value) ? value[0] : value,
+                });
+              }}
             />
           </div>
           <div
@@ -1027,6 +947,12 @@ function CreateExamination() {
                 { label: "考试结束前不允许交卷", value: "0" },
               ]}
               style={{ width: "259px", height: "34px", marginTop: "10px" }}
+              onChange={(value) => {
+                setExamForm({
+                  ...examForm,
+                  earlySubmit: Array.isArray(value) ? value[0] : value,
+                });
+              }}
             />
           </div>
         </div>
@@ -1056,22 +982,7 @@ function CreateExamination() {
               </button>
             </div>
           </div>
-          <div className="participants-list">
-            {/* <div
-              style={{ padding: "40px", textAlign: "center", color: "#8c8c8c" }}
-            >
-              <span
-                className="iconfont icon-user-plus-copy"
-                style={{
-                  fontSize: "48px",
-                  marginBottom: "16px",
-                  opacity: "0.5",
-                }}
-              ></span>
-              <p>还没有添加考生，点击上方按钮添加</p>
-            </div> */}
-            {renderExamStudentList()}
-          </div>
+          <div className="participants-list">{renderExamStudentList()}</div>
         </div>
 
         <div className="create-examination-grid m-t-20">
@@ -1083,14 +994,15 @@ function CreateExamination() {
               <h4>监考老师</h4>
             </div>
             <Select
-              defaultValue={["30"]}
               placeholder="请选择监考老师"
-              options={[
-                { label: "张三", value: "1" },
-                { label: "李四", value: "2" },
-                { label: "王五", value: "3" },
-              ]}
+              options={teachers}
               style={{ width: "259px", height: "34px", marginTop: "10px" }}
+              onChange={(value) => {
+                setExamForm({
+                  ...examForm,
+                  supervisor: Array.isArray(value) ? value[0] : value,
+                });
+              }}
             />
           </div>
         </div>

@@ -24,6 +24,11 @@ export const getExaminationPaperListReducer = (state: ExaminationPaperState, act
   console.log("action.payload ======> ", action.payload);
   
   const pagination = action.payload.pagination;
+
+  if (!action.payload) {
+    return state
+  }
+
   return {
     ...state,
     page: pagination.page,

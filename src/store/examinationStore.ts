@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { setActiveTabReducer, initExaminationListReducer, updateExaminationListReducer } from "../reducers/examinationReducer";
+import { setActiveTabReducer, initExaminationListReducer, updateExaminationListReducer, setExamResourcesReducer } from "../reducers/examinationReducer";
 
 const examinationSlice = createSlice({
   name: "examination",
@@ -29,13 +29,15 @@ const examinationSlice = createSlice({
         value: "exam-report",
       },
     ],
+    resources: {},
   },
   reducers: {
     setActiveTab: setActiveTabReducer,
     initExaminationList: initExaminationListReducer,
     updateExaminationList: updateExaminationListReducer,
+    setExamResources: setExamResourcesReducer,
   },
 });
 
-export const { setActiveTab, initExaminationList, updateExaminationList } = examinationSlice.actions;
+export const { setActiveTab, initExaminationList, updateExaminationList, setExamResources } = examinationSlice.actions;
 export default examinationSlice.reducer;

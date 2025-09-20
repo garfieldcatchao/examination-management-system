@@ -40,6 +40,9 @@ export interface CreateExaminationRequest {
   preventCopy: boolean;          // 禁止复制粘贴 默认true
   randomQuestion: boolean;       // 随机题目顺序 默认false
   randomOption: boolean;         // 随机选项顺序 默认false
+
+  subjectId: number;
+  subjectCode: string;
 }
 
 

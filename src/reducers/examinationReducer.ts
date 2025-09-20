@@ -25,3 +25,12 @@ export const updateExaminationListReducer = (state: any, action: PayloadAction<a
     examinationList: payload?.data || [],
   };
 };
+
+export const setExamResourcesReducer = (state: any, action: PayloadAction<any>) => {
+  const payload = action.payload;
+  
+  return {
+    ...state,
+    resources: payload?.data || {},
+  };
+};

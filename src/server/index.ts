@@ -44,6 +44,7 @@ export const api = {
     delete: (id: string) => http.delete(`/examinations/${id}`),
     start: (id: string) => http.post(`/examinations/${id}/start`),
     end: (id: string) => http.post(`/examinations/${id}/end`),
+    resources: () => http.get(`/examinations/resources`),
   },
 
   // 成绩管理

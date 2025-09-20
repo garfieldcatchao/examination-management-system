@@ -28,6 +28,7 @@ const examinationPaperSlice = createSlice({
     classes: [],
     students: [],
     selectedList: [],
+    examPaperList: []
   } as any,
   reducers: {
     setActiveTab: setSelectedTabReducer,
