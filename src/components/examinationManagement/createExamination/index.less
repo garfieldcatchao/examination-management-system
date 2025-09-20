@@ -296,24 +296,84 @@
     padding: 16px 20px;
 }
 
-.search-panel{
+.search-panel {
     gap: 20px;
     box-shadow: none;
 }
 
-.d-l-s-{
+.d-l-s- {
     justify-content: space-between;
 }
 
-.j-f-e{
+.j-f-e {
     justify-content: flex-end;
 }
 
-.paper-list-wrapper::webkit-scrollbar{
+.paper-list-wrapper::webkit-scrollbar {
     display: none;
     width: 0;
 }
 
-.paper-list-wrapper{
+.paper-list-wrapper {
     padding: 16px 0;
+}
+
+
+.create-examination-student-list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.create-examination-student-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.create-student-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fd4444;
+}
+
+
+.create-student-info {
+    padding: 10px 10px 10px 15px;
+}
+
+.create-student-name {
+    font-weight: 500;
+    color: #262626;
+    margin-bottom: 2px;
+}
+
+.create-student-detail {
+    font-size: 12px;
+    color: #8c8c8c;
+}
+
+
+@font-face {
+    font-family: "createStudent";
+    /* Project id 5026413 */
+    src: url('//at.alicdn.com/t/a/font_5026413_3gmh1ogsqk.woff2?t=1758341503072') format('woff2'),
+        url('//at.alicdn.com/t/a/font_5026413_3gmh1ogsqk.woff?t=1758341503072') format('woff'),
+        url('//at.alicdn.com/t/a/font_5026413_3gmh1ogsqk.ttf?t=1758341503072') format('truetype');
+}
+
+.createStudent {
+    font-family: "createStudent" !important;
+    font-size: 16px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bianzubeifen3:before {
+    content: "\e606";
 }

@@ -220,9 +220,9 @@ function CreateExamination() {
     randomOption: false,
   });
   const dispatch = useDispatch();
-  const { examPaperList, totalCount, classes, students, page, classMenu } =
+  const { examPaperList, totalCount, classes, students, page, classMenu, selectedList } =
     useSelector((state: any) => state.examinationPaper);
-  console.log("examPaperList ======> ", classMenu);
+  console.log("examPaperList selectedList ======> ", selectedList);
 
   useEffect(() => {
     if (isTrue(paperModalVisible)) {
@@ -753,6 +753,23 @@ function CreateExamination() {
     console.log("选择结束时间：", value, dateString);
   };
 
+  const renderExamStudentList = () => {
+    return (
+      <div className="create-examination-student-list">
+        <div className="create-examination-student-item">
+          <div className="create-student-avatar">头像</div>
+          <div className="create-student-info">
+            <div className="create-student-name">姓名</div>
+            <div className="create-student-detail">20021 · 计算机科学1班</div>
+          </div>
+        </div>
+        <div>
+          <div>操作</div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="create-examination-container">
       <div className="create-examination-form">
@@ -1040,7 +1057,7 @@ function CreateExamination() {
             </div>
           </div>
           <div className="participants-list">
-            <div
+            {/* <div
               style={{ padding: "40px", textAlign: "center", color: "#8c8c8c" }}
             >
               <span
@@ -1052,7 +1069,8 @@ function CreateExamination() {
                 }}
               ></span>
               <p>还没有添加考生，点击上方按钮添加</p>
-            </div>
+            </div> */}
+            {renderExamStudentList()}
           </div>
         </div>
 
