@@ -1,20 +1,21 @@
 import React, { act, useState } from "react";
-
+import { useDispatch } from "react-redux";
 import { isTrue } from "../../../../utils";
 import styles from "./index.module.css";
 import UploadFile from "./UploadFile";
 import UploadList from "./UploadList";
 import UploadResult from "./UploadResult";
 import { message } from "antd";
+import { setSelectedList } from "../../../../store/examinationPaperStore";
 
 const SET_PROGRESS = [
   {
     label: "1",
     value: "step1",
-    progress: false,
+    progress: true,
     normal: "set-progress",
     active: "set-progress-active",
-    complate: true,
+    complate: false,
   },
   {
     label: "line",
@@ -22,12 +23,12 @@ const SET_PROGRESS = [
     progress: false,
     normal: "set-progress-line",
     active: "set-progress-line-active",
-    complate: true,
+    complate: false,
   },
   {
     label: "2",
     value: "step2",
-    progress: true,
+    progress: false,
     normal: "set-progress",
     active: "set-progress-active",
     complate: false,
@@ -53,17 +54,15 @@ const SET_PROGRESS = [
 export function CreateImportCard() {
   const [active, setActive] = useState<string>("step1");
   const [progress, setProgress] = useState<any[]>(SET_PROGRESS);
-  const [importData, setImportData] = useState<
-    | {
-        success: boolean;
-        totalCount: number;
-        validCount: number;
-        wraingCount: number;
-        errorCount: number;
-        data: any[];
-      }
-    | null
-  >(null);
+  const [importData, setImportData] = useState<{
+    success: boolean;
+    totalCount: number;
+    validCount: number;
+    wraingCount: number;
+    errorCount: number;
+    data: any[];
+  } | null>(null);
+  const dispatch = useDispatch();
 
   const renderSetProgress1 = () => {};
 
@@ -78,15 +77,51 @@ export function CreateImportCard() {
     console.log("=======", res);
     setActive("step2");
     // setImportList(data);
-    setImportData(res)
+
+    const progressList = SET_PROGRESS.map((item) => {
+      if (item.value === "step1") {
+        item.complate = true;
+      }
+
+      if (item.value === "step2") {
+        item.progress = true;
+      }
+      return item;
+    });
+
+    setProgress(progressList);
+    setImportData(res);
+
     message.success("解析成功");
-    // message.error(data);
   };
 
-  const onReset = () => {
-    setActive("step1");
+  const onReset = (progressName: string) => {
+    setActive(progressName);
     setImportData(null);
-  }
+
+    const progressList = SET_PROGRESS.map((item) => {
+      if (item.value === progressName) {
+        item.complate = false;
+        item.progress = true;
+      }
+      return item;
+    });
+
+    setProgress(progressList);
+  };
+
+  const onImport = () => {
+    setActive("step3");
+
+    const progressList = SET_PROGRESS.map((item) => {
+      item.progress = true;
+      item.complate = true;
+      return item;
+    });
+
+    dispatch(setSelectedList(importData?.data || []));
+    setProgress(progressList);
+  };
 
   return (
     <div
@@ -129,8 +164,14 @@ export function CreateImportCard() {
         })}
       </div>
       {active === "step1" && <UploadFile onChange={onChange} />}
-      {active === "step2" && <UploadList importData={importData} onReset={onReset} />}
-      {active === "step3" && <UploadResult />}
+      {active === "step2" && (
+        <UploadList
+          importData={importData}
+          onReset={onReset}
+          onImport={onImport}
+        />
+      )}
+      {active === "step3" && <UploadResult importData={importData} />}
     </div>
   );
 }

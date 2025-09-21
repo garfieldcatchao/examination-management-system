@@ -121,11 +121,18 @@ export default function UploadList(props: any) {
       return;
     }
 
+    const { onImport } = props || {};
+    if (typeof onImport == "function") {
+      onImport(data);
+    }
     // dispatch(importData);
   };
 
   const resetBtn = () => {
-    
+    const { onReset } = props || {};
+    if (typeof onReset == "function") {
+      onReset("step1");
+    }
   }
 
   return (

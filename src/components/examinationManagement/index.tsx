@@ -4,6 +4,7 @@ import ExaminationList from "./examinationList";
 import CreateExamination from "./createExamination";
 import "./index.css";
 import { useSelector } from "react-redux";
+import CreateCalendar from "./createCalendar";
 
 function ExaminationManagement(props: any) {
   const { activeTab } = useSelector((state: any) => state.examination);
@@ -41,6 +42,7 @@ function ExaminationManagement(props: any) {
         <ExaminationMenu />
         {activeTab === "examination-list" && <ExaminationList />}
         {activeTab === "create-exam" && <CreateExamination />}
+        {activeTab === "exam-calendar" && <CreateCalendar />}
       </div>
     </div>
   );

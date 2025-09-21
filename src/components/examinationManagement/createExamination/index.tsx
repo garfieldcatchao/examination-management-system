@@ -626,8 +626,10 @@ function CreateExamination() {
     });
   };
 
-  const handleDeleteStudent = (item: any) => {
-    console.log(`删除id为${item.id}的考生信息`);
+  const handleDeleteStudent = (student: any) => {
+    console.log(`删除id为${student.studentId}的考生信息`);
+    const result = selectedList.filter((item: any) => item.studentId !== student.studentId);
+    dispatch(setSelectedList(result));
   };
 
   const renderExamStudentList = () => {

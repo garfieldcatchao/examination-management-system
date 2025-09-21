@@ -81,7 +81,7 @@ export class ExcelHelper {
             maxRows,
             skipEmptyRows,
           });
-
+          console.log("解析后的result =======》", result)
           resolve(result);
         } catch (error) {
           console.error("文件解析失败:", error);
@@ -237,7 +237,7 @@ export class ExcelHelper {
       });
 
       if (!hasError) {
-        result.data.push(rowData as T);
+        // result.data.push(rowData as T);
         result.validCount++;
       }
       result.data.push(rowData as T);

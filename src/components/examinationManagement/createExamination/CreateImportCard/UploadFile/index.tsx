@@ -91,7 +91,7 @@ export default function UploadFile(props: any) {
 
         setParseResult(result);
         let data = {};
-        
+        console.log("result ======> ", result);
         console.log("上传成功： ======》 ", result);
         if (result.success) {
           console.log("解析的学生数据:", result.data);
@@ -104,12 +104,13 @@ export default function UploadFile(props: any) {
             console.warn("解析警告:", result.warnings);
             data = getImportResult(result);
           }
-
-          props.onChange(data);
         } else {
           console.error("解析错误:", result.errors);
-          props.onChange(getImportResult(result));
+          data = getImportResult(result)
         }
+
+        props.onChange(data);
+
       } catch (error) {
         console.error("文件处理失败:", error);
         message.error("文件处理失败");
