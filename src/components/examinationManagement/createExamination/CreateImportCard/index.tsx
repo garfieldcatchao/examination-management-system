@@ -5,6 +5,7 @@ import styles from "./index.module.css";
 import UploadFile from "./UploadFile";
 import UploadList from "./UploadList";
 import UploadResult from "./UploadResult";
+import { message } from "antd";
 
 const SET_PROGRESS = [
   {
@@ -50,8 +51,19 @@ const SET_PROGRESS = [
 ];
 
 export function CreateImportCard() {
-  const [active, setActive] = useState<string>("step3");
+  const [active, setActive] = useState<string>("step1");
   const [progress, setProgress] = useState<any[]>(SET_PROGRESS);
+  const [importData, setImportData] = useState<
+    | {
+        success: boolean;
+        totalCount: number;
+        validCount: number;
+        wraingCount: number;
+        errorCount: number;
+        data: any[];
+      }
+    | null
+  >(null);
 
   const renderSetProgress1 = () => {};
 
@@ -61,6 +73,20 @@ export function CreateImportCard() {
     }
     return false;
   };
+
+  const onChange = (res: any) => {
+    console.log("=======", res);
+    setActive("step2");
+    // setImportList(data);
+    setImportData(res)
+    message.success("解析成功");
+    // message.error(data);
+  };
+
+  const onReset = () => {
+    setActive("step1");
+    setImportData(null);
+  }
 
   return (
     <div
@@ -102,8 +128,8 @@ export function CreateImportCard() {
           );
         })}
       </div>
-      {active === "step1" && <UploadFile />}
-      {active === "step2" && <UploadList />}
+      {active === "step1" && <UploadFile onChange={onChange} />}
+      {active === "step2" && <UploadList importData={importData} onReset={onReset} />}
       {active === "step3" && <UploadResult />}
     </div>
   );

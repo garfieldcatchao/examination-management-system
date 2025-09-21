@@ -92,3 +92,37 @@
     flex-direction: row;
     justify-content: flex-end;
 }
+
+
+@font-face {
+  font-family: "import-icon"; /* Project id 5026670 */
+  src: url('//at.alicdn.com/t/a/font_5026670_7ui93e5zb2l.woff2?t=1758382603547') format('woff2'),
+       url('//at.alicdn.com/t/a/font_5026670_7ui93e5zb2l.woff?t=1758382603547') format('woff'),
+       url('//at.alicdn.com/t/a/font_5026670_7ui93e5zb2l.ttf?t=1758382603547') format('truetype');
+}
+
+.import-icon {
+  font-family: "import-icon" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-tongguo:before {
+  content: "\e7ab";
+}
+
+.icon-weitongguo:before {
+  content: "\e60f";
+}
+
+.icon-weitongguo-copy:before {
+  content: "\e7ac";
+  color: #ff4d4f;
+}
+
+.icon-tongguo-copy:before {
+  content: "\e7ad";
+  color: #52c41a;
+}

@@ -915,9 +915,6 @@ function ImportModal(props: ImportModalProps) {
             details: error.details,
           });
         });
-        console.error(
-          `❌ 题目${currentQuestion.number}解析失败，发现 ${optionErrors.length} 个错误:`
-        );
         optionErrors.forEach((error, index) => {
           console.error(`   ${index + 1}. [${error.type}] ${error.error}`);
           if (error.details?.optionKey) {
@@ -943,7 +940,6 @@ function ImportModal(props: ImportModalProps) {
         });
       } else {
         // 没有错误的题目放入validQuestions
-        console.log(`✅ 题目${currentQuestion.number}解析成功`);
         validQuestions.push(
           formatWordQuestion(currentQuestion, questionNumber)
         );
@@ -976,11 +972,6 @@ function ImportModal(props: ImportModalProps) {
         finalValidQuestions.push(question);
       }
     });
-
-    // 显示解析汇总（不立即设置状态）
-    console.log(`📊 Word解析汇总:`);
-    console.log(`  ✅ 成功解析: ${finalValidQuestions.length} 道题目`);
-    console.log(`  ❌ 解析失败: ${invalidQuestions.length} 道题目`);
 
     if (currentParseErrors.length > 0) {
       console.error("📋 详细错误报告:");
@@ -1631,13 +1622,13 @@ function ImportModal(props: ImportModalProps) {
       try {
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: "array" });
-
         const workSheet = workbook.Sheets[workbook.SheetNames[0]];
-
+        
         const xlsxJson = XLSX.utils.sheet_to_json(workSheet, {
           header: 1,
         }) as any[][];
-
+        
+        console.log( "=======", xlsxJson)
         if (xlsxJson.length > 0) {
           console.log("Excel解析结果:", xlsxJson);
           setExcelData(xlsxJson);
@@ -1692,9 +1683,6 @@ function ImportModal(props: ImportModalProps) {
     accept: ".xlsx,.csv,.json,.docx",
     multiple: true,
     onChange: (info) => onChange(info),
-    onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
-    },
     showUploadList: false,
   };
 
