@@ -8,16 +8,6 @@ export const loginReducer = (state: LoginState, action: PayloadAction<any>) => {
   };
 };
 
-export const chooiceIdentityReducer = (state: LoginState, action: PayloadAction<ChooiceIdentityType>) => {
-  return {
-    ...state,
-    loginInfo: {
-      ...state.loginInfo,
-      identity: action.payload.identity,
-    }
-  };
-};
-
 export const modificationReducer = (state: LoginState, action: any) => {
   return state; // 暂时返回原state
 };

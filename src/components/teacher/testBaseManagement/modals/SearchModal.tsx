@@ -10,9 +10,9 @@ import {
   Pagination,
 } from "antd";
 import dayjs from "dayjs";
-import SearchResult from "../../dialog/searchResult";
-import { SearchModalProps } from "../../../interface/testBaseManagement";
-import { setSelectedTab } from "../../../store/testbaseManagementStore";
+import SearchResult from "../../../dialog/searchResult";
+import { SearchModalProps } from "../../../../interface/testBaseManagement";
+import { setSelectedTab } from "../../../../store/testbaseManagementStore";
 import "./SearchModal.css";
 
 const { Option } = Select;

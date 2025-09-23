@@ -1,17 +1,17 @@
 import React, { useState, useRef } from "react";
-import { ImportModalProps } from "../../../interface/testBaseManagement";
+import { ImportModalProps } from "../../../../interface/testBaseManagement";
 import * as XLSX from "xlsx";
 import {
   ParsedQuestion,
   ImportConfig,
   ImportProgress,
-} from "../../../interface/modalsFace";
+} from "../../../../interface/modalsFace";
 import type { UploadProps } from "antd";
-import excelJson from "../../../template/excelJson.json";
+import excelJson from "../../../../template/excelJson.json";
 import mammoth from "mammoth";
-import { generateDocx } from "../../../template/wordJs";
+import { generateDocx } from "../../../../template/wordJs";
 import { message, Upload, Select, Input, Modal } from "antd";
-import { isWordFile } from "../../../utils";
+import { isWordFile } from "../../../../utils";
 import "./ImportModal.css";
 
 const { Dragger } = Upload;

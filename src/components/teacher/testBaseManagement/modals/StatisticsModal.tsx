@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import SimpleChart from "../../common/SimpleChart";
+import SimpleChart from "../../../common/SimpleChart";
 import {
   StatisticsData,
   StatisticsModalProps,
-} from "../../../interface/testBaseManagement";
+} from "../../../../interface/testBaseManagement";
 import { useSelector } from "react-redux";
 import "./StatisticsModal.css";
 

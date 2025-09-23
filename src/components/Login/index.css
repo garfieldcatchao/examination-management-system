@@ -33,7 +33,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 60px;
 }
 
 .login-box-label p {
@@ -61,6 +61,7 @@
   cursor: pointer;
   transition: all 0.3s;
   min-width: 40px;
+  text-align: center;
 }
 
 .forgot-password {

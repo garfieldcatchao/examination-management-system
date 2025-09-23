@@ -6,7 +6,7 @@ import ExaminationPaperAnalysis from "./examinationPaperAnalysis";
 import IntelligentVolumeGroup from "./intelligentVolumeGroup";
 import TemplateManagement from "./templateManagement";
 import { useDispatch, useSelector } from "react-redux";
-import { setActiveTab } from "../../store/examinationPaperStore";
+import { setActiveTab } from "../../../store/examinationPaperStore";
 import "./index.css";
 
 function ExaminationPaperManagement() {

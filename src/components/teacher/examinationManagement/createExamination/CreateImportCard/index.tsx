@@ -1,12 +1,12 @@
 import React, { act, useState } from "react";
 import { useDispatch } from "react-redux";
-import { isTrue } from "../../../../utils";
+import { isTrue } from "../../../../../utils";
 import styles from "./index.module.css";
 import UploadFile from "./UploadFile";
 import UploadList from "./UploadList";
 import UploadResult from "./UploadResult";
 import { message } from "antd";
-import { setSelectedList } from "../../../../store/examinationPaperStore";
+import { setSelectedList } from "../../../../../store/examinationPaperStore";
 
 const SET_PROGRESS = [
   {

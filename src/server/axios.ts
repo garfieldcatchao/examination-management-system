@@ -72,7 +72,7 @@ class HttpRequest {
     this.instance.interceptors.response.use(
       (response: any) => {
         const { data } = response;
-        console.log('handleError', data)
+        console.log("handleError", data);
         // 统一处理响应
         if (data.code === 200 || data.success) {
           return data;
@@ -81,13 +81,13 @@ class HttpRequest {
           this.handleTokenExpired();
           return Promise.reject(data.message || "登录状态已过期");
         } else {
-          // 其他业务错误
           message.error(data.message || "请求失败");
-          return Promise.reject(data.message || "请求失败");
         }
       },
       (error: AxiosError) => {
-        return this.handleError(error);
+        console.log("request error", error);
+        // message.error(error.message)
+        // return this.handleError(error);
       }
     );
   }
@@ -109,7 +109,7 @@ class HttpRequest {
   /**
    * 统一错误处理
    */
-  private handleError(error: AxiosError): void {
+  private handleError(error: AxiosError) {
     let errorMessage = "网络请求失败";
 
     if (error.response) {
@@ -141,6 +141,7 @@ class HttpRequest {
     }
 
     message.error(errorMessage);
+    return Promise.resolve(error);
     // return Promise.reject(errorMessage);
   }
 

@@ -7,7 +7,7 @@ import {
   UserInfo,
   ChartData,
   ExamData,
-} from "../../interface/workBenchFac";
+} from "../../../interface/workBenchFac";
 
 function Workbench() {
   const [currentTime, setCurrentTime] = useState(new Date());

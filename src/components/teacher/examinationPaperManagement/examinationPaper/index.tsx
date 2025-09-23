@@ -1,7 +1,7 @@
 import React from "react";
 import Toolbar from "../toolbar";
 import { useSelector, useDispatch } from "react-redux";
-import { setActiveTab } from "../../../store/examinationPaperStore";
+import { setActiveTab } from "../../../../store/examinationPaperStore";
 import "./index.css";
 
 function ExaminationPaper(props: any) {

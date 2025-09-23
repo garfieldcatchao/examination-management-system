@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Checkbox } from "antd";
 import styles from "./index.module.css";
-import EmptyComponent from "../../../common/EmptyComponent";
+import EmptyComponent from "../../../../common/EmptyComponent";
 
 function CreateClassCard() {
   const { classes } = useSelector((state: any) => state.examinationPaper);

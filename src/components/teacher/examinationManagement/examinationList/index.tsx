@@ -4,22 +4,22 @@ import {
   initExaminationList,
   setActiveTab,
   updateExaminationList,
-} from "../../../store/examinationStore";
-import EmptyComponent from "../../common/EmptyComponent";
+} from "../../../../store/examinationStore";
+import EmptyComponent from "../../../common/EmptyComponent";
 import {
   initExaminationListAction,
   fetchExaminationListAction,
   deleteExaminationAction,
-} from "../../../actions/examinations";
+} from "../../../../actions/examinations";
 import {
   formatDateTime,
   checkTimePeriod,
   calculateTimeProgress,
-} from "../../../utils";
-import { ExaminationBtns } from "../../../interface/examinationsFace";
+} from "../../../../utils";
+import { ExaminationBtns } from "../../../../interface/examinationsFace";
 import "./index.css";
 import { message, Pagination, Spin } from "antd";
-import { scrollToTop } from "../../../utils";
+import { scrollToTop } from "../../../../utils";
 
 const EXAMINATION_BTN_MAP: ExaminationBtns = {
   draft: [

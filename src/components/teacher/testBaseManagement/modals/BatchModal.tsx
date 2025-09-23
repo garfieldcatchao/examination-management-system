@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
- import { BatchModalProps } from "../../../interface/testBaseManagement";
+ import { BatchModalProps } from "../../../../interface/testBaseManagement";
  import "./BatchModal.css";
 
 interface QuestionItem {

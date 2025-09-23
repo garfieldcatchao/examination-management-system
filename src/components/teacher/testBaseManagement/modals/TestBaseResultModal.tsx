@@ -1,5 +1,5 @@
 import React from "react";
-import { TestBaseResultModalProps } from "../../../interface/testBaseManagement";
+import { TestBaseResultModalProps } from "../../../../interface/testBaseManagement";
 import "./TestBaseResultModal.css";
 import SearchResultModal from "./SearchModal";
 import SearchModal from "./SearchModal";

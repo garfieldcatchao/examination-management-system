@@ -3,10 +3,14 @@ import { addURLParams } from "../utils";
 
 // 便捷的API接口定义
 export const api = {
+
+  login: {
+    login: (data: any) => http.post("/auth/login", data),
+    logout: () => http.post("/auth/logout"),
+  },
+
   // 用户相关
   user: {
-    login: (data: any) => http.post("/user/login", data),
-    logout: () => http.post("/user/logout"),
     getUserInfo: () => http.get("/user/info"),
     updateUserInfo: (data: any) => http.put("/user/info", data),
     searchByClass: (data: any) => http.post("/users/class", data),

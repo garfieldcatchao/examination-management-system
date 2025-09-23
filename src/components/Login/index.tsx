@@ -1,12 +1,15 @@
 import React, { useState, useMemo, useCallback } from "react";
 import type { FormProps } from "antd";
 import { useRoot } from "../../hooks/useRoot";
-import { Button, Checkbox, Flex, Form, Input } from "antd";
-import { FieldType, Identity } from "../../interface/loginFace";
+import { Button, Checkbox, Flex, Form, Input, message } from "antd";
+import { FieldType, Identity, LoginResponse } from "../../interface/loginFace";
 import "./index.css";
-// import { login } from "../../store/loginStore";
-import { chooiceIdentity } from "../../store/loginStore";
+import { onLogin } from "../../actions/users";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import { loginSuccess } from "../../store/loginStore";
+import { isTrue } from "../../utils";
+import { ApiResponse } from "../../server/axios";
 
 const STATUS_TYPE = {
   teacher: "工号",
@@ -15,27 +18,77 @@ const STATUS_TYPE = {
 };
 
 function Login(props: any) {
-  const { identity, loginInfo } = useSelector((state: any) => state.login);
-  const [active, setActive] = useState<string>(loginInfo.identity);
+  const { identity, userInfo } = useSelector((state: any) => state.login);
+  const [active, setActive] = useState<string>(userInfo?.identity || "teacher");
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const onFinish: FormProps<FieldType>["onFinish"] = (values: any) => {
+  const onFinish: FormProps<FieldType>["onFinish"] = async (values: any) => {
     console.log("Success:", values);
+    setLoading(true);
+    
+    try {
+      // 调用登录API
+      const response: any = await onLogin({
+        ...values,
+        role: active
+      });
+      console.log("response", response);
+      if (response && isTrue(response.success)) {
+        // 登录成功，更新Redux状态
+        dispatch(loginSuccess({
+          token: response?.token,
+          userInfo: {
+            id: response?.userInfo.id,
+            username: response?.userInfo.username,     
+            identity: response.userInfo.role,
+          }
+        }));
+
+        message.success('登录成功!');
+
+        // 根据用户角色跳转到对应页面
+        setTimeout(() => {
+          switch (response.userInfo.role) {
+            case 'teacher':
+              navigate('/teacher/workbench');
+              break;
+            case 'student':
+              navigate('/student');
+              break;
+            case 'admin':
+              navigate('/admin');
+              break;
+            default:
+              navigate('/teacher/workbench'); // 默认跳转
+          }
+        }, 500);
+
+      } else {
+        message.error(response?.message || '登录失败，请检查账号密码');
+      }
+    } catch (error) {
+      console.error('登录失败:', error);
+      message.error('登录失败，请检查网络连接');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
     errorInfo
   ) => {
     console.log("Failed:", errorInfo);
+    message.error('请填写完整的登录信息');
   };
 
   const chooseIdentity = useCallback((value: string) => {
     setActive(value);
-    dispatch(chooiceIdentity({ identity: value }));
   }, []);
 
   const resetPassword = useCallback(() => {
-    console.log("忘记密码");
+    message.info("密码重置功能开发中...");
   }, []);
 
   return (
@@ -45,7 +98,7 @@ function Login(props: any) {
           <h1>系统登录</h1>
           <p>欢迎回来！请登录账户</p>
         </div>
-        <div className="role-selector">
+        {/* <div className="role-selector">
           {identity.map((item: Identity) => (
             <div
               className={`role-btn ${active === item.value ? "active" : ""}`}
@@ -55,7 +108,7 @@ function Login(props: any) {
               {item.label}
             </div>
           ))}
-        </div>
+        </div> */}
 
         <Form
           name="loginForm"
@@ -75,18 +128,20 @@ function Login(props: any) {
           autoComplete="off"
         >
           <Form.Item<FieldType>
-            name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
+            name="studentId"
+            rules={[{ required: true, message: "请输入用户名!" }]}
           >
             <Input
-              placeholder={`请输入${STATUS_TYPE[active as keyof typeof STATUS_TYPE]}`}
+              placeholder={`请输入${
+                STATUS_TYPE[active as keyof typeof STATUS_TYPE]
+              }`}
               style={{ width: "260px", height: "37px" }}
             />
           </Form.Item>
 
           <Form.Item<FieldType>
             name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
+            rules={[{ required: true, message: "请输入密码!" }]}
           >
             <Input.Password
               placeholder="请输入密码"
@@ -98,10 +153,7 @@ function Login(props: any) {
             <Form.Item name="remember" valuePropName="checked" noStyle>
               <Checkbox>记住密码</Checkbox>
             </Form.Item>
-            <div
-              className="forgot-password"
-              onClick={() => resetPassword()}
-            >
+            <div className="forgot-password" onClick={() => resetPassword()}>
               忘记密码 ?
             </div>
           </div>
@@ -112,8 +164,9 @@ function Login(props: any) {
               type="primary"
               htmlType="submit"
               size="middle"
+              loading={loading}
             >
-              登录
+              {loading ? '登录中...' : '登录'}
             </Button>
           </Form.Item>
         </Form>

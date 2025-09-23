@@ -63,7 +63,7 @@ function Meun(props: any) {
 
   return (
     <div className="menu-container">
-      {props.items.map((item: MenuProps) => {
+      {props?.items?.map((item: MenuProps) => {
         return (
           <div key={item.key} onClick={(e) => handleClick(e, item)}>
             <NavLink to={item.path as string} className="menu-item-link">

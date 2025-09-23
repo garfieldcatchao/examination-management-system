@@ -2,11 +2,11 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import styles from "./index.module.css";
 import { Table, TableColumnsType, TableProps, Spin } from "antd";
-import { DataType } from "../../../../interface/examinationsFace";
-import EmptyComponent from "../../../common/EmptyComponent";
-import { searchUsers } from "../../../../actions/users";
-import Loading from "../../../common/Loading";
-import { isTrue } from "../../../../utils";
+import { DataType } from "../../../../../interface/examinationsFace";
+import EmptyComponent from "../../../../common/EmptyComponent";
+import { searchUsers } from "../../../../../actions/users";
+import Loading from "../../../../common/Loading";
+import { isTrue } from "../../../../../utils";
 // import { TableRowSelection } from "antd/es/table/interface";
 
 const columns: TableColumnsType<DataType> = [

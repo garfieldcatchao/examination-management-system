@@ -9,7 +9,7 @@ import {
   ExcelColumn,
   ExcelHelper,
   ExcelParseResult,
-} from "../../../../../utils/excelHelper";
+} from "../../../../../../utils/excelHelper";
 import { error } from "console";
 
 export default function UploadFile(props: any) {

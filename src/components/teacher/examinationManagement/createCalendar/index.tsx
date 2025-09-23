@@ -2,7 +2,6 @@ import React from "react";
 import type { BadgeProps, CalendarProps } from "antd";
 import { Badge, Calendar } from "antd";
 import type { Dayjs } from "dayjs";
-import locale from 'antd/es/date-picker/locale/zh_CN';
 import "./index.css";
 
 const getListData = (value: Dayjs) => {

@@ -13,12 +13,12 @@ import {
   message,
   Pagination,
 } from "antd";
-import CommonModal from "../../common/Modal";
-import { CreateExaminationRequest } from "../../../interface/examinationsFace";
+import CommonModal from "../../../common/Modal";
+import { CreateExaminationRequest } from "../../../../interface/examinationsFace";
 import {
   createExamination,
   getExaminationResourcesAction,
-} from "../../../actions/examinations";
+} from "../../../../actions/examinations";
 import CreateClassCard from "./CreateClassCard";
 import CreateStudentPanel from "./CreateStudentPanel";
 import { CreateImportCard } from "./CreateImportCard";
@@ -27,18 +27,18 @@ import {
   getExaminationPaperListAction,
   searchClassesAction,
   searchExaminationPaper,
-} from "../../../actions/examinationPaper";
+} from "../../../../actions/examinationPaper";
 import {
   getClasses,
   getExaminationPaperList,
   getStudents,
   initConfig,
   setSelectedList,
-} from "../../../store/examinationPaperStore";
-import { debounce, isTrue } from "../../../utils";
-import EmptyComponent from "../../common/EmptyComponent";
-import { searchUsers } from "../../../actions/users";
-import { setExamResources } from "../../../store/examinationStore";
+} from "../../../../store/examinationPaperStore";
+import { debounce, isTrue } from "../../../../utils";
+import EmptyComponent from "../../../common/EmptyComponent";
+import { searchUsers } from "../../../../actions/users";
+import { setExamResources } from "../../../../store/examinationStore";
 const { TextArea } = Input;
 
 function CreateExamination() {

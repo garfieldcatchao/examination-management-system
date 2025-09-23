@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import "./index.css";
-import { setActiveTab } from "../../../store/examinationStore";
+import { setActiveTab } from "../../../../store/examinationStore";
 
 function ExaminationMenu(props: any) {
   const { examinationMenu, activeTab } = useSelector((state: any) => state.examination);
