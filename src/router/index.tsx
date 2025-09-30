@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router";
 import Login from "../components/Login";
 import NoFound from "../components/NoFound";
 import Main from "../components/Main";
+import Dashboard from "../components/Dashboard";
 import Workbench from "../components/teacher/workbench";
 import TestBaseManagement from "../components/teacher/testBaseManagement";
 import ExaminationPaperManagement from "../components/teacher/examinationPaperManagement";
@@ -10,17 +11,19 @@ import ScoreManagement from "../components/teacher/scoreManagement";
 import StatisticsAnalysis from "../components/teacher/statisticsAnalysis";
 import SystemSettings from "../components/teacher/systemSettings";
 import QuickOperation from "../components/teacher/quickOperation";
+import OnlineExamination from "../components/OnlineExamination";
 
 import Student from "../components/student";
 import Teacher from "../components/teacher";
 import { useSelector } from "react-redux";
+import { StudentWorkBench } from "../components/student/workBench";
 
 export function ProtectedRoute({
   children,
   requiredRole,
 }: {
   children: React.ReactNode;
-  requiredRole: "teacher" | "student" | "admin";
+  requiredRole?: "teacher" | "student" | "admin" | null;
 }) {
   const { isLogin, userInfo, isInitialized } = useSelector((state: any) => state.login);
 
@@ -42,7 +45,8 @@ export function ProtectedRoute({
     return <Navigate to="/login" replace />;
   }
 
-  if (userInfo?.identity !== requiredRole) {
+  // 如果指定了特定角色，检查用户角色是否匹配
+  if (requiredRole && userInfo?.identity !== requiredRole) {
     return <Navigate to="/unauthorized" replace />;
   }
 
@@ -70,16 +74,8 @@ export function RoleRedirect() {
     return <Navigate to="/login" replace />;
   }
 
-  switch (userInfo?.identity) {
-    case "teacher":
-      return <Navigate to="/teacher/workbench" replace />;
-    case "student":
-      return <Navigate to="/student" replace />;
-    case "admin":
-      return <Navigate to="/admin" replace />;
-    default:
-      return <Navigate to="/login" replace />;
-  }
+  // 所有登录用户都跳转到统一的dashboard，根据身份自动显示对应界面
+  return <Navigate to="/dashboard" replace />;
 }
 
 const router = createBrowserRouter([
@@ -88,38 +84,37 @@ const router = createBrowserRouter([
     element: <RoleRedirect />,
   },
   {
-    path: "/teacher",
+    path: "/dashboard",
     element: (
-      <ProtectedRoute requiredRole="teacher">
-        <Teacher />
+      <ProtectedRoute requiredRole={null}>
+        <Dashboard />
       </ProtectedRoute>
     ),
     children: [
-      { index: true, Component: Workbench, path: "workbench" },
+      // 教师功能子路由
+      { path: "workbench", Component: Workbench },
       { path: "testBaseManagement", Component: TestBaseManagement },
-      {
-        path: "examinationPaperManagement",
-        Component: ExaminationPaperManagement,
-      },
+      { path: "examinationPaperManagement", Component: ExaminationPaperManagement },
       { path: "examinationManagement", Component: ExaminationManagement },
       { path: "scoreManagement", Component: ScoreManagement },
       { path: "statisticsAnalysis", Component: StatisticsAnalysis },
       { path: "systemSettings", Component: SystemSettings },
       { path: "quickOperation", Component: QuickOperation },
+      // 学生功能子路由
+      { path: "workspace", Component: StudentWorkBench },
     ],
-  },
-  {
-    path: "/student",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <Student />
-      </ProtectedRoute>
-    ),
-    children: [],
   },
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/exam/:examId",
+    element: (
+      <ProtectedRoute requiredRole={null}>
+        <OnlineExamination />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "*",

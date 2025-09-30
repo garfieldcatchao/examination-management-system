@@ -48,21 +48,9 @@ function Login(props: any) {
 
         message.success('登录成功!');
 
-        // 根据用户角色跳转到对应页面
+        // 登录成功后跳转到统一的dashboard
         setTimeout(() => {
-          switch (response.userInfo.role) {
-            case 'teacher':
-              navigate('/teacher/workbench');
-              break;
-            case 'student':
-              navigate('/student');
-              break;
-            case 'admin':
-              navigate('/admin');
-              break;
-            default:
-              navigate('/teacher/workbench'); // 默认跳转
-          }
+          navigate('/dashboard');
         }, 500);
 
       } else {

@@ -8,43 +8,43 @@ export const teacherMenuList: MenuProps[] = [
     key: "workbench",
     icon: "iconfont icon-gongzuotai",
     label: "工作台",
-    path: "/teacher/workbench",
+    path: "/dashboard/workbench",
   },
   {
     key: "testBaseManagement",
     icon: "iconfont icon-tikuguanli",
     label: "题库管理",
-    path: "/teacher/testBaseManagement",
+    path: "/dashboard/testBaseManagement",
   },
   {
     key: "examinationPaperManagement",
     label: "试卷管理",
     icon: "iconfont icon-mianshishijuan",
-    path: "/teacher/examinationPaperManagement",
+    path: "/dashboard/examinationPaperManagement",
   },
   {
     key: "examinationManagement",
     label: "考试管理",
     icon: "iconfont icon-xueyuan-kaoshi",
-    path: "/teacher/examinationManagement",
+    path: "/dashboard/examinationManagement",
   },
   {
     key: "scoreManagement",
     icon: "iconfont icon-chengji",
     label: "成绩管理",
-    path: "/teacher/scoreManagement",
+    path: "/dashboard/scoreManagement",
   },
   {
     key: "statisticsAnalysis",
     icon: "iconfont icon-tongjifenxi2",
     label: "统计分析",
-    path: "/teacher/statisticsAnalysis",
+    path: "/dashboard/statisticsAnalysis",
   },
   {
     key: "systemSettings",
     icon: "iconfont icon-xitongshezhi",
     label: "系统设置",
-    path: "/teacher/systemSettings",
+    path: "/dashboard/systemSettings",
   },
   {
     key: "quickOperation",
@@ -57,17 +57,17 @@ export const teacherMenuList: MenuProps[] = [
       {
         key: "NewTitleAddition",
         label: "新增题目",
-        path: "/teacher/NewTitleAddition",
+        path: "/dashboard/NewTitleAddition",
       },
       {
         key: "NewExamCreation",
         label: "创建考试",
-        path: "/teacher/NewExamCreation",
+        path: "/dashboard/NewExamCreation",
       },
       {
         key: "ViewPendingTasks",
         label: "查看待办",
-        path: "/teacher/ViewPendingTasks",
+        path: "/dashboard/ViewPendingTasks",
       },
     ],
   },
@@ -75,9 +75,16 @@ export const teacherMenuList: MenuProps[] = [
 
 const studentMenuList: MenuProps[] = [
   {
-    key: "workbench",
-    icon: "iconfont icon-gongzuotai",
-    label: "工作台",
+    key: "workspace",
+    icon: "studentMenu icon-xuexizhongxin-copy",
+    label: "学习中心",
+    path: "/dashboard/workspace",
+  },
+  {
+    key: "onlineExam",
+    icon: "studentMenu icon-kaoshi-copy",
+    label: "在线考试",
+    path: "/dashboard/onlineExam",
   },
 ];
 
@@ -86,6 +93,7 @@ const adminMenuList: MenuProps[] = [
     key: "workbench",
     icon: "iconfont icon-gongzuotai",
     label: "工作台",
+    path: "/dashboard/workbench",
   },
 ];
 
@@ -93,4 +101,42 @@ export const menuListMap: MenuListProps = {
   teacher: teacherMenuList,
   student: studentMenuList,
   manager: adminMenuList,
+};
+
+export const THEME = {
+  teacherTheme: {
+    containerStyle: {
+    },
+    versionStyle: {
+      color: "#fff",
+    },
+    logoStyle: {
+      color: "#1890ff",
+    },
+    navPathStyle: {
+      color: "#666",
+    },
+    sideBarStyle: {
+      // backgroundColor: "#fff",
+      color: "#fff",
+    }
+  },
+  studentTheme: {
+    containerStyle: {
+      backgroundColor: "#fff",
+    },
+    versionStyle: {
+      color: "#fff",
+    },
+    logoStyle: {
+      color: "#1890ff",
+    },
+    navPathStyle: {
+      color: "#666",
+    },
+    sideBarStyle: {
+      backgroundColor: "#fff",
+      color: "#666",
+    }
+  },
 };

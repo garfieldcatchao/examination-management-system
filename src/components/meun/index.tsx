@@ -3,11 +3,18 @@ import { NavLink } from "react-router";
 import { MenuProps } from "../../interface/menuFace";
 import { isTrue } from "../../utils";
 import "./index.css";
+import { useSelector } from "react-redux";
 
 function Meun(props: any) {
-  const [selectedKey, setSelectedKey] = useState(props.selectedKey || ["workbench"]);
-  const [openKeys, setOpenKeys] = useState<string[] | null>(props.openKeys || ["workbench"]);
+  const [selectedKey, setSelectedKey] = useState(
+    props.selectedKey || ["workbench"]
+  );
+  const [openKeys, setOpenKeys] = useState<string[] | null>(
+    props.openKeys || ["workbench"]
+  );
+  const {userInfo} = useSelector((state: any) => state.login);
   const [fold, setFold] = useState(true);
+  const { style = {} } = props || {};
 
   const handleClickChild = (
     e: React.MouseEvent<HTMLDivElement>,
@@ -64,18 +71,38 @@ function Meun(props: any) {
   return (
     <div className="menu-container">
       {props?.items?.map((item: MenuProps) => {
+        const isActive = (openKeys || selectedKey).includes(item.key);
         return (
           <div key={item.key} onClick={(e) => handleClick(e, item)}>
             <NavLink to={item.path as string} className="menu-item-link">
               <div
-                className={`siderbar-menu-item ${
-                  (openKeys || selectedKey).includes(item.key)
-                    ? "siderbar-menu-item-active"
-                    : ""
-                }`}
+                className={`siderbar-menu-item`}
+                style={{
+                  ...style,
+                  ...(isActive
+                    ? {
+                        background: "#e6f7ff",
+                        color: "#1890ff",
+                        borderRight: "3px solid #1890ff",
+                        fontWeight: "500",
+                      }
+                    : {}),
+                }}
               >
                 <div className={item.icon}></div>
-                <span className="menu-item-label">{item.label}</span>
+                <span
+                  className="menu-item-label"
+                  style={{
+                    // color: userInfo?.identity === "student" ? "#666" : "#fff",
+                    ...(isActive
+                      ? {
+                          color: "#1890ff",
+                        }
+                      : {}),
+                  }}
+                >
+                  {item.label}
+                </span>
                 <span
                   className={`${
                     isTrue(item.hasSubMenu) ? "menu-item-fold" : ""

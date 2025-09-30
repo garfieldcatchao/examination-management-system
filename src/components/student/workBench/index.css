@@ -1,0 +1,322 @@
+.student-workbench-container {
+  padding: 24px;
+  background: #f5f5f5;
+  /* min-height: calc(100vh - 60px); */
+  width: 100%;
+  overflow-y: scroll;
+}
+
+.student-workbench-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.student-workbench-header-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #262626;
+  width: fit-content;
+}
+
+.student-workbench-header-time {
+  font-size: 14px;
+  color: #666;
+}
+
+.data-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.data-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 20px;
+  transition: box-shadow 0.2s;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 14px;
+  color: #666;
+}
+
+.card-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+.card-trend {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trend-up {
+  color: #52c41a;
+}
+
+@font-face {
+  font-family: "workspace"; /* Project id 5031802 */
+  src: url("//at.alicdn.com/t/a/font_5031802_a56gnagasye.woff2?t=1758944636507")
+      format("woff2"),
+    url("//at.alicdn.com/t/a/font_5031802_a56gnagasye.woff?t=1758944636507")
+      format("woff"),
+    url("//at.alicdn.com/t/a/font_5031802_a56gnagasye.ttf?t=1758944636507")
+      format("truetype");
+}
+
+.workspace {
+  font-family: "workspace" !important;
+  font-size: 22px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-yiwancheng1:before {
+  content: "\e724";
+  color: #52c41a;
+}
+
+.icon-bianzuaa:before {
+  content: "\e629";
+}
+
+.icon-paiming:before {
+  content: "\e6b0";
+}
+
+.icon-yejimubiao:before {
+  content: "\e710";
+}
+
+.icon-yiwancheng:before {
+  content: "\e600";
+}
+
+.icon-tousujianyi:before {
+  content: "\10135";
+}
+
+.icon-a-064_xiaoshuai:before {
+  content: "\e74c";
+}
+
+.icon-yiwancheng3:before {
+  content: "\e747";
+}
+
+.icon-wanchengshuai:before {
+  content: "\e709";
+}
+
+.student-content-grid {
+  display: flex;
+  flex-direction: column;
+  /* width: 60%; */
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  overflow: hidden;
+  padding: 16px 20px;
+}
+
+.student-content-header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+}
+
+.student-content {
+  display: flex;
+  flex-direction: row;
+}
+
+.student-schedule-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  /* padding: 16px 20px; */
+  /* width: 100%; */
+}
+
+.student-schedule {
+  background-color: #ffffff;
+}
+
+.schedule {
+  display: flex;
+  flex-direction: row;
+}
+
+.schedule-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.schedule-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.status-processing {
+  background: #1890ff;
+}
+
+.schedule-content-title {
+  font-size: 14px;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.schedule-content-info {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.schedule-progress {
+  width: 120px;
+  margin-right: 16px;
+}
+
+.schedule-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #f5f5f5;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.schedule-progress-value {
+  height: 100%;
+  background: #1890ff;
+  transition: width 0.3s;
+}
+
+.schedule-progress-text {
+  font-size: 11px;
+  color: #8c8c8c;
+  text-align: center;
+}
+
+.schedule-btn {
+  padding: 4px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #262626;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.schedule-btn-primary {
+  background: #1890ff;
+  border-color: #1890ff;
+  color: #ffffff;
+  margin-right: 10px;
+}
+
+.schedule-btn-pause:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.right-panel {
+  width: 370px;
+  margin-left: 24px;
+}
+
+.ai-panel {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.ai-header {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.ai-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.ai-subtitle {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.ai-content {
+  padding: 16px 20px;
+}
+
+.ai-suggestion {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestion-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.suggestion-content {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.suggestion-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.link-btn {
+  font-size: 11px;
+  color: #1890ff;
+  text-decoration: none;
+  padding: 2px 6px;
+  border-radius: 2px;
+  transition: background-color 0.2s;
+}
+
+.student-workbench-container::-webkit-scrollbar {
+  width: 0;
+  display: none;
+}
