@@ -138,6 +138,8 @@ export interface QuestionResult {
 // 考试配置（用于不同模式）
 export interface ExamConfig {
   mode: 'exam' | 'practice' | 'review' | 'mistakes'; // 考试模式
+  earlySubmitLimit: number; // 提前提交时间限制(分钟)
+  limitTime: number; // 时间限制(分钟)
   allowPause: boolean; // 是否允许暂停
   allowReview: boolean; // 是否允许回顾
   showAnswerImmediately: boolean; // 是否立即显示答案

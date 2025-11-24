@@ -10,9 +10,11 @@ import {
   QuestionStatus,
   ExamStatus
 } from '../interface/examFace';
+import { scrollTo } from '../utils';
+import { getExaminationQuestionAction } from '../actions/examinations';
 
 // 考试Hook - 管理考试状态和逻辑
-export const useExam = (examId: string) => {
+export default function useExam (examId: string) {
   // 考试状态
   const [examState, setExamState] = useState<ExamState>({
     examInfo: null,
@@ -30,6 +32,8 @@ export const useExam = (examId: string) => {
     },
     config: {
       mode: 'exam',
+      earlySubmitLimit: 0,
+      limitTime: 0,
       allowPause: false,
       allowReview: false,
       showAnswerImmediately: false,
@@ -52,7 +56,6 @@ export const useExam = (examId: string) => {
   const [remainingTime, setRemainingTime] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const startTimeRef = useRef<Date | null>(null);
 
   // 初始化考试
   const initExam = useCallback(async () => {
@@ -60,9 +63,9 @@ export const useExam = (examId: string) => {
       setExamState(prev => ({ ...prev, isLoading: true, error: null }));
       
       // 模拟API调用
-      const examData = await fetchExamData(examId);
+      const examData = await getExaminationQuestionAction(examId);
       
-      if (examData.success) {
+      if (examData && examData.success) {
         const { examInfo, questions, session, config } = examData.data;
         
         setExamState(prev => ({
@@ -74,24 +77,20 @@ export const useExam = (examId: string) => {
           isLoading: false,
         }));
         
-        // 恢复会话状态
+        // // 恢复会话状态
         if (session) {
-          setCurrentQuestionNumber(session.currentQuestionNumber);
-          setAnswers(session.answers);
-          setMarkedQuestions(session.markedQuestions);
-          setVisitedQuestions(session.visitedQuestions);
+          setCurrentQuestionNumber(1);
+          setAnswers(session.answers || {});
+          setMarkedQuestions(session.markedQuestions  || new Set());
+          setVisitedQuestions(session.visitedQuestions || new Set());
           setRemainingTime(session.remainingTime);
         }
         
-        // 启动计时器
-        if (config.mode === 'exam' && config.timeLimit) {
-          startTimer(session?.remainingTime || config.timeLimit * 60);
-        }
         
       } else {
         setExamState(prev => ({ 
           ...prev, 
-          error: examData.message,
+          error: examData?.message || '加载考试失败',
           isLoading: false 
         }));
       }
@@ -104,27 +103,6 @@ export const useExam = (examId: string) => {
     }
   }, [examId]);
 
-  // 启动计时器
-  const startTimer = useCallback((initialTime: number) => {
-    startTimeRef.current = new Date();
-    setRemainingTime(initialTime);
-    
-    timerRef.current = setInterval(() => {
-      setRemainingTime(prev => {
-        const newTime = prev - 1;
-        setElapsedTime(initialTime - newTime);
-        
-        // 时间到自动提交
-        if (newTime <= 0 && examState.config.autoSubmit) {
-          submitExam(true);
-          return 0;
-        }
-        
-        return Math.max(0, newTime);
-      });
-    }, 1000);
-  }, [examState.config.autoSubmit]);
-
   // 停止计时器
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -135,27 +113,41 @@ export const useExam = (examId: string) => {
 
   // 获取当前题目
   const getCurrentQuestion = useCallback((): Question | null => {
-    return examState.questions.find(q => q.number === currentQuestionNumber) || null;
+    return examState.questions.find((q: any) => q.questionNumber === currentQuestionNumber) || null;
   }, [examState.questions, currentQuestionNumber]);
 
   // 获取题目状态
   const getQuestionStatus = useCallback((questionNumber: number): QuestionStatus => {
-    const questionId = examState.questions.find(q => q.number === questionNumber)?.id;
+    const question = examState.questions.find(q => (q as any).questionNumber === questionNumber);
+    const questionId = question?.id;
     
     if (questionNumber === currentQuestionNumber) return QuestionStatus.CURRENT;
     if (questionId && markedQuestions.has(questionId)) return QuestionStatus.MARKED;
-    if (questionId && answers[questionId]) return QuestionStatus.ANSWERED;
+    
+    // 检查是否已答题（支持多选题）
+    if (questionId && answers[questionId]) {
+      const answer = answers[questionId].answer;
+      // 对于多选题，检查是否有选择答案
+      if (Array.isArray(answer)) {
+        return answer.length > 0 ? QuestionStatus.ANSWERED : QuestionStatus.UNANSWERED;
+      }
+      // 对于单选题，检查答案是否不为空
+      return answer ? QuestionStatus.ANSWERED : QuestionStatus.UNANSWERED;
+    }
+    
     return QuestionStatus.UNANSWERED;
   }, [currentQuestionNumber, markedQuestions, answers, examState.questions]);
 
   // 跳转到指定题目
   const jumpToQuestion = useCallback((questionNumber: number) => {
-    if (questionNumber >= 1 && questionNumber <= examState.statistics.totalQuestions) {
-      const question = examState.questions.find(q => q.number === questionNumber);
+    const totalSize = examState?.examInfo?.totalQuestions || 0;
+    if (questionNumber >= 1 && questionNumber <= totalSize) {
+
+      const question = (examState.questions || []).find((q: any) => q?.questionNumber === questionNumber);
       if (question) {
         setCurrentQuestionNumber(questionNumber);
         setVisitedQuestions(prev => new Set(prev).add(question.id));
-        
+        scrollTo();
         // 记录题目访问时间
         const currentTime = Date.now();
         // 这里可以记录用户在每题上的停留时间
@@ -163,78 +155,23 @@ export const useExam = (examId: string) => {
     }
   }, [examState.questions, examState.statistics.totalQuestions]);
 
-  // 选择答案
-  const selectAnswer = useCallback(async (answer: string | string[]) => {
-    const currentQuestion = getCurrentQuestion();
-    if (!currentQuestion) return;
-
-    const userAnswer: UserAnswer = {
-      questionId: currentQuestion.id,
-      questionNumber: currentQuestion.number,
-      answer,
-      answerTime: 0, // 这里应该计算实际用时
-      isMarked: markedQuestions.has(currentQuestion.id),
-      submitTime: new Date(),
-    };
-
-    // 更新本地状态
-    setAnswers(prev => ({
-      ...prev,
-      [currentQuestion.id]: userAnswer
-    }));
-
-    // 更新访问记录
-    setVisitedQuestions(prev => new Set(prev).add(currentQuestion.id));
-
-    // 自动保存到服务器
-    try {
-    //   await saveAnswer(userAnswer);
-    } catch (error) {
-      console.error('保存答案失败:', error);
-    }
-
-    // 更新统计
-    updateStatistics();
-  }, [getCurrentQuestion, markedQuestions]);
-
-  // 标记题目
-  const markQuestion = useCallback((questionNumber?: number) => {
-    const targetNumber = questionNumber || currentQuestionNumber;
-    const question = examState.questions.find(q => q.number === targetNumber);
-    
-    if (question) {
-      setMarkedQuestions(prev => {
-        const newSet = new Set(prev);
-        if (newSet.has(question.id)) {
-          newSet.delete(question.id);
-        } else {
-          newSet.add(question.id);
-        }
-        return newSet;
-      });
-      
-      updateStatistics();
-    }
-  }, [currentQuestionNumber, examState.questions]);
-
-  // 清除答案
-  const clearAnswer = useCallback(() => {
-    const currentQuestion = getCurrentQuestion();
-    if (currentQuestion) {
-      setAnswers(prev => {
-        const newAnswers = { ...prev };
-        delete newAnswers[currentQuestion.id];
-        return newAnswers;
-      });
-      
-      updateStatistics();
-    }
-  }, [getCurrentQuestion]);
-
-  // 更新统计信息
-  const updateStatistics = useCallback(() => {
+  // 更新统计信息 - 使用传入的最新状态
+  const updateStatisticsWithStates = useCallback((
+    latestAnswers: Record<string, UserAnswer>, 
+    latestVisitedQuestions: Set<string>
+  ) => {
     const totalQuestions = examState.questions.length;
-    const answeredCount = Object.keys(answers).length;
+    
+    // 计算已答题数量（支持多选题）
+    const answeredCount = Object.values(latestAnswers).filter(userAnswer => {
+      const answer = userAnswer.answer;
+      if (Array.isArray(answer)) {
+        return answer.length > 0; // 多选题至少选择一个
+      }
+      return answer && answer.trim() !== ''; // 单选题或其他题型答案不为空
+    }).length;
+    console.log("latestVisitedQuestions =====> ", latestVisitedQuestions)
+    
     const unansweredCount = totalQuestions - answeredCount;
     const markedCount = markedQuestions.size;
     const completionRate = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
@@ -252,7 +189,84 @@ export const useExam = (examId: string) => {
         averageTimePerQuestion: answeredCount > 0 ? elapsedTime / answeredCount : 0,
       }
     }));
-  }, [examState.questions.length, answers, markedQuestions.size, elapsedTime, remainingTime]);
+  }, [examState.questions.length, markedQuestions.size, elapsedTime, remainingTime]);
+
+  // 更新统计信息
+  const updateStatistics = useCallback(() => {
+    updateStatisticsWithStates(answers, visitedQuestions);
+  }, [updateStatisticsWithStates, answers, visitedQuestions]);
+
+  // 选择答案
+  const selectAnswer = useCallback(async (answer: string | string[]) => {
+    const currentQuestion = getCurrentQuestion();
+    if (!currentQuestion) return;
+
+    const userAnswer: UserAnswer = {
+      questionId: currentQuestion.id,
+      questionNumber: (currentQuestion as any).questionNumber || 0,
+      answer,
+      answerTime: 0, // 这里应该计算实际用时
+      isMarked: markedQuestions.has(currentQuestion.id),
+      submitTime: new Date(),
+    };
+
+    
+    // 更新本地状态
+    const newAnswers = {
+      ...answers,
+      [currentQuestion.id]: userAnswer
+    };
+    setAnswers(newAnswers);
+    
+    // 更新访问记录
+    const newVisitedQuestions = new Set(visitedQuestions).add(currentQuestion.id);
+    setVisitedQuestions(newVisitedQuestions);
+    
+    // 自动保存到服务器
+    try {
+    //   await saveAnswer(userAnswer);
+    } catch (error) {
+      console.error('保存答案失败:', error);
+    }
+
+    updateStatisticsWithStates(newAnswers, newVisitedQuestions);
+  }, [getCurrentQuestion, markedQuestions, answers, visitedQuestions, updateStatisticsWithStates]);
+
+  // 标记题目
+  const markQuestion = useCallback((questionNumber?: number) => {
+    console.log("标记题目 questionNumber =====> ", questionNumber)
+    const targetNumber = questionNumber || currentQuestionNumber;
+    const question = examState.questions.find(q => (q as any).questionNumber === targetNumber);
+    
+    if (question) {
+      let newMarkedQuestions: Set<string>;
+      setMarkedQuestions(prev => {
+        newMarkedQuestions = new Set(prev);
+        if (newMarkedQuestions.has(question.id)) {
+          newMarkedQuestions.delete(question.id);
+        } else {
+          newMarkedQuestions.add(question.id);
+        }
+        return newMarkedQuestions;
+      });
+      
+      // 延迟更新统计，确保状态已更新
+      setTimeout(() => updateStatistics(), 0);
+    }
+  }, [currentQuestionNumber, examState.questions, updateStatistics]);
+
+  // 清除答案
+  const clearAnswer = useCallback(() => {
+    const currentQuestion = getCurrentQuestion();
+    if (currentQuestion) {
+      const newAnswers = { ...answers };
+      delete newAnswers[currentQuestion.id];
+      setAnswers(newAnswers);
+      
+      // 使用最新状态立即更新统计
+      updateStatisticsWithStates(newAnswers, visitedQuestions);
+    }
+  }, [getCurrentQuestion, answers, visitedQuestions, updateStatisticsWithStates]);
 
   // 保存答案到服务器
   const saveAnswer = useCallback(async (userAnswer: UserAnswer) => {
@@ -338,20 +352,6 @@ export const useExam = (examId: string) => {
     }
   }, [examState.config.allowPause, stopTimer]);
 
-  // 继续考试
-  const resumeExam = useCallback(() => {
-    if (examState.currentSession?.status === ExamStatus.PAUSED) {
-      startTimer(remainingTime);
-      setExamState(prev => ({
-        ...prev,
-        currentSession: prev.currentSession ? {
-          ...prev.currentSession,
-          status: ExamStatus.IN_PROGRESS,
-        } : null,
-      }));
-    }
-  }, [examState.currentSession?.status, remainingTime, startTimer]);
-
   // 组件卸载时清理
   useEffect(() => {
     return () => {
@@ -399,18 +399,17 @@ export const useExam = (examId: string) => {
     clearAnswer,
     submitExam,
     pauseExam,
-    resumeExam,
-    
     // 导航方法
-    nextQuestion: () => {
-      const nextNum = Math.min(currentQuestionNumber + 1, examState.statistics.totalQuestions);
-      console.log("nextNum", nextNum)
+    nextQuestion: useCallback(() => {
+      const totalSize = examState?.questions?.length || 0;
+      const nextNum = Math.min(currentQuestionNumber + 1, totalSize);
       jumpToQuestion(nextNum);
-    },
-    previousQuestion: () => {
+    }, [currentQuestionNumber, examState, jumpToQuestion]),
+    
+    previousQuestion: useCallback(() => {
       const prevNum = Math.max(currentQuestionNumber - 1, 1);
       jumpToQuestion(prevNum);
-    },
+    }, [currentQuestionNumber, jumpToQuestion]),
     
     // 工具方法
     formatTime: (seconds: number) => {
@@ -433,82 +432,3 @@ export const useExam = (examId: string) => {
     },
   };
 };
-
-// 模拟API调用
-async function fetchExamData(examId: string) {
-  // 这里应该是真实的API调用
-  return new Promise<any>((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        data: {
-          examInfo: {
-            id: examId,
-            title: '计算机网络原理期末考试',
-            subject: 'computer-network',
-            type: 'final',
-            duration: 120,
-            totalQuestions: 25,
-            totalScore: 100,
-            startTime: new Date(),
-            endTime: new Date(Date.now() + 120 * 60 * 1000),
-            allowedAttempts: 1,
-            isShuffled: false,
-            showScore: true,
-            showCorrectAnswer: false,
-          },
-          questions: generateMockQuestions(25),
-          session: {
-            examId,
-            userId: 'user123',
-            status: ExamStatus.IN_PROGRESS,
-            currentQuestionNumber: 1,
-            startTime: new Date(),
-            remainingTime: 120 * 60,
-            answers: {},
-            markedQuestions: new Set(),
-            visitedQuestions: new Set(),
-            timeSpentPerQuestion: {},
-            lastSaveTime: new Date(),
-          },
-          config: {
-            mode: 'exam',
-            allowPause: false,
-            allowReview: false,
-            showAnswerImmediately: false,
-            shuffleQuestions: false,
-            shuffleOptions: false,
-            timeLimit: 120,
-            autoSubmit: true,
-            preventCheating: true,
-          },
-        }
-      });
-    }, 1000);
-  });
-}
-
-// 生成模拟题目数据
-function generateMockQuestions(count: number): Question[] {
-  const questions: Question[] = [];
-  
-  for (let i = 1; i <= count; i++) {
-    questions.push({
-      id: `q_${i}`,
-      number: i,
-      type: 'single_choice' as any,
-      content: `这是第${i}道题目的内容，请选择正确答案。`,
-      options: [
-        { key: 'A', content: `选项A的内容 - 题目${i}` },
-        { key: 'B', content: `选项B的内容 - 题目${i}` },
-        { key: 'C', content: `选项C的内容 - 题目${i}` },
-        { key: 'D', content: `选项D的内容 - 题目${i}` },
-      ],
-      score: 4,
-      difficulty: 'medium',
-      subject: 'computer-network',
-    });
-  }
-  
-  return questions;
-}

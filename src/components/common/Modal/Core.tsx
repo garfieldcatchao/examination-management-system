@@ -118,13 +118,17 @@ const Modal: React.FC<ModalProps> = ({
 
     return (
       <div className="modal-footer">
-        <button 
-          className="modal-btn modal-btn-cancel" 
-          onClick={handleCancel}
-          disabled={confirmLoading}
-        >
-          {cancelText}
-        </button>
+        {
+          onCancel && (
+            <button 
+              className="modal-btn modal-btn-cancel" 
+              onClick={handleCancel}
+              disabled={confirmLoading}
+            >
+              {cancelText}
+            </button>
+          )
+        }
         <button 
           className={`modal-btn modal-btn-primary ${confirmLoading ? 'loading' : ''}`}
           onClick={handleOk}

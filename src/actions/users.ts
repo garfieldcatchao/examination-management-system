@@ -52,3 +52,13 @@ export const onLogin = async (params: any) => {
   }
   return null;
 };
+
+
+
+// export const onAuth = async() => {
+//   const result = await api.login.auth();
+//   if (result && isTrue(result.success)) {
+//     return result;
+//   }
+//   return null;
+// };

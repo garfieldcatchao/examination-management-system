@@ -101,3 +101,7 @@
   cursor: pointer;
   font-size: 14px;
 }
+
+.siderbar-container::-webkit-scrollbar {
+  display: none;
+}

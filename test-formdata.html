@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试FormData上传</title>
+</head>
+<body>
+    <h1>测试FormData上传</h1>
+    <button onclick="testUpload()">测试上传</button>
+    <pre id="output"></pre>
+
+    <script>
+        async function testUpload() {
+            const output = document.getElementById('output');
+            output.textContent = '开始测试...\n';
+
+            try {
+                // 创建一个测试图片（红色方块）
+                const canvas = document.createElement('canvas');
+                canvas.width = 100;
+                canvas.height = 100;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'red';
+                ctx.fillRect(0, 0, 100, 100);
+                
+                // 转换为blob
+                const blob = await new Promise(resolve => {
+                    canvas.toBlob(resolve, 'image/jpeg', 0.7);
+                });
+
+                output.textContent += `Blob创建成功: size=${blob.size}, type=${blob.type}\n`;
+
+                // 创建FormData
+                const formData = new FormData();
+                const fileName = `test_snapshot_${Date.now()}.jpg`;
+                formData.append('file', blob, fileName);
+                formData.append('examId', '1');
+                formData.append('userId', '2');
+
+                output.textContent += '\nFormData内容:\n';
+                for (let pair of formData.entries()) {
+                    output.textContent += `  ${pair[0]}: ${pair[1]}\n`;
+                }
+
+                // 发送请求
+                output.textContent += '\n发送请求到 /api/monitoring/snapshots/upload\n';
+                const response = await fetch('/api/monitoring/snapshots/upload', {
+                    method: 'POST',
+                    body: formData,
+                    // 不要设置 Content-Type，让浏览器自动设置
+                });
+
+                const result = await response.json();
+                output.textContent += '\n响应:\n' + JSON.stringify(result, null, 2);
+            } catch (error) {
+                output.textContent += '\n错误: ' + error.message;
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

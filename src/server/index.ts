@@ -5,8 +5,9 @@ import { addURLParams } from "../utils";
 export const api = {
 
   login: {
-    login: (data: any) => http.post("/auth/login", data),
+    login: (data: any) => http.post("/auth", data),
     logout: () => http.post("/auth/logout"),
+    // auth: () => http.post("/auth")
   },
 
   // 用户相关
@@ -49,6 +50,23 @@ export const api = {
     start: (id: string) => http.post(`/examinations/${id}/start`),
     end: (id: string) => http.post(`/examinations/${id}/end`),
     resources: () => http.get(`/examinations/resources`),
+    getExamQuestion: (id: string) => http.get(`/examinations/questions/${id}`),
+    checkParticipation: (data: any) => http.post(`/examinations/checkParticipation`, data),
+    
+  },
+
+  monitoring: {
+    getMonitoringInfo: () => http.get(`/monitoring/students`),
+    // 快照相关接口
+    uploadSnapshot: (formData: any) => http.upload(`/monitoring/snapshots/upload`, formData),
+    saveSnapshot: (data: any) => http.post(`/monitoring/saveSnapshots`, data),
+    batchSaveSnapshots: (data: any) => http.post(`/monitoring/snapshots/batch`, data),
+    getSnapshots: (params: any) => http.get(`/monitoring/snapshots`, params),
+    deleteExpiredSnapshots: (days: number) => http.delete(`/monitoring/snapshots/expired/${days}`),
+  },
+
+  file: {
+    upload: (formData: any) => http.upload(`/file/upload`, formData),
   },
 
   // 成绩管理

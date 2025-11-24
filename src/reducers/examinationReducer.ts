@@ -34,3 +34,13 @@ export const setExamResourcesReducer = (state: any, action: PayloadAction<any>) 
     resources: payload?.data || {},
   };
 };
+
+
+
+export const setExamQuestionReducer = (state: any, action: PayloadAction<any>) => {
+  const payload = action.payload;
+  return {
+    ...state,
+    examQuestion: payload?.data || null,
+  };
+};

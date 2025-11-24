@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import ExaminationMenu from "./examinationMenu";
 import ExaminationList from "./examinationList";
 import CreateExamination from "./createExamination";
-import "./index.css";
 import { useSelector } from "react-redux";
 import CreateCalendar from "./createCalendar";
+import MonitorExam from "./monitorExam";
+import "./index.css";
 
 function ExaminationManagement(props: any) {
   const { activeTab } = useSelector((state: any) => state.examination);
@@ -43,6 +44,7 @@ function ExaminationManagement(props: any) {
         {activeTab === "examination-list" && <ExaminationList />}
         {activeTab === "create-exam" && <CreateExamination />}
         {activeTab === "exam-calendar" && <CreateCalendar />}
+        {activeTab === "monitor-exam" && <MonitorExam />}
       </div>
     </div>
   );

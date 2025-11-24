@@ -30,6 +30,7 @@ const examinationSlice = createSlice({
       },
     ],
     resources: {},
+    examQuestion: null,
   },
   reducers: {
     setActiveTab: setActiveTabReducer,

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import type { FormProps } from "antd";
 import { useRoot } from "../../hooks/useRoot";
 import { Button, Checkbox, Flex, Form, Input, message } from "antd";
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router";
 import { loginSuccess } from "../../store/loginStore";
 import { isTrue } from "../../utils";
 import { ApiResponse } from "../../server/axios";
+import { fetchExaminationListAction } from "../../actions/examinations";
 
 const STATUS_TYPE = {
   teacher: "工号",
@@ -24,8 +25,13 @@ function Login(props: any) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    fetchExaminationListAction(1, 1000);
+    // onAuth();
+  }, [userInfo]);
+
   const onFinish: FormProps<FieldType>["onFinish"] = async (values: any) => {
-    console.log("Success:", values);
+    console.log("登录表单提交:", values);
     setLoading(true);
     
     try {
@@ -43,7 +49,8 @@ function Login(props: any) {
             id: response?.userInfo.id,
             username: response?.userInfo.username,     
             identity: response.userInfo.role,
-          }
+          },
+          remember: values.remember // 添加记住我状态
         }));
 
         message.success('登录成功!');
@@ -56,9 +63,10 @@ function Login(props: any) {
       } else {
         message.error(response?.message || '登录失败，请检查账号密码');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('登录失败:', error);
-      message.error('登录失败，请检查网络连接');
+      // 显示更详细的错误信息
+      message.error('登录失败: ' + (error.message || '请检查网络连接'));
     } finally {
       setLoading(false);
     }

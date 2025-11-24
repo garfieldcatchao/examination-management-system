@@ -44,6 +44,7 @@
     "jest-watch-typeahead": "^1.0.0",
     "mammoth": "^1.10.0",
     "mini-css-extract-plugin": "^2.4.5",
+    "multer": "^2.0.2",
     "postcss": "^8.4.4",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^6.2.1",
@@ -77,7 +78,10 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "ws-server": "node websocket-server.js",
+    "mock-api": "node mock-server.js",
+    "dev": "concurrently \"npm run ws-server\" \"npm run mock-api\" \"npm start\""
   },
   "eslintConfig": {
     "extends": [
@@ -101,9 +105,14 @@
     "@types/file-saver": "^2.0.7",
     "antd-style": "^3.7.1",
     "axios": "^1.11.0",
+    "body-parser": "^2.2.0",
+    "concurrently": "^7.6.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "less": "^4.4.1",
     "less-loader": "^12.3.0",
-    "styled-components": "^6.1.19"
+    "styled-components": "^6.1.19",
+    "ws": "^8.18.3"
   },
   "server": {
     "proxy": {

@@ -8,6 +8,8 @@ import {
 
 export const isTrue = (v: any) => `${v}` === "true";
 
+const date = new Date();
+
 /**
  * 获取文件扩展名（安全版）
  * @param filename 文件名（如 "test.xlsx"）
@@ -290,3 +292,81 @@ export function debounce<T extends any[], U>(
     }
   };
 }
+
+export const QUESTION_TYPE_MAP = {
+  single_choice: "单选题",
+  multiple_choice: "多选题",
+  true_false: "判断题",
+  essay: "简答题",
+  fill_blank: "填空题",
+};
+
+export const scrollTo = (
+  options: {
+    top?: number;
+    left?: number;
+    behavior?: "smooth" | "auto";
+  } | null = null,
+  element: HTMLElement | null = null
+) => {
+  const { top = 0, left = 0, behavior = "smooth" } = options || {};
+  if (!element) {
+    window.scrollTo({ top, left, behavior });
+    return;
+  }
+
+  element.scrollTo({ top, left, behavior });
+};
+
+export const getBlankCount = (content: string) => {
+  return (content.match(/_{2,}/g) || []).length;
+};
+
+export const convertToTimestamp = ({ hours = 0, minutes = 0, seconds = 0 }) => {
+  const totalMilliseconds = (hours * 3600 + minutes * 60 + seconds) * 1000;
+  const currentTimestamp = date.getTime() + totalMilliseconds;
+  return currentTimestamp;
+};
+
+export const EXAM_TYPE_MAP = {
+  final: "期末考试",
+  midterm: "期中考试",
+  quiz: "测验/随堂测验",
+  makeup: "补考",
+  practice: "练习",
+};
+
+export const convertToDate = (date: number) => {
+  const dateObj = new Date(date);
+  return dateObj.toLocaleDateString();
+};
+
+// 判断当前考试时间是否在30分钟内
+export const comparelimitTime = ({
+  limitTime = 0,
+  startTime,
+  endTime,
+}: {
+  limitTime: number;
+  startTime?: string | undefined;
+  endTime?: string | undefined;
+}) => {
+  if (!startTime && !endTime && !limitTime) {
+    return false; // or handle undefined case as needed
+  }
+
+  const limitTamp = convertToTimestamp({ minutes: limitTime });
+  let startTamp = 0;
+  let endTamp = 0;
+
+  if (endTime) {
+    endTamp = new Date(endTime).getTime();
+  }
+
+  if (startTime) {
+    startTamp = new Date(startTime).getTime();
+  }
+
+  // const maxTamp = startTamp + limitTamp;
+  return limitTamp - startTamp < 30;
+};

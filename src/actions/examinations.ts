@@ -2,13 +2,18 @@ import { api } from "../server/index";
 import { CreateExaminationRequest } from "../interface/examinationsFace";
 import { isTrue } from "../utils";
 
+let errorMsg = {
+  success: false,
+  data: null,
+  message: "加载失败",
+};
+
 export const initExaminationListAction = async (): Promise<any> => {
   const result = await api.examination.getList({ page: 1, pageSize: 9 });
   if (result && isTrue(result.success)) {
     return result;
   }
-
-  return null;
+  return errorMsg;
 };
 
 export const fetchExaminationListAction = async (
@@ -19,7 +24,7 @@ export const fetchExaminationListAction = async (
   if (result && isTrue(result.success)) {
     return result;
   }
-  return null;
+  return errorMsg;
 };
 
 export const deleteExaminationAction = async (id: string): Promise<any> => {
@@ -27,7 +32,7 @@ export const deleteExaminationAction = async (id: string): Promise<any> => {
   if (result && isTrue(result.success)) {
     return result;
   }
-  return null;
+  return errorMsg;
 };
 
 export const getExaminationResourcesAction = async (): Promise<any> => {
@@ -36,11 +41,10 @@ export const getExaminationResourcesAction = async (): Promise<any> => {
   if (result && isTrue(result.success)) {
     return result;
   }
-  return null;
+  return errorMsg;
 };
 
 export const createExamination = async (examData: CreateExaminationRequest) => {
-
   return await api.examination.create({
     examName: examData.examName,
     subjectId: examData.subjectId,
@@ -67,4 +71,20 @@ export const createExamination = async (examData: CreateExaminationRequest) => {
     randomQuestion: examData.randomQuestion,
     randomOption: examData.randomOption,
   });
+};
+
+export const getExaminationQuestionAction = async (id: string) => {
+  const result = await api.examination.getExamQuestion(id);
+  if (result && isTrue(result.success)) {
+    return result;
+  }
+  return errorMsg;
+};
+
+export const checkParticipationAction = async (data: any) => {
+  const result = await api.examination.checkParticipation(data);
+  if (result && isTrue(result.success)) {
+    return result;
+  }
+  return errorMsg;
 };

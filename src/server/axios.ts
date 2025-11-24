@@ -27,11 +27,18 @@ class HttpRequest {
   constructor(config: AxiosRequestConfig = {}) {
     // 创建axios实例
     this.instance = axios.create({
-      baseURL: process.env.REACT_APP_API_BASE_URL || "/api",
-      timeout: 10000,
+      baseURL: "/api", // 直接使用相对路径，避免环境变量问题
+      timeout: 30000, // 增加超时时间
       headers: {
         "Content-Type": "application/json",
+        "Cache-Control": "no-cache", // 防止缓存
+        "Pragma": "no-cache"
       },
+      // 确保不会因为网络错误而中断
+      validateStatus: function (status) {
+        return true; // 接受所有状态码，在拦截器中处理
+      },
+      withCredentials: true,
       ...config,
     });
 
@@ -60,10 +67,12 @@ class HttpRequest {
             _t: Date.now(),
           };
         }
+        console.log("请求拦截器 Request config:", config);
 
         return config;
       },
       (error) => {
+        console.log("请求拦截器 Request error:", error);
         return Promise.reject(error);
       }
     );
@@ -72,7 +81,7 @@ class HttpRequest {
     this.instance.interceptors.response.use(
       (response: any) => {
         const { data } = response;
-        console.log("handleError", data);
+        console.log("Response data:", data, response);
         // 统一处理响应
         if (data.code === 200 || data.success) {
           return data;
@@ -82,11 +91,11 @@ class HttpRequest {
           return Promise.reject(data.message || "登录状态已过期");
         } else {
           message.error(data.message || "请求失败");
+          return Promise.reject(data.message || "请求失败");
         }
       },
       (error: AxiosError) => {
-        console.log("request error", error);
-        // message.error(error.message)
+        console.log("Request error:", error);
         // return this.handleError(error);
       }
     );
@@ -136,13 +145,14 @@ class HttpRequest {
       }
     } else if (error.request) {
       errorMessage = "网络连接失败，请检查网络";
+      console.error("网络连接失败，请检查网络", error.request);
     } else {
       errorMessage = error.message || "请求失败";
     }
 
+    console.error("请求错误:", errorMessage);
     message.error(errorMessage);
-    return Promise.resolve(error);
-    // return Promise.reject(errorMessage);
+    return Promise.reject(errorMessage);
   }
 
   /**
@@ -201,15 +211,27 @@ class HttpRequest {
 
   /**
    * 文件上传
+   * @param url - 上传地址
+   * @param fileOrFormData - File对象或FormData对象
+   * @param config - 请求配置
+   * @param onUploadProgress - 上传进度回调
    */
   upload<T = any>(
     url: string,
-    file: File,
+    fileOrFormData: File | FormData,
     config?: RequestConfig,
     onUploadProgress?: (progressEvent: any) => void
   ): Promise<ApiResponse<T>> {
-    const formData = new FormData();
-    formData.append("file", file);
+    let formData: FormData;
+    
+    // 如果传入的已经是 FormData，直接使用
+    if (fileOrFormData instanceof FormData) {
+      formData = fileOrFormData;
+    } else {
+      // 如果是 File 对象，创建 FormData 并添加文件
+      formData = new FormData();
+      formData.append("file", fileOrFormData);
+    }
 
     return this.instance.post(url, formData, {
       headers: {

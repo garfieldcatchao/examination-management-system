@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试登录API</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <h1>登录API测试</h1>
+  <form id="loginForm">
+    <div>
+      <label for="studentId">用户名:</label>
+      <input type="text" id="studentId" name="studentId" value="004">
+    </div>
+    <div>
+      <label for="password">密码:</label>
+      <input type="password" id="password" name="password" value="1234">
+    </div>
+    <div>
+      <label for="role">角色:</label>
+      <select id="role" name="role">
+        <option value="teacher">教师</option>
+        <option value="student">学生</option>
+        <option value="admin">管理员</option>
+      </select>
+    </div>
+    <div>
+      <label>
+        <input type="checkbox" id="remember" name="remember" checked> 记住我
+      </label>
+    </div>
+    <div>
+      <button type="button" id="loginButton">登录</button>
+      <button type="button" id="testFetchButton">使用Fetch测试</button>
+      <button type="button" id="testAxiosButton">使用Axios测试</button>
+    </div>
+  </form>
+
+  <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+
+  <script>
+    document.getElementById('loginButton').addEventListener('click', async function() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '请求中...';
+
+      try {
+        // 获取表单数据
+        const studentId = document.getElementById('studentId').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+        const remember = document.getElementById('remember').checked;
+
+        // 使用XMLHttpRequest发送请求
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/auth/login', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resultDiv.innerHTML = '<div style="color: green;">登录成功!</div><pre>' + JSON.stringify(JSON.parse(xhr.responseText), null, 2) + '</pre>';
+          } else {
+            resultDiv.innerHTML = '<div style="color: red;">登录失败: ' + xhr.status + '</div><pre>' + xhr.responseText + '</pre>';
+          }
+        };
+        xhr.onerror = function() {
+          resultDiv.innerHTML = '<div style="color: red;">网络错误!</div>';
+        };
+        xhr.send(JSON.stringify({ studentId, password, role, remember }));
+      } catch (error) {
+        resultDiv.innerHTML = '<div style="color: red;">错误: ' + error.message + '</div>';
+      }
+    });
+
+    document.getElementById('testFetchButton').addEventListener('click', async function() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '使用Fetch请求中...';
+
+      try {
+        // 获取表单数据
+        const studentId = document.getElementById('studentId').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+        const remember = document.getElementById('remember').checked;
+
+        // 使用Fetch API发送请求
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ studentId, password, role, remember })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          resultDiv.innerHTML = '<div style="color: green;">Fetch登录成功!</div><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        } else {
+          resultDiv.innerHTML = '<div style="color: red;">Fetch登录失败: ' + response.status + '</div>';
+          try {
+            const errorText = await response.text();
+            resultDiv.innerHTML += '<pre>' + errorText + '</pre>';
+          } catch (e) {
+            resultDiv.innerHTML += '<div>无法读取错误详情</div>';
+          }
+        }
+      } catch (error) {
+        resultDiv.innerHTML = '<div style="color: red;">Fetch错误: ' + error.message + '</div>';
+      }
+    });
+
+    document.getElementById('testAxiosButton').addEventListener('click', async function() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '使用Axios请求中...';
+
+      try {
+        // 获取表单数据
+        const studentId = document.getElementById('studentId').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+        const remember = document.getElementById('remember').checked;
+
+        // 使用Axios发送请求
+        const response = await axios.post('/api/auth/login', {
+          studentId, password, role, remember
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        resultDiv.innerHTML = '<div style="color: green;">Axios登录成功!</div><pre>' + JSON.stringify(response.data, null, 2) + '</pre>';
+      } catch (error) {
+        resultDiv.innerHTML = '<div style="color: red;">Axios错误: ' + error.message + '</div>';
+        if (error.response) {
+          resultDiv.innerHTML += '<div>状态码: ' + error.response.status + '</div>';
+          resultDiv.innerHTML += '<pre>' + JSON.stringify(error.response.data, null, 2) + '</pre>';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

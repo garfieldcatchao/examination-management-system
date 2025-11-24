@@ -13,7 +13,6 @@ export const setSelectedTabReducer = (
 
 
 export const initConfigReducer = (state: ExaminationPaperState, action: PayloadAction<any>) => {
-  console.log("action =======", action)
   return {
     ...state,
     classMenu: action.payload
@@ -21,8 +20,6 @@ export const initConfigReducer = (state: ExaminationPaperState, action: PayloadA
 };
 
 export const getExaminationPaperListReducer = (state: ExaminationPaperState, action: PayloadAction<any>) => {
-  console.log("action.payload ======> ", action.payload);
-  
   const pagination = action.payload.pagination;
 
   if (!action.payload) {
